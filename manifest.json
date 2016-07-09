@@ -1,0 +1,28 @@
+{
+  "manifest_version": 2,
+  "applications": {
+    "gecko": {
+      "id": "{bb1b80be-e6b3-40a1-9b6e-9d4073343f0b}"
+    }
+  },
+
+  "name": "Facebook Link Tracking Removal",
+  "version": "1.0.0",
+  "description": "Removes Facebook's tracking from links and sets the proper href so they work like a normal link",
+  "permissions": [
+    "*://*.facebook.com/*"
+  ],
+
+  "content_scripts": [
+    {
+      "matches": ["*://*.facebook.com/*"],
+      "css": ["app.css"],
+      "js": ["app.js"],
+      "run_at": "document_end"
+    }
+  ],
+
+  "developer": {
+    "name": "Michael Ziminsky"
+  }
+}
