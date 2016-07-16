@@ -28,6 +28,7 @@ function stopPropagation(e) {
 }
 
 // Only load once at beginning for consistency
+var showOutline; chrome.storage.local.get({"showOutline": true}, function(opts) { showOutline = opts.showOutline; });
 function removeTracking(node) {
     var trackedLinks = node.querySelectorAll("a[onclick^='LinkshimAsyncLink.referrer_log']");
     if (trackedLinks.length) {
@@ -36,7 +37,7 @@ function removeTracking(node) {
             var newHref = mouseover.substring(mouseover.indexOf('"') + 1, mouseover.lastIndexOf('"')).replace(/\\(.)/g, '$1');
 
             a.href = newHref;
-            a.className = a.className + " fbltr-untracked";
+            if (showOutline) a.className = a.className + " fbltr-untracked";
             a.removeAttribute("onmouseover");
             a.removeAttribute("onclick");
             a.addEventListener("click", stopPropagation, false);

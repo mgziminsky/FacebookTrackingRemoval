@@ -2,16 +2,22 @@
   "manifest_version": 2,
   "applications": {
     "gecko": {
-      "id": "{bb1b80be-e6b3-40a1-9b6e-9d4073343f0b}"
+      "id": "{bb1b80be-e6b3-40a1-9b6e-9d4073343f0b}",
+      "strict_min_version": "48.0"
     }
   },
 
   "name": "Facebook Link Tracking Removal",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Removes Facebook's tracking from links and sets the proper href so they work like a normal link",
   "permissions": [
+    "storage",
     "*://*.facebook.com/*"
   ],
+
+  "options_ui": {
+    "page": "options.html"
+  },
 
   "content_scripts": [
     {
