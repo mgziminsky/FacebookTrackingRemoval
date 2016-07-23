@@ -1,7 +1,23 @@
 var storage = chrome.storage.sync;
-var outlineCheckbox = document.getElementById("showOutline");
+var useStyle = document.getElementById("useStyle");
+var modStyle = document.getElementById("modStyle");
 
-storage.get({"showOutline": true}, function(opts){ outlineCheckbox.checked = opts.showOutline; });
-outlineCheckbox.addEventListener("change", function(e) {
-    storage.set({"showOutline": this.checked});
+var defaultOptions = {
+    "useStyle": true,
+    "modStyle": "border: 1px dashed green"
+};
+
+storage.get(defaultOptions, function(opts) {
+    useStyle.checked = opts.useStyle;
+    modStyle.value = opts.modStyle;
+    modStyle.style.display = useStyle.checked ? '' : 'none';
+});
+
+useStyle.addEventListener("change", function(e) {
+    storage.set({"useStyle": this.checked});
+    modStyle.style.display = this.checked ? '' : 'none';
+});
+
+modStyle.addEventListener("change", function(e) {
+    storage.set({"modStyle": this.value});
 });

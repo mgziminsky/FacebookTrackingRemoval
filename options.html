@@ -4,10 +4,16 @@
     <title>Facebook Link Tracking Removal</title>
 </head>
 <body>
-    <label>
-        <input type="checkbox" id="showOutline" />
-        Show outline around "fixed" links? (Reload page to take effect)
-    </label>
+    <p>All changes require the page to be reloaded before taking effect.</p>
+    <div>
+        <div>
+            <label>
+                <input type="checkbox" id="useStyle">
+                Add a custom style to page elements that have been modified?
+            </label>
+        </div>
+        <textarea id="modStyle" cols="50"></textarea>
+    </div>
 
     <script type="text/javascript" src="options.js"></script>
 </body>

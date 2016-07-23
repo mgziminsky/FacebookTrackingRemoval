@@ -1,50 +1,30 @@
 console.log("Initializing Tracking Removal");
 
-// Walk through event target and parents until the currentTarget looking for an anchor link
-function isLinkTarget(e) {
-    var checkTarget = e.target;
-    while (e.currentTarget !== checkTarget) {
-        if (checkTarget.tagName === "A")
-            return true;
-
-        checkTarget = checkTarget.parentNode;
-    }
-    return false;
-}
-
-// Stops propagation of events that don't include an anchor link in the target hierarchy
-// Meant to be used as a capturing event handler
-function restrictEventPropagation(e) {
-    if (!isLinkTarget(e))
-    {
-        console.log("Prevented propagation of " + e.type + " to " + e.target);
-        e.stopImmediatePropagation();
-        e.stopPropagation();
-    }
-}
-
-function stopPropagation(e) {
-    e.stopPropagation();
-}
-
 // Only load once at beginning for consistency
-var showOutline; chrome.storage.sync.get({"showOutline": true}, function(opts) { showOutline = opts.showOutline; });
-function removeTracking(node) {
+var options = {
+    "useStyle": true,
+    "modStyle": "border: 1px dashed green"
+};
+chrome.storage.sync.get(options, function(opts) {
+    options = opts;
+    console.log(options);
+});
+
+
+function removeLinkTracking(node) {
     var trackedLinks = node.querySelectorAll("a[onclick^='LinkshimAsyncLink.referrer_log']");
-    if (trackedLinks.length) {
-        for (var a of trackedLinks) {
-            var mouseover = a.getAttribute("onmouseover");
-            var newHref = mouseover.substring(mouseover.indexOf('"') + 1, mouseover.lastIndexOf('"')).replace(/\\(.)/g, '$1');
+    for (var a of trackedLinks) {
+        var mouseover = a.getAttribute("onmouseover");
+        var newHref = extractQuotedString(mouseover).replace(/\\(.)/g, '$1');
 
-            a.href = newHref;
-            if (showOutline) a.className = a.className + " fbltr-untracked";
-            a.removeAttribute("onmouseover");
-            a.removeAttribute("onclick");
-            a.addEventListener("click", stopPropagation, false);
-            a.addEventListener("mousedown", stopPropagation, false);
+        a.href = newHref;
+        if (options.useStyle) a.style = options.modStyle;
+        a.removeAttribute("onmouseover");
+        a.removeAttribute("onclick");
+        a.addEventListener("click", stopPropagation, false);
+        a.addEventListener("mousedown", stopPropagation, false);
 
-            console.log("Removed tracking from link: " + a);
-        }
+        console.log("Removed tracking from link: " + a);
     }
     return trackedLinks.length;
 }
@@ -52,7 +32,7 @@ function removeTracking(node) {
 var observer = new MutationObserver(function(mutations) {
     mutations.forEach(function(mutation) {
         for (var node of mutation.addedNodes) {
-            if (node.nodeType === Node.ELEMENT_NODE && removeTracking(node)) {
+            if (node.nodeType === Node.ELEMENT_NODE && removeLinkTracking(node)) {
                 mutation.target.addEventListener("click", restrictEventPropagation, true);
                 mutation.target.addEventListener("mousedown", restrictEventPropagation, true);
             }
@@ -61,4 +41,4 @@ var observer = new MutationObserver(function(mutations) {
 });
 
 observer.observe(document, { childList: true, subtree: true, attributes: false, characterData: false });
-removeTracking(document);
+removeLinkTracking(document);
