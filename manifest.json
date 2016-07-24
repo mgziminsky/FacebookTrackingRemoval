@@ -2,9 +2,9 @@
   "manifest_version": 2,
   "author": "Michael Ziminsky",
 
-  "name": "Facebook Link Tracking Removal",
-  "version": "1.0.1",
-  "description": "Removes Facebook's tracking from external links and sets the proper href so they work like a normal link",
+  "name": "Facebook Tracking Removal",
+  "version": "1.1.0",
+  "description": "Removes Facebook's tracking from external links and videos",
   "permissions": [
     "storage",
     "*://*.facebook.com/*"

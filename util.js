@@ -1,10 +1,9 @@
 // Walk through event target and parents until the currentTarget looking for an anchor link
 function isLinkTarget(e) {
-    var checkTarget = e.target;
+    let checkTarget = e.target;
     while (e.currentTarget !== checkTarget) {
         if (checkTarget.tagName === "A")
             return true;
-
         checkTarget = checkTarget.parentNode;
     }
     return false;
@@ -23,6 +22,19 @@ function restrictEventPropagation(e) {
 
 function stopPropagation(e) {
     e.stopPropagation();
+}
+
+function closest(node, selector) {
+    if (typeof(node.closest) === "function")
+        return node.closest(selector);
+
+    let target = node;
+    while (target) {
+        if (target.matches(selector))
+            return target;
+        target = target.parentNode;
+    }
+    return null;
 }
 
 function extractQuotedString(s) {

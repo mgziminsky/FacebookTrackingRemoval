@@ -1,19 +1,37 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Facebook Link Tracking Removal</title>
+    <title>Facebook Tracking Removal</title>
 </head>
 <body>
-    <p>All changes require the page to be reloaded before taking effect.</p>
-    <div>
-        <div>
+    <p><strong>
+        **For the sake of consistency, all changes require the page to be reloaded before taking effect.**
+    </strong></p>
+
+    <ul style="list-style: none">
+        <li>
             <label>
-                <input type="checkbox" id="useStyle">
-                Add a custom style to page elements that have been modified?
+                <input type="checkbox" id="fixLinks">
+                Remove tracking from external links
             </label>
-        </div>
-        <textarea id="modStyle" cols="50"></textarea>
-    </div>
+        </li>
+        <li>
+            <label>
+                <input type="checkbox" id="fixVideos">
+                Remove tracking from videos
+            </label>
+        </li>
+        <li>
+            <div>
+                <label>
+                    <input type="checkbox" id="useStyle">
+                    Apply custom style to page elements that have been modified
+                </label>
+            </div>
+            <textarea id="modStyle" cols="50"></textarea>
+        </li>
+    </ul>
+    <button type="button" id="reset" class="addon-control">Restore Defaults</button>
 
     <script type="text/javascript" src="options.js"></script>
 </body>
