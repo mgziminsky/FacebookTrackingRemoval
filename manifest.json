@@ -6,9 +6,9 @@
     }
   },
 
-  "name": "Facebook Link Tracking Removal",
-  "version": "1.1.1",
-  "description": "Removes Facebook's tracking from links and sets the proper href so they work like a normal link",
+  "name": "Facebook Tracking Removal",
+  "version": "1.2.0",
+  "description": "Removes Facebook's tracking from external links and videos",
   "permissions": [
     "storage",
     "*://*.facebook.com/*"
