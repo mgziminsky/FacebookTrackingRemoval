@@ -18,6 +18,8 @@
     "page": "options.html"
   },
 
+  "web_accessible_resources": ["options.html"],
+
   "content_scripts": [
     {
       "matches": ["*://*.facebook.com/*"],

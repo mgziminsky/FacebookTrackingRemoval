@@ -1,7 +1,24 @@
 (function(w) {
 
 
+// Add a link to the options page in the menu on mobile
+function addOptionsLink() {
+    const menu = document.getElementById("bookmarks_jewel");
+    if (menu) {
+        const link = document.createElement("a");
+        link.innerText = "Tracking Removal Options";
+        link.href = chrome.runtime.getURL("options.html");
+        link.className = "_52x6 _5lut _5luu touchable";
+        link.target = "_top";
+
+        const flyout = menu.querySelector(".flyout");
+        flyout.insertBefore(link, flyout.firstChild);
+    }
+}
+
 function init(options) {
+    addOptionsLink();
+
     console.log("Initializing Tracking Removal");
     console.log(options);
 
