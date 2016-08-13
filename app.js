@@ -31,6 +31,7 @@ function init(options) {
     }
 
     if (options.fixLinks) {
+        // Desktop site
         function cleanShimLinks(node) {
             const trackedLinks = node.querySelectorAll("a[onclick^='LinkshimAsyncLink.referrer_log']");
             for (let a of trackedLinks) {
@@ -40,6 +41,17 @@ function init(options) {
             return trackedLinks.length;
         }
 
+        // Mobile site
+        function cleanDataStoreLinks(node) {
+            const trackedLinks = node.querySelectorAll("a[data-sigil='MLinkshim'][data-store]");
+            for (let a of trackedLinks) {
+                cleanLink(a, JSON.parse(a.getAttribute("data-store")).dest_uri);
+                console.log("Removed tracking from data-store link: " + a);
+            }
+            return trackedLinks.length;
+        }
+
+        // Desktop and Mobile site
         function cleanRedirectLinks(node) {
             const trackedLinks = node.querySelectorAll("a[href*='facebook.com/l.php?']");
             for (let a of trackedLinks) {
@@ -50,9 +62,28 @@ function init(options) {
             return trackedLinks.length;
         }
 
+        // Mobile site only?
+        function fixVideoLinks(node) {
+            const videoLinks = node.querySelectorAll("a[href^='/video_redirect/']");
+            for (let a of videoLinks) {
+                const vidSrc = decodeURIComponent((/\bsrc=([^&]*)/).exec(a.href)[1]);
+                if (options.inlineVids) {
+                    const poster = extractQuotedString(a.querySelector("i.img").style.backgroundImage);
+                    const video = buildVideo(vidSrc, poster);
+                    a.parentNode.replaceChild(video, a);
+                    console.log("Inlined linked video: " + video.src);
+                } else {
+                    cleanLink(a, vidSrc);
+                    console.log("Removed redirect from video link: " + a)
+                }
+            }
+        }
+
         function removeLinkTracking(node) {
             return cleanShimLinks(node)
-                   + cleanRedirectLinks(node);
+                   + cleanDataStoreLinks(node)
+                   + cleanRedirectLinks(node)
+                   + fixVideoLinks(node);
         }
 
         new MutationObserver(function(mutations) {
@@ -95,6 +126,7 @@ function init(options) {
 
 const defaultOptions = {
     "fixLinks":   true,
+    "inlineVids": false,
     "fixVideos":  true,
     "useStyle":   true,
     "modStyle":   "border: 1px dashed green"
