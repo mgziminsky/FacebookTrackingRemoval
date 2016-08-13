@@ -3,7 +3,12 @@
 <head>
     <title>Facebook Tracking Removal</title>
     <style type="text/css">
+        ul { list-style: none; }
         li { margin: 10px; }
+        textarea { display: block; }
+        #toggleExpert { cursor: pointer; }
+        #expertOpts label { display: block; margin: 10px; }
+        #preview { white-space: nowrap; }
     </style>
 </head>
 <body>
@@ -13,7 +18,7 @@
             **For the sake of consistency, all changes require the page to be reloaded before taking effect.**
         </strong></p>
 
-        <ul style="list-style: none">
+        <ul>
             <li>
                 <label>
                     <input type="checkbox" id="fixLinks">
@@ -23,7 +28,7 @@
             <li>
                 <label>
                     <input type="checkbox" id="inlineVids">
-                    Replace redirect links to videos with the actual video
+                    Replace redirect links to videos with the actual video <em>(Only affects mobile)</em>
                 </label>
             </li>
             <li>
@@ -33,13 +38,21 @@
                 </label>
             </li>
             <li>
-                <div>
-                    <label>
-                        <input type="checkbox" id="useStyle">
-                        Apply custom style to page elements that have been modified
-                    </label>
-                </div>
-                <textarea id="modStyle" cols="50"></textarea>
+                <label>
+                    <input type="checkbox" id="useStyle">
+                    Add styling to modified elements
+                </label>
+            </li>
+            <li>
+                <fieldset style="border-style: inset">
+                    <legend><a id="toggleExpert">Show Expert Options</a></legend>
+                    <div id="expertOpts" style="display: none">
+                        <label>
+                            Custom CSS style to be added to modified elements: <span id="preview">STYLE PREVIEW</span>
+                            <textarea id="modStyle" cols="50" rows="1"></textarea>
+                        </label>
+                    </div>
+                </fieldset>
             </li>
         </ul>
         <button type="button" id="reset" class="addon-control">Restore Defaults</button>
