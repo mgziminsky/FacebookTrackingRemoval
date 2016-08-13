@@ -41,6 +41,6 @@ modStyle.addEventListener("change", function(e) {
 });
 
 document.getElementById("reset").addEventListener("click", function(e) {
-    storage.remove(Object.keys(defaultOptions));
+    storage.clear();
     init();
 });
