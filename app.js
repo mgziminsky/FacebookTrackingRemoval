@@ -1,78 +1,101 @@
-console.log("Initializing Tracking Removal");
-
-// Only load once at beginning for consistency
-var options = {
-    "fixLinks":  true,
-    "fixVideos": true,
-    "useStyle":  true,
-    "modStyle":  "border: 1px dashed green"
-};
-chrome.storage.sync.get(options, function(opts) {
-    options = opts;
+function init(options) {
+    console.log("Initializing Tracking Removal");
     console.log(options);
-});
 
-function removeLinkTracking(node) {
-    const trackedLinks = node.querySelectorAll("a[onclick^='LinkshimAsyncLink.referrer_log']");
-    for (let a of trackedLinks) {
-        const mouseover = a.getAttribute("onmouseover");
-        const newHref = extractQuotedString(mouseover).replace(/\\(.)/g, '$1');
+    function applyStyle(elem) {
+        if (options.useStyle)
+            elem.style.cssText = options.modStyle;
+    }
 
-        a.href = newHref;
-        a.removeAttribute("onmouseover");
-        a.removeAttribute("onclick");
+    function cleanLink(a, href) {
+        removeAllAttrs(a);
+        a.href = href;
+        a.target = "_blank";
         a.addEventListener("click", stopPropagation, false);
         a.addEventListener("mousedown", stopPropagation, false);
-        if (options.useStyle)
-            a.style.cssText = options.modStyle;
-
-        console.log("Removed tracking from link: " + a);
+        applyStyle(a);
     }
-    return trackedLinks.length;
-}
 
-function removeVideoTracking(video) {
-    if (video.nodeName === "VIDEO") {
-        const cleanVideo = video.cloneNode(/*deep*/false);
-        const replaceTarget = closest(video, "span._3m6-") || video.parentNode;
-
-        cleanVideo.removeAttribute("id");
-        cleanVideo.removeAttribute("class");
-
-        cleanVideo.preload = "metadata";
-        cleanVideo.controls = true;
-        cleanVideo.poster = extractQuotedString(video.parentNode.querySelector("img._1445").style.backgroundImage);
-        if (options.useStyle)
-            cleanVideo.style.cssText = options.modStyle;
-
-        replaceTarget.parentNode.replaceChild(cleanVideo, replaceTarget);
-
-        console.log("Removed tracking from video: " + cleanVideo.src);
+    function buildVideo(src, poster) {
+        const video = document.createElement("video");
+        video.src = src;
+        video.preload = "metadata";
+        video.controls = true;
+        video.poster = poster;
+        video.setAttribute("width", "100%");
+        applyStyle(video);
+        return video;
     }
-}
 
-if (options.fixLinks) {
-    new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
-            for (let node of mutation.addedNodes) {
-                if (node.nodeType === Node.ELEMENT_NODE && removeLinkTracking(node)) {
-                    mutation.target.addEventListener("click", restrictEventPropagation, true);
-                    mutation.target.addEventListener("mousedown", restrictEventPropagation, true);
-                }
+    if (options.fixLinks) {
+        function cleanShimLinks(node) {
+            const trackedLinks = node.querySelectorAll("a[onclick^='LinkshimAsyncLink.referrer_log']");
+            for (let a of trackedLinks) {
+                cleanLink(a, extractQuotedString(a.getAttribute("onmouseover")).replace(/\\(.)/g, '$1'));
+                console.log("Removed tracking from shim link: " + a);
             }
-        });
-    }).observe(document, { childList: true, subtree: true, attributes: false, characterData: false });
+            return trackedLinks.length;
+        }
 
-    removeLinkTracking(document);
-}
+        function cleanRedirectLinks(node) {
+            const trackedLinks = node.querySelectorAll("a[href*='facebook.com/l.php?']");
+            for (let a of trackedLinks) {
+                const newHref = decodeURIComponent((/\bu=([^&]*)/).exec(a.href)[1]);
+                cleanLink(a, newHref);
+                console.log("Removed tracking from redirect link: " + a);
+            }
+            return trackedLinks.length;
+        }
 
-if (options.fixVideos) {
-    new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
-            removeVideoTracking(mutation.target);
-        });
-    }).observe(document, { attributes: true, attributeFilter: ["src"], subtree: true, childList: false, characterData: false });
+        function removeLinkTracking(node) {
+            return cleanShimLinks(node)
+                   + cleanRedirectLinks(node);
+        }
 
-    for (let video of document.querySelectorAll("video[src]"))
-        removeVideoTracking(video);
-}
+        new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                for (let node of mutation.addedNodes) {
+                    if (node.nodeType === Node.ELEMENT_NODE && removeLinkTracking(node)) {
+                        mutation.target.addEventListener("click", restrictEventPropagation, true);
+                        mutation.target.addEventListener("mousedown", restrictEventPropagation, true);
+                    }
+                }
+            });
+        }).observe(document, { childList: true, subtree: true, attributes: false, characterData: false });
+
+        removeLinkTracking(document);
+    }
+
+    if (options.fixVideos) {
+        function removeVideoTracking(video) {
+            if (video.nodeName === "VIDEO") {
+                const poster = extractQuotedString(video.parentNode.querySelector("img._1445").style.backgroundImage);
+                const cleanVideo = buildVideo(video.src, poster);
+
+                const replaceTarget = closest(video, "span._3m6-") || video.parentNode;
+                replaceTarget.parentNode.replaceChild(cleanVideo, replaceTarget);
+
+                console.log("Removed tracking from video: " + cleanVideo.src);
+            }
+        }
+
+        new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                removeVideoTracking(mutation.target);
+            });
+        }).observe(document, { attributes: true, attributeFilter: ["src"], subtree: true, childList: false, characterData: false });
+
+        for (let video of document.querySelectorAll("video[src]"))
+            removeVideoTracking(video);
+    }
+};
+
+const defaultOptions = {
+    "fixLinks":   true,
+    "fixVideos":  true,
+    "useStyle":   true,
+    "modStyle":   "border: 1px dashed green"
+};
+
+// Only load once at beginning for consistency
+chrome.storage.sync.get(defaultOptions, init);

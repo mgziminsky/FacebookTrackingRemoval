@@ -40,3 +40,8 @@ function closest(node, selector) {
 function extractQuotedString(s) {
     return s.substring(s.indexOf('"') + 1, s.lastIndexOf('"'));
 }
+
+function removeAllAttrs(elem) {
+    while (elem.attributes.length)
+        elem.removeAttribute(elem.attributes[0].name);
+}
