@@ -48,7 +48,7 @@ function init(options) {
     }
 
     if (options.fixLinks) {
-        // Desktop site
+        // Desktop only
         function cleanShimLinks(node) {
             const trackedLinks = node.querySelectorAll("a[onclick^='LinkshimAsyncLink.referrer_log']");
             for (let a of trackedLinks) {
@@ -58,7 +58,7 @@ function init(options) {
             return trackedLinks.length;
         }
 
-        // Mobile site
+        // Mobile only
         function cleanDataStoreLinks(node) {
             const trackedLinks = node.querySelectorAll("a[data-sigil='MLinkshim'][data-store]");
             for (let a of trackedLinks) {
@@ -68,7 +68,7 @@ function init(options) {
             return trackedLinks.length;
         }
 
-        // Desktop and Mobile site
+        // Desktop and Mobile
         function cleanRedirectLinks(node) {
             const trackedLinks = node.querySelectorAll("a[href*='facebook.com/l.php?']");
             for (let a of trackedLinks) {
@@ -79,7 +79,7 @@ function init(options) {
             return trackedLinks.length;
         }
 
-        // Mobile site only?
+        // Mobile only?
         function fixVideoLinks(node) {
             const videoLinks = node.querySelectorAll("a[href^='/video_redirect/']");
             for (let a of videoLinks) {
@@ -96,6 +96,16 @@ function init(options) {
             }
         }
 
+        // Desktop and Mobile
+        function removePixeledArticles(node) {
+            const pixels = node.parentNode.querySelectorAll(".fbEmuTracking");
+            for (let ad of pixels) {
+                const del = ad.parentNode;
+                del.parentNode.removeChild(del);
+                console.log("Removed pixeled article");
+            }
+        }
+
         function removeLinkTracking(node) {
             return cleanShimLinks(node)
                    + cleanDataStoreLinks(node)
@@ -106,7 +116,13 @@ function init(options) {
         new MutationObserver(function(mutations) {
             mutations.forEach(function(mutation) {
                 for (let node of mutation.addedNodes) {
-                    if (node.nodeType === Node.ELEMENT_NODE && removeLinkTracking(node)) {
+                    if (node.nodeType !== Node.ELEMENT_NODE)
+                        continue;
+
+                    if (options.delPixeled)
+                        removePixeledArticles(node);
+
+                    if (removeLinkTracking(node)) {
                         mutation.target.addEventListener("click", restrictEventPropagation, true);
                         mutation.target.addEventListener("mousedown", restrictEventPropagation, true);
                     }
@@ -118,8 +134,9 @@ function init(options) {
     }
 
     if (options.fixVideos) {
+        // Desktop only
         function removeVideoTracking(video) {
-            if (video.nodeName === "VIDEO") {
+            if (video.nodeName === "VIDEO" && video.src) {
                 const poster = extractQuotedString(video.parentNode.querySelector("img._1445").style.backgroundImage);
                 const cleanVideo = buildVideo(video.src, poster);
 
@@ -145,6 +162,7 @@ const defaultOptions = {
     "fixLinks":   true,
     "inlineVids": false,
     "fixVideos":  true,
+    "delPixeled": true,
     "useStyle":   true,
     "modStyle":   "border: 1px dashed green"
 };
