@@ -1,6 +1,7 @@
 // Standard Options
 const fixLinks   = document.getElementById("fixLinks");
 const fixVideos  = document.getElementById("fixVideos");
+const delPixeled = document.getElementById("delPixeled");
 const useStyle   = document.getElementById("useStyle");
 
 fixLinks.addEventListener("change", function(e) {
@@ -9,6 +10,10 @@ fixLinks.addEventListener("change", function(e) {
 
 fixVideos.addEventListener("change", function(e) {
     storage.set({"fixVideos": this.checked});
+});
+
+delPixeled.addEventListener("change", function(e) {
+    storage.set({"delPixeled": this.checked});
 });
 
 useStyle.addEventListener("change", function(e) {
@@ -49,6 +54,7 @@ toggleExpert.addEventListener("click", function(e) {
 const defaultOptions = {
     "fixLinks":   true,
     "fixVideos":  true,
+    "delPixeled": true,
     "useStyle":   true,
     "modStyle":   "border: 1px dashed green"
 };
@@ -57,12 +63,13 @@ function init() {
     storage.get(defaultOptions, function(opts) {
         fixLinks.checked   = opts.fixLinks;
         fixVideos.checked  = opts.fixVideos;
+        delPixeled.checked = opts.delPixeled;
         useStyle.checked   = opts.useStyle;
         modStyle.value     = opts.modStyle;
 
         preview.style.cssText = modStyle.value;
 
-        modStyle.disabled   = !useStyle.checked;
+        modStyle.disabled = !useStyle.checked;
     });
 }
 init();

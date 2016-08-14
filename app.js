@@ -47,6 +47,15 @@ function init(options) {
             return trackedLinks.length;
         }
 
+        function removePixeledArticles(node) {
+            const pixels = node.parentNode.querySelectorAll(".fbEmuTracking");
+            for (let ad of pixels) {
+                const del = ad.parentNode;
+                del.parentNode.removeChild(del);
+                console.log("Removed pixeled article");
+            }
+        }
+
         function removeLinkTracking(node) {
             return cleanShimLinks(node)
                    + cleanRedirectLinks(node);
@@ -55,7 +64,13 @@ function init(options) {
         new MutationObserver(function(mutations) {
             mutations.forEach(function(mutation) {
                 for (let node of mutation.addedNodes) {
-                    if (node.nodeType === Node.ELEMENT_NODE && removeLinkTracking(node)) {
+                    if (node.nodeType !== Node.ELEMENT_NODE)
+                        continue;
+
+                    if (options.delPixeled)
+                        removePixeledArticles(node);
+
+                    if (removeLinkTracking(node)) {
                         mutation.target.addEventListener("click", restrictEventPropagation, true);
                         mutation.target.addEventListener("mousedown", restrictEventPropagation, true);
                     }
@@ -68,7 +83,7 @@ function init(options) {
 
     if (options.fixVideos) {
         function removeVideoTracking(video) {
-            if (video.nodeName === "VIDEO") {
+            if (video.nodeName === "VIDEO" && video.src) {
                 const poster = extractQuotedString(video.parentNode.querySelector("img._1445").style.backgroundImage);
                 const cleanVideo = buildVideo(video.src, poster);
 
@@ -93,6 +108,7 @@ function init(options) {
 const defaultOptions = {
     "fixLinks":   true,
     "fixVideos":  true,
+    "delPixeled": true,
     "useStyle":   true,
     "modStyle":   "border: 1px dashed green"
 };
