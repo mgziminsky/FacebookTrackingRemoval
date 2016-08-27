@@ -19,8 +19,13 @@ function addOptionsLink() {
 function init(options) {
     addOptionsLink();
 
-    console.log("Initializing Tracking Removal");
-    console.log(options);
+    let log = function(){};
+    if (options.logging) {
+        log = console.log.bind(console);
+    }
+
+    log("Initializing Tracking Removal");
+    log(options);
 
     function applyStyle(elem) {
         if (options.useStyle)
@@ -53,7 +58,7 @@ function init(options) {
             const trackedLinks = node.querySelectorAll("a[onclick^='LinkshimAsyncLink.referrer_log']");
             for (let a of trackedLinks) {
                 cleanLink(a, extractQuotedString(a.getAttribute("onmouseover")).replace(/\\(.)/g, '$1'));
-                console.log("Removed tracking from shim link: " + a);
+                log("Removed tracking from shim link: " + a);
             }
             return trackedLinks.length;
         }
@@ -63,7 +68,7 @@ function init(options) {
             const trackedLinks = node.querySelectorAll("a[data-sigil='MLinkshim'][data-store]");
             for (let a of trackedLinks) {
                 cleanLink(a, JSON.parse(a.getAttribute("data-store")).dest_uri);
-                console.log("Removed tracking from data-store link: " + a);
+                log("Removed tracking from data-store link: " + a);
             }
             return trackedLinks.length;
         }
@@ -74,7 +79,7 @@ function init(options) {
             for (let a of trackedLinks) {
                 const newHref = decodeURIComponent((/\bu=([^&]*)/).exec(a.href)[1]);
                 cleanLink(a, newHref);
-                console.log("Removed tracking from redirect link: " + a);
+                log("Removed tracking from redirect link: " + a);
             }
             return trackedLinks.length;
         }
@@ -88,10 +93,10 @@ function init(options) {
                     const poster = extractQuotedString(a.querySelector("i.img").style.backgroundImage);
                     const video = buildVideo(vidSrc, poster);
                     a.parentNode.replaceChild(video, a);
-                    console.log("Inlined linked video: " + video.src);
+                    log("Inlined linked video: " + video.src);
                 } else {
                     cleanLink(a, vidSrc);
-                    console.log("Removed redirect from video link: " + a)
+                    log("Removed redirect from video link: " + a)
                 }
             }
         }
@@ -102,7 +107,7 @@ function init(options) {
             for (let ad of pixels) {
                 const del = ad.parentNode;
                 del.parentNode.removeChild(del);
-                console.log("Removed pixeled article");
+                log("Removed pixeled article");
             }
         }
 
@@ -143,7 +148,7 @@ function init(options) {
                 const replaceTarget = closest(video, "span._3m6-") || video.parentNode;
                 replaceTarget.parentNode.replaceChild(cleanVideo, replaceTarget);
 
-                console.log("Removed tracking from video: " + cleanVideo.src);
+                log("Removed tracking from video: " + cleanVideo.src);
             }
         }
 
@@ -164,6 +169,7 @@ const defaultOptions = {
     "fixVideos":  true,
     "delPixeled": true,
     "useStyle":   true,
+    "logging":    false,
     "modStyle":   "border: 1px dashed green"
 };
 

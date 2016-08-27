@@ -4,6 +4,7 @@ const inlineVids = document.getElementById("inlineVids");
 const fixVideos  = document.getElementById("fixVideos");
 const delPixeled = document.getElementById("delPixeled");
 const useStyle   = document.getElementById("useStyle");
+const logging    = document.getElementById("logging");
 
 fixLinks.addEventListener("change", function(e) {
     storage.set({"fixLinks": this.checked});
@@ -25,6 +26,10 @@ delPixeled.addEventListener("change", function(e) {
 useStyle.addEventListener("change", function(e) {
     storage.set({"useStyle": this.checked});
     modStyle.disabled = !this.checked;
+});
+
+logging.addEventListener("change", function(e) {
+    storage.set({"logging": this.checked});
 });
 
 document.getElementById("reset").addEventListener("click", function(e) {
@@ -63,6 +68,7 @@ const defaultOptions = {
     "fixVideos":  true,
     "delPixeled": true,
     "useStyle":   true,
+    "logging":    false,
     "modStyle":   "border: 1px dashed green"
 };
 const storage = chrome.storage.local;
