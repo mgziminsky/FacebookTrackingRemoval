@@ -43,11 +43,11 @@ function init(options) {
 
     function buildVideo(src, poster) {
         const video = document.createElement("video");
-        video.src = src;
         video.preload = "metadata";
         video.controls = true;
         video.poster = poster;
         video.setAttribute("width", "100%");
+        video.src = src;
         applyStyle(video);
         return video;
     }
@@ -63,6 +63,17 @@ function init(options) {
             return trackedLinks.length;
         }
 
+        // Desktop only
+        // TODO: Can these be inlined???
+        function cleanVideoPageLinks(node) {
+            const trackedLinks = node.querySelectorAll("a[rel=theater][ajaxify]");
+            for (let a of trackedLinks) {
+                cleanLink(a, a.href);
+                log("Removed tracking from video page link: " + a);
+            }
+            return trackedLinks.length;
+        }
+
         // Mobile only
         function cleanDataStoreLinks(node) {
             const trackedLinks = node.querySelectorAll("a[data-sigil='MLinkshim'][data-store]");
@@ -71,6 +82,24 @@ function init(options) {
                 log("Removed tracking from data-store link: " + a);
             }
             return trackedLinks.length;
+        }
+
+        // Mobile only?
+        function fixVideoLinks(node) {
+            const videoLinks = node.querySelectorAll("a[href^='/video_redirect/']");
+            for (let a of videoLinks) {
+                const vidSrc = decodeURIComponent((/\bsrc=([^&]*)/).exec(a.href)[1]);
+                if (options.inlineVids) {
+                    const poster = extractQuotedString(a.querySelector(".img").style.backgroundImage);
+                    const video = buildVideo(vidSrc, poster);
+                    a.parentNode.replaceChild(video, a);
+                    log("Inlined linked video: " + video.src);
+                } else {
+                    cleanLink(a, vidSrc);
+                    log("Removed redirect from video link: " + a)
+                }
+            }
+            return videoLinks.length;
         }
 
         // Desktop and Mobile
@@ -82,23 +111,6 @@ function init(options) {
                 log("Removed tracking from redirect link: " + a);
             }
             return trackedLinks.length;
-        }
-
-        // Mobile only?
-        function fixVideoLinks(node) {
-            const videoLinks = node.querySelectorAll("a[href^='/video_redirect/']");
-            for (let a of videoLinks) {
-                const vidSrc = decodeURIComponent((/\bsrc=([^&]*)/).exec(a.href)[1]);
-                if (options.inlineVids) {
-                    const poster = extractQuotedString(a.querySelector("i.img").style.backgroundImage);
-                    const video = buildVideo(vidSrc, poster);
-                    a.parentNode.replaceChild(video, a);
-                    log("Inlined linked video: " + video.src);
-                } else {
-                    cleanLink(a, vidSrc);
-                    log("Removed redirect from video link: " + a)
-                }
-            }
         }
 
         // Desktop and Mobile
@@ -113,9 +125,11 @@ function init(options) {
 
         function removeLinkTracking(node) {
             return cleanShimLinks(node)
+                   + cleanVideoPageLinks(node)
                    + cleanDataStoreLinks(node)
+                   + fixVideoLinks(node)
                    + cleanRedirectLinks(node)
-                   + fixVideoLinks(node);
+                   ;
         }
 
         new MutationObserver(function(mutations) {
