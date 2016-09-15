@@ -63,17 +63,6 @@ function init(options) {
             return trackedLinks.length;
         }
 
-        // Desktop only
-        // TODO: Can these be inlined???
-        function cleanVideoPageLinks(node) {
-            const trackedLinks = node.querySelectorAll("a[rel=theater][ajaxify]");
-            for (let a of trackedLinks) {
-                cleanLink(a, a.href);
-                log("Removed tracking from video page link: " + a);
-            }
-            return trackedLinks.length;
-        }
-
         // Mobile only
         function cleanDataStoreLinks(node) {
             const trackedLinks = node.querySelectorAll("a[data-sigil='MLinkshim'][data-store]");
@@ -125,7 +114,6 @@ function init(options) {
 
         function removeLinkTracking(node) {
             return cleanShimLinks(node)
-                   + cleanVideoPageLinks(node)
                    + cleanDataStoreLinks(node)
                    + fixVideoLinks(node)
                    + cleanRedirectLinks(node)
