@@ -52,93 +52,109 @@ function init(options) {
         return video;
     }
 
-    if (options.fixLinks) {
-        // Desktop only
-        function cleanShimLinks(node) {
-            const trackedLinks = node.querySelectorAll("a[onclick^='LinkshimAsyncLink.referrer_log']");
-            for (let a of trackedLinks) {
-                cleanLink(a, extractQuotedString(a.getAttribute("onmouseover")).replace(/\\(.)/g, '$1'));
-                log("Removed tracking from shim link: " + a);
-            }
-            return trackedLinks.length;
+    /**** LINK TRACKING ****/
+
+    // Desktop only
+    function cleanShimLinks(node) {
+        const trackedLinks = node.querySelectorAll("a[onclick^='LinkshimAsyncLink.referrer_log']");
+        for (let a of trackedLinks) {
+            cleanLink(a, extractQuotedString(a.getAttribute("onmouseover")).replace(/\\(.)/g, '$1'));
+            log("Removed tracking from shim link: " + a);
         }
-
-        // Mobile only
-        function cleanDataStoreLinks(node) {
-            const trackedLinks = node.querySelectorAll("a[data-sigil='MLinkshim'][data-store]");
-            for (let a of trackedLinks) {
-                cleanLink(a, JSON.parse(a.getAttribute("data-store")).dest_uri);
-                log("Removed tracking from data-store link: " + a);
-            }
-            return trackedLinks.length;
-        }
-
-        // Mobile only?
-        function fixVideoLinks(node) {
-            const videoLinks = node.querySelectorAll("a[href^='/video_redirect/']");
-            for (let a of videoLinks) {
-                const vidSrc = decodeURIComponent((/\bsrc=([^&]*)/).exec(a.href)[1]);
-                if (options.inlineVids) {
-                    const poster = extractQuotedString(a.querySelector(".img").style.backgroundImage);
-                    const video = buildVideo(vidSrc, poster);
-                    a.parentNode.replaceChild(video, a);
-                    log("Inlined linked video: " + video.src);
-                } else {
-                    cleanLink(a, vidSrc);
-                    log("Removed redirect from video link: " + a)
-                }
-            }
-            return videoLinks.length;
-        }
-
-        // Desktop and Mobile
-        function cleanRedirectLinks(node) {
-            const trackedLinks = node.querySelectorAll("a[href*='facebook.com/l.php?']");
-            for (let a of trackedLinks) {
-                const newHref = decodeURIComponent((/\bu=([^&]*)/).exec(a.href)[1]);
-                cleanLink(a, newHref);
-                log("Removed tracking from redirect link: " + a);
-            }
-            return trackedLinks.length;
-        }
-
-        // Desktop and Mobile
-        function removePixeledArticles(node) {
-            const pixels = node.parentNode.querySelectorAll(".fbEmuTracking");
-            for (let ad of pixels) {
-                const del = ad.parentNode;
-                del.parentNode.removeChild(del);
-                log("Removed pixeled article");
-            }
-        }
-
-        function removeLinkTracking(node) {
-            return cleanShimLinks(node)
-                   + cleanDataStoreLinks(node)
-                   + fixVideoLinks(node)
-                   + cleanRedirectLinks(node)
-                   ;
-        }
-
-        new MutationObserver(function(mutations) {
-            mutations.forEach(function(mutation) {
-                for (let node of mutation.addedNodes) {
-                    if (node.nodeType !== Node.ELEMENT_NODE)
-                        continue;
-
-                    if (options.delPixeled)
-                        removePixeledArticles(node);
-
-                    if (removeLinkTracking(node)) {
-                        mutation.target.addEventListener("click", restrictEventPropagation, true);
-                        mutation.target.addEventListener("mousedown", restrictEventPropagation, true);
-                    }
-                }
-            });
-        }).observe(document, { childList: true, subtree: true, attributes: false, characterData: false });
-
-        removeLinkTracking(document);
+        return trackedLinks.length;
     }
+
+    // Mobile only
+    function cleanDataStoreLinks(node) {
+        const trackedLinks = node.querySelectorAll("a[data-sigil='MLinkshim'][data-store]");
+        for (let a of trackedLinks) {
+            cleanLink(a, JSON.parse(a.getAttribute("data-store")).dest_uri);
+            log("Removed tracking from data-store link: " + a);
+        }
+        return trackedLinks.length;
+    }
+
+    // Mobile only?
+    function fixVideoLinks(node) {
+        const videoLinks = node.querySelectorAll("a[href^='/video_redirect/']");
+        for (let a of videoLinks) {
+            const vidSrc = decodeURIComponent((/\bsrc=([^&]*)/).exec(a.href)[1]);
+            if (options.inlineVids) {
+                const poster = extractQuotedString(a.querySelector(".img").style.backgroundImage);
+                const video = buildVideo(vidSrc, poster);
+                a.parentNode.replaceChild(video, a);
+                log("Inlined linked video: " + video.src);
+            } else {
+                cleanLink(a, vidSrc);
+                log("Removed redirect from video link: " + a)
+            }
+        }
+        return videoLinks.length;
+    }
+
+    // Desktop and Mobile
+    function cleanRedirectLinks(node) {
+        const trackedLinks = node.querySelectorAll("a[href*='facebook.com/l.php?']");
+        for (let a of trackedLinks) {
+            const newHref = decodeURIComponent((/\bu=([^&]*)/).exec(a.href)[1]);
+            cleanLink(a, newHref);
+            log("Removed tracking from redirect link: " + a);
+        }
+        return trackedLinks.length;
+    }
+
+    function removeLinkTracking(node) {
+        return cleanShimLinks(node)
+               + cleanDataStoreLinks(node)
+               + fixVideoLinks(node)
+               + cleanRedirectLinks(node)
+               ;
+    }
+
+    /**** END LINK TRACKING ****/
+
+    function removePixeledArticles(node) {
+        const pixels = (node.parentNode || node).querySelectorAll(".fbEmuTracking");
+        for (let ad of pixels) {
+            ad.parentNode.remove();
+            log("Removed pixeled article");
+        }
+    }
+
+    function removeSuggestions(node) {
+        const elements = (node.parentNode || node).querySelectorAll("div.userContentWrapper div.mts, div.userContentWrapper div._5g-l");
+        for (let e of elements) {
+            e.closest("div.userContentWrapper").remove();
+            log("Removed inline suggestion");
+        }
+    }
+
+    new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            for (let node of mutation.addedNodes) {
+                if (node.nodeType !== Node.ELEMENT_NODE)
+                    continue;
+
+                if (options.delPixeled)
+                    removePixeledArticles(node);
+
+                if (options.delSuggest)
+                    removeSuggestions(node);
+
+                if (options.fixLinks && removeLinkTracking(node)) {
+                    mutation.target.addEventListener("click", restrictEventPropagation, true);
+                    mutation.target.addEventListener("mousedown", restrictEventPropagation, true);
+                }
+            }
+        });
+    }).observe(document, { childList: true, subtree: true, attributes: false, characterData: false });
+
+    if (options.fixLinks)
+        removeLinkTracking(document);
+    if (options.delPixeled)
+        removePixeledArticles(document);
+    if (options.delSuggest)
+        removeSuggestions(document);
 
     if (options.fixVideos) {
         // Desktop only
@@ -170,6 +186,7 @@ const defaultOptions = {
     "inlineVids": false,
     "fixVideos":  true,
     "delPixeled": true,
+    "delSuggest": true,
     "useStyle":   true,
     "logging":    false,
     "modStyle":   "border: 1px dashed green"

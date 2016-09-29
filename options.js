@@ -3,6 +3,7 @@ const fixLinks   = document.getElementById("fixLinks");
 const inlineVids = document.getElementById("inlineVids");
 const fixVideos  = document.getElementById("fixVideos");
 const delPixeled = document.getElementById("delPixeled");
+const delSuggest = document.getElementById("delSuggest");
 const useStyle   = document.getElementById("useStyle");
 const logging    = document.getElementById("logging");
 
@@ -21,6 +22,10 @@ fixVideos.addEventListener("change", function(e) {
 
 delPixeled.addEventListener("change", function(e) {
     storage.set({"delPixeled": this.checked});
+});
+
+delSuggest.addEventListener("change", function(e) {
+    storage.set({"delSuggest": this.checked});
 });
 
 useStyle.addEventListener("change", function(e) {
@@ -67,6 +72,7 @@ const defaultOptions = {
     "inlineVids": false,
     "fixVideos":  true,
     "delPixeled": true,
+    "delSuggest": true,
     "useStyle":   true,
     "logging":    false,
     "modStyle":   "border: 1px dashed green"
@@ -77,9 +83,11 @@ function init() {
         fixLinks.checked   = opts.fixLinks;
         inlineVids.checked = opts.inlineVids;
         fixVideos.checked  = opts.fixVideos;
-        delPixeled.checked    = opts.delPixeled;
+        delPixeled.checked = opts.delPixeled;
+        delSuggest.checked = opts.delSuggest;
         useStyle.checked   = opts.useStyle;
         modStyle.value     = opts.modStyle;
+        logging.checked    = opts.logging;
 
         preview.style.cssText = modStyle.value;
 
