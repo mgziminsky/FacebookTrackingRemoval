@@ -27,6 +27,16 @@ function init(options) {
     log("Initializing Tracking Removal");
     log(options);
 
+    // Meant to be used as a capturing event handler
+    function restrictEventPropagation(e) {
+        if (!isAllowedTarget(e))
+        {
+            log("Prevented propagation of " + e.type + " to " + e.target);
+            e.stopImmediatePropagation();
+            e.stopPropagation();
+        }
+    }
+
     function applyStyle(elem) {
         if (options.useStyle)
             elem.style.cssText = options.modStyle;
@@ -163,7 +173,7 @@ function init(options) {
                 const poster = extractQuotedString(video.parentNode.querySelector("img._1445").style.backgroundImage);
                 const cleanVideo = buildVideo(video.src, poster);
 
-                const replaceTarget = closest(video, "span._3m6-") || video.parentNode;
+                const replaceTarget = video.closest("span._3m6-") || video.parentNode;
                 replaceTarget.parentNode.replaceChild(cleanVideo, replaceTarget);
 
                 log("Removed tracking from video: " + cleanVideo.src);
