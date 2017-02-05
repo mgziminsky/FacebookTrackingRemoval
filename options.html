@@ -9,6 +9,7 @@
         #toggleExpert { cursor: pointer; }
         #expertOpts label { display: block; margin: 10px; }
         #preview { white-space: nowrap; }
+        #hideMethod > label {  margin: 0 5px; }
     </style>
 </head>
 <body>
@@ -34,20 +35,25 @@
             <li>
                 <label>
                     <input type="checkbox" id="fixVideos">
-                    Remove tracking from videos
+                    Remove tracking from videos <em>(Currently breaks most videos)</em>
                 </label>
             </li>
             <li>
                 <label>
                     <input type="checkbox" id="delPixeled">
-                    Remove pixeled articles <em>(Includes most "Suggested Posts")</em>
+                    Hide Sponsored articles <em>(Includes most "Suggested Posts")</em>
                 </label>
             </li>
             <li>
                 <label>
                     <input type="checkbox" id="delSuggest">
-                    Remove inline suggestions <em>(eg: Suggested Posts, People You May Know)</em>
+                    Hide inline suggestions <em>(eg: Suggested Posts, People You May Know)</em>
                 </label>
+            </li>
+            <li id="hideMethod">
+                Hide method:
+                <label><input type="radio" name="hm" value="collapse"> Collapse</label>
+                <label><input type="radio" name="hm" value="remove"> Remove</label>
             </li>
             <li>
                 <label>
@@ -74,6 +80,7 @@
         <button type="button" id="reset" class="addon-control">Restore Defaults</button>
     </fieldset>
 
+    <script type="text/javascript" src="common.js"></script>
     <script type="text/javascript" src="options.js"></script>
 </body>
 </html>

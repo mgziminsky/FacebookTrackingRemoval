@@ -4,6 +4,7 @@ const inlineVids = document.getElementById("inlineVids");
 const fixVideos  = document.getElementById("fixVideos");
 const delPixeled = document.getElementById("delPixeled");
 const delSuggest = document.getElementById("delSuggest");
+const hideMethod = document.getElementById("hideMethod");
 const useStyle   = document.getElementById("useStyle");
 const logging    = document.getElementById("logging");
 
@@ -26,6 +27,12 @@ delPixeled.addEventListener("change", function(e) {
 
 delSuggest.addEventListener("change", function(e) {
     storage.set({"delSuggest": this.checked});
+});
+
+hideMethod.querySelectorAll("input").forEach(function(radio){
+    radio.addEventListener("change", function(e) {
+        storage.set({"hideMethod": this.value});
+    });
 });
 
 useStyle.addEventListener("change", function(e) {
@@ -67,16 +74,6 @@ toggleExpert.addEventListener("click", function(e) {
 
 
 // Init
-const defaultOptions = {
-    "fixLinks":   true,
-    "inlineVids": false,
-    "fixVideos":  true,
-    "delPixeled": true,
-    "delSuggest": true,
-    "useStyle":   true,
-    "logging":    false,
-    "modStyle":   "border: 1px dashed green"
-};
 const storage = chrome.storage.local;
 function init() {
     storage.get(defaultOptions, function(opts) {
@@ -88,6 +85,8 @@ function init() {
         useStyle.checked   = opts.useStyle;
         modStyle.value     = opts.modStyle;
         logging.checked    = opts.logging;
+
+        hideMethod.querySelector("input[value=" + opts.hideMethod + "]").checked = true;
 
         preview.style.cssText = modStyle.value;
 

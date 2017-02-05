@@ -1,18 +1,27 @@
+var log = function(){};
+
+const ALLOWED_CLICK_ELEMENTS = ["A", "INPUT", "SELECT", "BUTTON"];
 function isAllowedTarget(e) {
     let checkTarget = e.target;
 
-    // Allow clicks on input elements
-    if (checkTarget.tagName === "INPUT" || checkTarget.tagName === "SELECT" || checkTarget.tagName === "BUTTON")
-        return true;
-
-    // Walk through event target and parents until the currentTarget looking for an anchor link
+    // Walk through event target and parents until the currentTarget looking for an element
     while (e.currentTarget !== checkTarget) {
-        if (checkTarget.tagName === "A")
+        if (ALLOWED_CLICK_ELEMENTS.include(e.tagName) || checkTarget.hasClass("fbtrCollapsible"))
             return true;
         checkTarget = checkTarget.parentNode;
     }
 
     return false;
+}
+
+// Meant to be used as a capturing event handler
+function restrictEventPropagation(e) {
+    if (!isAllowedTarget(e))
+    {
+        log("Prevented propagation of " + e.type + " to " + e.target);
+        e.stopImmediatePropagation();
+        e.stopPropagation();
+    }
 }
 
 function stopPropagation(e) {
@@ -26,4 +35,20 @@ function extractQuotedString(s) {
 function removeAllAttrs(elem) {
     while (elem.attributes.length)
         elem.removeAttribute(elem.attributes[0].name);
+}
+
+function buildCollapsible(label) {
+    const content = document.createElement("span");
+    content.textContent = "Show " + label;
+    content.classList.add("fbtrLabel");
+
+    const collapsible = document.createElement("div");
+    collapsible.classList.add("fbtrCollapsible", "mbm");
+    collapsible.addEventListener("click", function(e) {
+        content.textContent = (this.classList.toggle("open") ? "Hide " : "Show ") + label;
+        e.stopPropagation();
+    });
+    collapsible.appendChild(content);
+
+    return collapsible;
 }

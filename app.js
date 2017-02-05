@@ -19,27 +19,35 @@ function addOptionsLink() {
 function init(options) {
     addOptionsLink();
 
-    let log = function(){};
     if (options.logging) {
         log = console.log.bind(console);
+    } else {
+        log = function(){};
     }
 
     log("Initializing Tracking Removal");
     log(options);
 
-    // Meant to be used as a capturing event handler
-    function restrictEventPropagation(e) {
-        if (!isAllowedTarget(e))
-        {
-            log("Prevented propagation of " + e.type + " to " + e.target);
-            e.stopImmediatePropagation();
-            e.stopPropagation();
-        }
-    }
-
     function applyStyle(elem) {
         if (options.useStyle)
             elem.style.cssText = options.modStyle;
+    }
+
+    function hide(elem, label) {
+        if (options.hideMethod === "collapse") {
+            if (elem.closest(".fbtrCollapsible"))
+                return;
+
+            const wrapper = buildCollapsible(label);
+            applyStyle(wrapper);
+            for (let c of elem.classList)
+                wrapper.classList.add(c);
+
+            elem.parentNode.appendChild(wrapper);
+            wrapper.appendChild(elem);
+        } else {
+            elem.remove();
+        }
     }
 
     function cleanLink(a, href) {
@@ -123,19 +131,21 @@ function init(options) {
 
     /**** END LINK TRACKING ****/
 
-    function removePixeledArticles(node) {
+    function removeSponsored(node) {
         const pixels = (node.parentNode || node).querySelectorAll(".fbEmuTracking");
-        for (let ad of pixels) {
-            ad.parentNode.remove();
-            log("Removed pixeled article");
+        for (let pixel of pixels) {
+            hide(pixel.parentNode, "Sponsored Article");
+            pixel.remove();
+            log("Sponsored Article Hidden");
         }
     }
 
     function removeSuggestions(node) {
-        const elements = (node.parentNode || node).querySelectorAll("div.userContentWrapper div.mts, div.userContentWrapper div._5g-l");
+        const elements = (node.parentNode || node).querySelectorAll("span._m8d");
         for (let e of elements) {
-            e.closest("div.userContentWrapper").remove();
-            log("Removed inline suggestion");
+            e.classList.remove("_m8d"); // avoid infinite recursion
+            hide(e.closest("div.mbm"), e.innerText);
+            log(e.innerText + " Hidden");
         }
     }
 
@@ -146,7 +156,7 @@ function init(options) {
                     continue;
 
                 if (options.delPixeled)
-                    removePixeledArticles(node);
+                    removeSponsored(node);
 
                 if (options.delSuggest)
                     removeSuggestions(node);
@@ -159,12 +169,12 @@ function init(options) {
         });
     }).observe(document, { childList: true, subtree: true, attributes: false, characterData: false });
 
-    if (options.fixLinks)
-        removeLinkTracking(document);
     if (options.delPixeled)
-        removePixeledArticles(document);
+        removeSponsored(document);
     if (options.delSuggest)
         removeSuggestions(document);
+    if (options.fixLinks)
+        removeLinkTracking(document);
 
     if (options.fixVideos) {
         // Desktop only
@@ -190,17 +200,6 @@ function init(options) {
             removeVideoTracking(video);
     }
 }
-
-const defaultOptions = {
-    "fixLinks":   true,
-    "inlineVids": false,
-    "fixVideos":  true,
-    "delPixeled": true,
-    "delSuggest": true,
-    "useStyle":   true,
-    "logging":    false,
-    "modStyle":   "border: 1px dashed green"
-};
 
 // Only load once at beginning for consistency
 if (typeof(chrome) !== "undefined" && chrome.storage) {
