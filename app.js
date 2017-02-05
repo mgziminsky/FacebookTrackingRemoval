@@ -1,45 +1,18 @@
-(function(w) {
+const FBTR = {
+    options: defaultOptions,
 
+    applyStyle: function(elem) {
+        if (FBTR.options.useStyle)
+            elem.style.cssText = FBTR.options.modStyle;
+    },
 
-// Add a link to the options page in the menu on mobile
-function addOptionsLink() {
-    const menu = document.getElementById("bookmarks_jewel");
-    if (menu) {
-        const link = document.createElement("a");
-        link.innerText = "Tracking Removal Options";
-        link.href = chrome.runtime.getURL("options.html");
-        link.className = "_52x6 _5lut _5luu touchable";
-        link.target = "_top";
-
-        const flyout = menu.querySelector(".flyout");
-        flyout.insertBefore(link, flyout.firstChild);
-    }
-}
-
-function init(options) {
-    addOptionsLink();
-
-    if (options.logging) {
-        log = console.log.bind(console);
-    } else {
-        log = function(){};
-    }
-
-    log("Initializing Tracking Removal");
-    log(options);
-
-    function applyStyle(elem) {
-        if (options.useStyle)
-            elem.style.cssText = options.modStyle;
-    }
-
-    function hide(elem, label) {
-        if (options.hideMethod === "collapse") {
+    hide: function(elem, label) {
+        if (FBTR.options.hideMethod === "collapse") {
             if (elem.closest(".fbtrCollapsible"))
                 return;
 
             const wrapper = buildCollapsible(label);
-            applyStyle(wrapper);
+            FBTR.applyStyle(wrapper);
             for (let c of elem.classList)
                 wrapper.classList.add(c);
 
@@ -48,165 +21,168 @@ function init(options) {
         } else {
             elem.remove();
         }
-    }
+    },
 
-    function cleanLink(a, href) {
+    cleanLink: function(a, href) {
         removeAllAttrs(a);
         a.href = href;
         a.target = "_blank";
         a.addEventListener("click", stopPropagation, false);
         a.addEventListener("mousedown", stopPropagation, false);
-        applyStyle(a);
-    }
+        FBTR.applyStyle(a);
+    },
 
-    function buildVideo(src, poster) {
+    buildVideo: function(src, poster) {
         const video = document.createElement("video");
         video.preload = "metadata";
         video.controls = true;
         video.poster = poster;
         video.setAttribute("width", "100%");
         video.src = src;
-        applyStyle(video);
+        FBTR.applyStyle(video);
         return video;
-    }
+    },
 
     /**** LINK TRACKING ****/
 
     // Desktop only
-    function cleanShimLinks(node) {
+    cleanShimLinks: function(node) {
         const trackedLinks = node.querySelectorAll("a[onclick^='LinkshimAsyncLink.referrer_log']");
         for (let a of trackedLinks) {
-            cleanLink(a, extractQuotedString(a.getAttribute("onmouseover")).replace(/\\(.)/g, '$1'));
+            FBTR.cleanLink(a, extractQuotedString(a.getAttribute("onmouseover")).replace(/\\(.)/g, '$1'));
             log("Removed tracking from shim link: " + a);
         }
         return trackedLinks.length;
-    }
+    },
 
     // Mobile only
-    function cleanDataStoreLinks(node) {
+    cleanDataStoreLinks: function(node) {
         const trackedLinks = node.querySelectorAll("a[data-sigil='MLinkshim'][data-store]");
         for (let a of trackedLinks) {
-            cleanLink(a, JSON.parse(a.getAttribute("data-store")).dest_uri);
+            FBTR.cleanLink(a, JSON.parse(a.getAttribute("data-store")).dest_uri);
             log("Removed tracking from data-store link: " + a);
         }
         return trackedLinks.length;
-    }
+    },
 
     // Mobile only?
-    function fixVideoLinks(node) {
+    fixVideoLinks: function(node) {
         const videoLinks = node.querySelectorAll("a[href^='/video_redirect/']");
         for (let a of videoLinks) {
             const vidSrc = decodeURIComponent((/\bsrc=([^&]*)/).exec(a.href)[1]);
-            if (options.inlineVids) {
+            if (FBTR.options.inlineVids) {
                 const poster = extractQuotedString(a.querySelector(".img").style.backgroundImage);
-                const video = buildVideo(vidSrc, poster);
+                const video = FBTR.buildVideo(vidSrc, poster);
                 a.parentNode.replaceChild(video, a);
                 log("Inlined linked video: " + video.src);
             } else {
-                cleanLink(a, vidSrc);
+                FBTR.cleanLink(a, vidSrc);
                 log("Removed redirect from video link: " + a)
             }
         }
         return videoLinks.length;
-    }
+    },
 
     // Desktop and Mobile
-    function cleanRedirectLinks(node) {
+    cleanRedirectLinks: function(node) {
         const trackedLinks = node.querySelectorAll("a[href*='facebook.com/l.php?']");
         for (let a of trackedLinks) {
             const newHref = decodeURIComponent((/\bu=([^&]*)/).exec(a.href)[1]);
-            cleanLink(a, newHref);
+            FBTR.cleanLink(a, newHref);
             log("Removed tracking from redirect link: " + a);
         }
         return trackedLinks.length;
-    }
+    },
 
-    function removeLinkTracking(node) {
-        return cleanShimLinks(node)
-               + cleanDataStoreLinks(node)
-               + fixVideoLinks(node)
-               + cleanRedirectLinks(node)
+    removeLinkTracking: function(node) {
+        return FBTR.cleanShimLinks(node)
+               + FBTR.cleanDataStoreLinks(node)
+               + FBTR.fixVideoLinks(node)
+               + FBTR.cleanRedirectLinks(node)
                ;
-    }
+    },
 
     /**** END LINK TRACKING ****/
 
-    function removeSponsored(node) {
+    removeSponsored: function(node) {
         const pixels = (node.parentNode || node).querySelectorAll(".fbEmuTracking");
         for (let pixel of pixels) {
-            hide(pixel.parentNode, "Sponsored Article");
+            FBTR.hide(pixel.parentNode, "Sponsored Article");
             pixel.remove();
             log("Sponsored Article Hidden");
         }
-    }
+    },
 
-    function removeSuggestions(node) {
+    removeSuggestions: function(node) {
         const elements = (node.parentNode || node).querySelectorAll("span._m8d");
         for (let e of elements) {
             e.classList.remove("_m8d"); // avoid infinite recursion
-            hide(e.closest("div.mbm"), e.innerText);
+            FBTR.hide(e.closest("div.mbm"), e.innerText);
             log(e.innerText + " Hidden");
         }
-    }
+    },
 
-    new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
-            for (let node of mutation.addedNodes) {
-                if (node.nodeType !== Node.ELEMENT_NODE)
-                    continue;
+    init: function(options) {
+        FBTR.options = Object.assign({}, FBTR.options, options);
 
-                if (options.delPixeled)
-                    removeSponsored(node);
-
-                if (options.delSuggest)
-                    removeSuggestions(node);
-
-                if (options.fixLinks && removeLinkTracking(node)) {
-                    mutation.target.addEventListener("click", restrictEventPropagation, true);
-                    mutation.target.addEventListener("mousedown", restrictEventPropagation, true);
-                }
-            }
-        });
-    }).observe(document, { childList: true, subtree: true, attributes: false, characterData: false });
-
-    if (options.delPixeled)
-        removeSponsored(document);
-    if (options.delSuggest)
-        removeSuggestions(document);
-    if (options.fixLinks)
-        removeLinkTracking(document);
-
-    if (options.fixVideos) {
-        // Desktop only
-        function removeVideoTracking(video) {
-            if (video.nodeName === "VIDEO" && video.src) {
-                const poster = extractQuotedString(video.parentNode.querySelector("img._1445").style.backgroundImage);
-                const cleanVideo = buildVideo(video.src, poster);
-
-                const replaceTarget = video.closest("span._3m6-") || video.parentNode;
-                replaceTarget.parentNode.replaceChild(cleanVideo, replaceTarget);
-
-                log("Removed tracking from video: " + cleanVideo.src);
-            }
+        if (FBTR.options.logging) {
+            log = console.log.bind(console);
+        } else {
+            log = function(){};
         }
+
+        log("Initializing Tracking Removal");
+        log(FBTR.options);
 
         new MutationObserver(function(mutations) {
             mutations.forEach(function(mutation) {
-                removeVideoTracking(mutation.target);
+                for (let node of mutation.addedNodes) {
+                    if (node.nodeType !== Node.ELEMENT_NODE)
+                        continue;
+
+                    if (FBTR.options.delPixeled)
+                        FBTR.removeSponsored(node);
+
+                    if (FBTR.options.delSuggest)
+                        FBTR.removeSuggestions(node);
+
+                    if (FBTR.options.fixLinks && FBTR.removeLinkTracking(node)) {
+                        mutation.target.addEventListener("click", restrictEventPropagation, true);
+                        mutation.target.addEventListener("mousedown", restrictEventPropagation, true);
+                    }
+                }
             });
-        }).observe(document, { attributes: true, attributeFilter: ["src"], subtree: true, childList: false, characterData: false });
+        }).observe(document, { childList: true, subtree: true, attributes: false, characterData: false });
 
-        for (let video of document.querySelectorAll("video[src]"))
-            removeVideoTracking(video);
+        if (FBTR.options.delPixeled)
+            FBTR.removeSponsored(document);
+        if (FBTR.options.delSuggest)
+            FBTR.removeSuggestions(document);
+        if (FBTR.options.fixLinks)
+            FBTR.removeLinkTracking(document);
+
+        if (FBTR.options.fixVideos) {
+            // Desktop only
+            function removeVideoTracking(video) {
+                if (video.nodeName === "VIDEO" && video.src) {
+                    const poster = extractQuotedString(video.parentNode.querySelector("img._1445").style.backgroundImage);
+                    const cleanVideo = FBTR.buildVideo(video.src, poster);
+
+                    const replaceTarget = video.closest("span._3m6-") || video.parentNode;
+                    replaceTarget.parentNode.replaceChild(cleanVideo, replaceTarget);
+
+                    log("Removed tracking from video: " + cleanVideo.src);
+                }
+            }
+
+            new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    removeVideoTracking(mutation.target);
+                });
+            }).observe(document, { attributes: true, attributeFilter: ["src"], subtree: true, childList: false, characterData: false });
+
+            for (let video of document.querySelectorAll("video[src]"))
+                removeVideoTracking(video);
+        }
     }
-}
-
-// Only load once at beginning for consistency
-if (typeof(chrome) !== "undefined" && chrome.storage) {
-    chrome.storage.local.get(defaultOptions, init);
-} else {
-    init(defaultOptions);
-}
-
-
-}(window));
+};

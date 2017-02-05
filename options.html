@@ -7,6 +7,8 @@
         li { margin: 10px; }
         textarea { display: block; }
         #toggleExpert { cursor: pointer; }
+        #expertOpts { display: none; }
+        #expertOpts.visible { display: block; }
         #expertOpts label { display: block; margin: 10px; }
         #preview { white-space: nowrap; }
         #hideMethod > label {  margin: 0 5px; }
@@ -63,8 +65,8 @@
             </li>
             <li>
                 <fieldset style="border-style: inset">
-                    <legend><a id="toggleExpert">Show Expert Options</a></legend>
-                    <div id="expertOpts" style="display: none">
+                    <legend><a id="toggleExpert"><span>Show</span> Advanced Options</a></legend>
+                    <div id="expertOpts">
                         <label>
                             Custom CSS style to be added to modified elements: <span id="preview">STYLE PREVIEW</span>
                             <textarea id="modStyle" cols="50" rows="1"></textarea>
