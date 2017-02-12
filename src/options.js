@@ -86,4 +86,4 @@
         });
     }
     init();
-}(chrome.storage.local));
+}(chrome.storage.sync));
