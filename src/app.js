@@ -155,7 +155,10 @@ const FBTR = {
         }).observe(document, { childList: true, subtree: true, attributes: false, characterData: false });
 
         if (FBTR.options.delPixeled)
+        {
+            FBTR.hide(document.getElementById("pagelet_ego_pane"), "Sponsored Ads");
             FBTR.removeSponsored(document);
+        }
         if (FBTR.options.delSuggest)
             FBTR.removeSuggestions(document);
         if (FBTR.options.fixLinks)

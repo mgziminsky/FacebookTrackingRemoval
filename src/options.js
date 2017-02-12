@@ -66,22 +66,24 @@
         this.firstChild.innerText = (expertOpts.classList.toggle("visible") ? "Hide" : "Show");
     });
 
-    // Init
-    storage.get(defaultOptions, function(opts) {
-        fixLinks.checked   = opts.fixLinks;
-        inlineVids.checked = opts.inlineVids;
-        fixVideos.checked  = opts.fixVideos;
-        delPixeled.checked = opts.delPixeled;
-        delSuggest.checked = opts.delSuggest;
-        useStyle.checked   = opts.useStyle;
-        modStyle.value     = opts.modStyle;
-        logging.checked    = opts.logging;
+    function init() {
+        storage.get(defaultOptions, function(opts) {
+            fixLinks.checked   = opts.fixLinks;
+            inlineVids.checked = opts.inlineVids;
+            fixVideos.checked  = opts.fixVideos;
+            delPixeled.checked = opts.delPixeled;
+            delSuggest.checked = opts.delSuggest;
+            useStyle.checked   = opts.useStyle;
+            modStyle.value     = opts.modStyle;
+            logging.checked    = opts.logging;
 
-        hideMethod.querySelector("input[value=" + opts.hideMethod + "]").checked = true;
+            hideMethod.querySelector("input[value=" + opts.hideMethod + "]").checked = true;
 
-        preview.style.cssText = modStyle.value;
+            preview.style.cssText = modStyle.value;
 
-        inlineVids.disabled = !fixLinks.checked;
-        modStyle.disabled   = !useStyle.checked;
-    });
+            inlineVids.disabled = !fixLinks.checked;
+            modStyle.disabled   = !useStyle.checked;
+        });
+    }
+    init();
 }(chrome.storage.local));
