@@ -6,7 +6,12 @@
         ul { list-style: none; }
         li { margin: 10px; }
         textarea { display: block; }
+        #toggleExpert { cursor: pointer; }
+        #expertOpts { display: none; }
+        #expertOpts.visible { display: block; }
         #expertOpts label { display: block; margin: 10px; }
+        #preview { white-space: nowrap; }
+        #hideMethod > label {  margin: 0 5px; }
     </style>
 </head>
 <body>
@@ -25,15 +30,32 @@
             </li>
             <li>
                 <label>
+                    <input type="checkbox" id="inlineVids">
+                    Replace redirect links to videos with the actual video <em>(Only affects mobile; May increase data usage)</em>
+                </label>
+            </li>
+            <li>
+                <label>
                     <input type="checkbox" id="fixVideos">
-                    Remove tracking from videos
+                    Remove tracking from videos <em>(Currently breaks most videos)</em>
                 </label>
             </li>
             <li>
                 <label>
                     <input type="checkbox" id="delPixeled">
-                    Remove pixeled articles <em>(eg: Suggested Posts)</em>
+                    Hide Sponsored articles <em>(Includes most "Suggested Posts")</em>
                 </label>
+            </li>
+            <li>
+                <label>
+                    <input type="checkbox" id="delSuggest">
+                    Hide inline suggestions <em>(eg: Suggested Posts, People You May Know)</em>
+                </label>
+            </li>
+            <li id="hideMethod">
+                Hide method:
+                <label><input type="radio" name="hm" value="collapse"> Collapse</label>
+                <label><input type="radio" name="hm" value="remove"> Remove</label>
             </li>
             <li>
                 <label>
@@ -43,11 +65,15 @@
             </li>
             <li>
                 <fieldset style="border-style: inset">
-                    <legend><a id="toggleExpert">Show Expert Options</a></legend>
-                    <div id="expertOpts" style="display: none">
+                    <legend><a id="toggleExpert"><span>Show</span> Advanced Options</a></legend>
+                    <div id="expertOpts">
                         <label>
                             Custom CSS style to be added to modified elements: <span id="preview">STYLE PREVIEW</span>
                             <textarea id="modStyle" cols="50" rows="1"></textarea>
+                        </label>
+                        <label>
+                            <input type="checkbox" id="logging">
+                            Display log messages in the console
                         </label>
                     </div>
                 </fieldset>
@@ -56,6 +82,7 @@
         <button type="button" id="reset" class="addon-control">Restore Defaults</button>
     </fieldset>
 
+    <script type="text/javascript" src="common.js"></script>
     <script type="text/javascript" src="options.js"></script>
 </body>
 </html>

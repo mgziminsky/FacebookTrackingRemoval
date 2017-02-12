@@ -1,23 +1,26 @@
 {
   "manifest_version": 2,
   "author": "Michael Ziminsky",
+  "homepage_url": "https://github.com/mgziminsky/FacebookTrackingRemoval/tree/Chrome",
 
   "name": "Facebook Tracking Removal",
   "version": "1.1.0",
-  "description": "Removes Facebook's tracking from external links and videos",
+  "description": "Removes Facebook's tracking from links and videos",
   "permissions": [
     "storage",
     "*://*.facebook.com/*"
   ],
 
   "options_ui": {
-    "page": "options.html"
+    "page": "src/options.html",
+    "chrome_style": true
   },
 
   "content_scripts": [
     {
       "matches": ["*://*.facebook.com/*"],
-      "js": ["util.js", "app.js"],
+      "css": ["src/app.css"],
+      "js": ["src/common.js", "src/util.js", "src/app.js", "init.js"],
       "run_at": "document_end"
     }
   ]

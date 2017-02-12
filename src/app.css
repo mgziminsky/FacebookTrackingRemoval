@@ -1,0 +1,28 @@
+/* Make mobile article links clickable */
+section.touchable > a {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 41;
+}
+
+.fbtrCollapsible {
+    padding: 10px;
+}
+
+.fbtrCollapsible > div:first-of-type {
+    display: none;
+}
+
+.fbtrCollapsible.open > div:first-of-type {
+    display: initial;
+}
+
+.fbtrLabel {
+    display: block;
+    width: 100%;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
