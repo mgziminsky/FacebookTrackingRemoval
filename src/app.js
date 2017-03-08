@@ -18,8 +18,10 @@ const FBTR = {
 
             elem.parentNode.appendChild(wrapper);
             wrapper.appendChild(elem);
+            log("Collapsed " + label);
         } else {
             elem.remove();
+            log("Removed " + label);
         }
     },
 
@@ -109,16 +111,13 @@ const FBTR = {
         for (let pixel of pixels) {
             FBTR.hide(pixel.parentNode, "Sponsored Article");
             pixel.remove();
-            log("Sponsored Article Hidden");
         }
     },
 
     removeSuggestions: function(node) {
-        const elements = (node.parentNode || node).querySelectorAll("span._m8d");
+        const elements = (node.parentNode || node).querySelectorAll("span._m8d,span.fcb");
         for (let e of elements) {
-            e.classList.remove("_m8d"); // avoid infinite recursion
             FBTR.hide(e.closest("div.mbm"), e.innerText);
-            log(e.innerText + " Hidden");
         }
     },
 

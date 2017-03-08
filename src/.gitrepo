@@ -4,8 +4,8 @@
 ; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
 ;
 [subrepo]
-	remote = origin
+	remote = .
 	branch = master
-	commit = df68c619726d0a4f341172a531207185cf4d9628
-	parent = 1e3d944242a790ce974488ce2b7633d76afaa722
+	commit = 169f01d3d04a42213ef4e9b8d34e4abc245b2ba5
+	parent = 407f0721f2b9948c1d1f29fdd7292d8435fba847
 	cmdver = 0.3.0

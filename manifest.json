@@ -7,7 +7,7 @@
   },
 
   "name": "Facebook Tracking Removal",
-  "version": "1.3.7",
+  "version": "1.3.8",
   "description": "Removes Facebook's tracking from links and videos",
   "permissions": [
     "storage",

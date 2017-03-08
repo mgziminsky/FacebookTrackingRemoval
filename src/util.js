@@ -38,16 +38,12 @@ function removeAllAttrs(elem) {
 }
 
 function buildCollapsible(label) {
-    const content = document.createElement("span");
-    content.textContent = "Show " + label;
+    const content = document.createElement("summary");
+    content.textContent = label;
     content.classList.add("fbtrLabel");
 
-    const collapsible = document.createElement("div");
+    const collapsible = document.createElement("details");
     collapsible.classList.add("fbtrCollapsible", "mbm");
-    collapsible.addEventListener("click", function(e) {
-        content.textContent = (this.classList.toggle("open") ? "Hide " : "Show ") + label;
-        e.stopPropagation();
-    });
     collapsible.appendChild(content);
 
     return collapsible;
