@@ -8,21 +8,12 @@ section.touchable > a {
     z-index: 41;
 }
 
-.fbtrCollapsible {
-    padding: 10px;
+details.fbtrCollapsible {
+    padding: 0 10px;
 }
 
-.fbtrCollapsible > div:first-of-type {
-    display: none;
-}
-
-.fbtrCollapsible.open > div:first-of-type {
-    display: initial;
-}
-
-.fbtrLabel {
-    display: block;
-    width: 100%;
+summary.fbtrLabel {
+    margin: 10px 0;
     cursor: pointer;
     font-size: 0.8rem;
 }
