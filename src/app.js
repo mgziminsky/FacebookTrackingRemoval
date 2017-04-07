@@ -107,7 +107,7 @@ const FBTR = {
     /**** END LINK TRACKING ****/
 
     removeSponsored: function(node) {
-        const pixels = (node.parentNode || node).querySelectorAll(".fbEmuTracking");
+        const pixels = node.querySelectorAll(".fbEmuTracking");
         for (let pixel of pixels) {
             FBTR.hide(pixel.parentNode, "Sponsored Article");
             pixel.remove();
@@ -115,7 +115,7 @@ const FBTR = {
     },
 
     removeSuggestions: function(node) {
-        const elements = (node.parentNode || node).querySelectorAll("span._m8d,span.fcb");
+        const elements = node.querySelectorAll("div._5g-l,span.fcb");
         for (let e of elements) {
             FBTR.hide(e.closest("div.mbm"), e.innerText);
         }
@@ -132,36 +132,36 @@ const FBTR = {
 
         log("Initializing Tracking Removal");
         log(FBTR.options);
+        const body = document.body;
 
         new MutationObserver(function(mutations) {
             mutations.forEach(function(mutation) {
-                for (let node of mutation.addedNodes) {
-                    if (node.nodeType !== Node.ELEMENT_NODE)
-                        continue;
+                if (mutation.addedNodes.length) {
+                    const target = mutation.target;
 
                     if (FBTR.options.delPixeled)
-                        FBTR.removeSponsored(node);
+                        FBTR.removeSponsored(target);
 
                     if (FBTR.options.delSuggest)
-                        FBTR.removeSuggestions(node);
+                        FBTR.removeSuggestions(target);
 
-                    if (FBTR.options.fixLinks && FBTR.removeLinkTracking(node)) {
-                        mutation.target.addEventListener("click", restrictEventPropagation, true);
-                        mutation.target.addEventListener("mousedown", restrictEventPropagation, true);
+                    if (FBTR.options.fixLinks && FBTR.removeLinkTracking(target)) {
+                        target.addEventListener("click", restrictEventPropagation, true);
+                        target.addEventListener("mousedown", restrictEventPropagation, true);
                     }
                 }
             });
-        }).observe(document, { childList: true, subtree: true, attributes: false, characterData: false });
+        }).observe(body, { childList: true, subtree: true, attributes: false, characterData: false });
 
         if (FBTR.options.delPixeled)
         {
-            FBTR.hide(document.getElementById("pagelet_ego_pane"), "Sponsored Ads");
-            FBTR.removeSponsored(document);
+            FBTR.hide(body.getElementById("pagelet_ego_pane"), "Sponsored Ads");
+            FBTR.removeSponsored(body);
         }
         if (FBTR.options.delSuggest)
-            FBTR.removeSuggestions(document);
+            FBTR.removeSuggestions(body);
         if (FBTR.options.fixLinks)
-            FBTR.removeLinkTracking(document);
+            FBTR.removeLinkTracking(body);
 
         if (FBTR.options.fixVideos) {
             // Desktop only
@@ -181,9 +181,9 @@ const FBTR = {
                 mutations.forEach(function(mutation) {
                     removeVideoTracking(mutation.target);
                 });
-            }).observe(document, { attributes: true, attributeFilter: ["src"], subtree: true, childList: false, characterData: false });
+            }).observe(body, { attributes: true, attributeFilter: ["src"], subtree: true, childList: false, characterData: false });
 
-            for (let video of document.querySelectorAll("video[src]"))
+            for (let video of body.querySelectorAll("video[src]"))
                 removeVideoTracking(video);
         }
     }
