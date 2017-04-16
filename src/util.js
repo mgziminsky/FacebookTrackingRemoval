@@ -6,7 +6,8 @@ function isAllowedTarget(e) {
 
     // Walk through event target and parents until the currentTarget looking for an element
     while (e.currentTarget !== checkTarget) {
-        if (ALLOWED_CLICK_ELEMENTS.includes(checkTarget.tagName) || checkTarget.classList.contains("fbtrCollapsible"))
+        let role = checkTarget.attributes.role;
+        if (ALLOWED_CLICK_ELEMENTS.includes(checkTarget.tagName) || (role && role.value.toUpperCase() == "BUTTON"))
             return true;
         checkTarget = checkTarget.parentNode;
     }
