@@ -145,23 +145,31 @@ const FBTR = {
                     if (FBTR.options.delSuggest)
                         FBTR.removeSuggestions(target);
 
-                    if (FBTR.options.fixLinks && FBTR.removeLinkTracking(target)) {
-                        target.addEventListener("click", restrictEventPropagation, true);
-                        target.addEventListener("mousedown", restrictEventPropagation, true);
+                    if (FBTR.options.fixLinks) {
+                        for (let node of mutation.addedNodes) {
+                            if (node.nodeType == Node.ELEMENT_NODE && FBTR.removeLinkTracking(node)) {
+                                node.addEventListener("click", restrictEventPropagation, true);
+                                node.addEventListener("mousedown", restrictEventPropagation, true);
+                            }
+                        }
                     }
                 }
             });
         }).observe(body, { childList: true, subtree: true, attributes: false, characterData: false });
 
-        if (FBTR.options.delPixeled)
-        {
-            FBTR.hide(body.getElementById("pagelet_ego_pane"), "Sponsored Ads");
-            FBTR.removeSponsored(body);
-        }
         if (FBTR.options.delSuggest)
             FBTR.removeSuggestions(body);
-        if (FBTR.options.fixLinks)
-            FBTR.removeLinkTracking(body);
+        if (FBTR.options.delPixeled) {
+            FBTR.hide(document.getElementById("pagelet_ego_pane"), "Sponsored Ads");
+            FBTR.removeSponsored(body);
+        }
+        if (FBTR.options.fixLinks && FBTR.removeLinkTracking(body)) {
+            const feed = document.getElementById("newsFeedHeading").parentNode;
+            for (let stream of feed.querySelectorAll("div._4ikz")) {
+                stream.addEventListener("click", restrictEventPropagation, true);
+                stream.addEventListener("mousedown", restrictEventPropagation, true);
+            }
+        }
 
         if (FBTR.options.fixVideos) {
             // Desktop only
