@@ -1,36 +1,47 @@
 {
-  "manifest_version": 2,
+  "name": "Facebook Tracking Removal",
+  "version": "1.4.0",
+  "description": "Removes Facebook's tracking from links and videos",
+  "icons": { "96": "src/icon.png" },
+
+  "author": "Michael Ziminsky",
+  "homepage_url": "https://github.com/mgziminsky/FacebookTrackingRemoval/tree/Firefox",
+
   "applications": {
     "gecko": {
-      "id": "{bb1b80be-e6b3-40a1-9b6e-9d4073343f0b}"
+      "id": "{bb1b80be-e6b3-40a1-9b6e-9d4073343f0b}",
+      "strict_min_version": "49.0"
     }
   },
 
-  "name": "Facebook Tracking Removal",
-  "version": "1.3.9.1",
-  "description": "Removes Facebook's tracking from links and videos",
   "permissions": [
+    "*://*.facebook.com/*",
     "storage",
-    "*://*.facebook.com/*"
+    "tabs"
   ],
 
   "options_ui": {
     "page": "src/options.html"
   },
 
-  "web_accessible_resources": ["options.html"],
+  "background": {
+    "scripts": ["src/background.js"]
+  },
+
+  "page_action": {
+    "browser_style": true,
+    "default_icon": "src/icon.png",
+    "default_popup": "src/options.html"
+  },
 
   "content_scripts": [
     {
       "matches": ["*://*.facebook.com/*"],
       "css": ["src/app.css"],
-      "js": ["src/common.js", "src/util.js", "src/app.js", "init.js"],
+      "js": ["src/common.js", "src/util.js", "src/app.js"],
       "run_at": "document_end"
     }
   ],
 
-  "developer": {
-    "name": "Michael Ziminsky"
-  },
-  "homepage_url": "https://github.com/mgziminsky/FacebookTrackingRemoval/tree/Firefox"
+  "manifest_version": 2
 }
