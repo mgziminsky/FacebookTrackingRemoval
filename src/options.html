@@ -6,12 +6,14 @@
         ul { list-style: none; }
         li { margin: 10px; }
         textarea { display: block; }
-        #toggleExpert { cursor: pointer; }
-        #expertOpts { display: none; }
-        #expertOpts.visible { display: block; }
-        #expertOpts label { display: block; margin: 10px; }
+
+        details { padding: 5px; border: inset 1px; }
+        details label { display: block; margin: 10px; }
+        details > summary { cursor: pointer; }
+
         #preview { white-space: nowrap; }
-        #hideMethod > label {  margin: 0 5px; }
+        #_hideMethod > label {  margin: 0 5px; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
@@ -24,20 +26,27 @@
         <ul>
             <li>
                 <label>
+                    <input type="checkbox" id="enableSync">
+                    Sync settings across devices
+                </label>
+                <hr>
+            </li>
+            <li>
+                <label>
                     <input type="checkbox" id="fixLinks">
                     Remove tracking from external links
                 </label>
             </li>
             <li>
                 <label>
-                    <input type="checkbox" id="inlineVids">
-                    Replace redirect links to videos with the actual video <em>(Only affects mobile; May increase data usage)</em>
+                    <input type="checkbox" id="fixVideos">
+                    Remove tracking from videos on desktop <em>(Currently breaks most videos)</em>
                 </label>
             </li>
             <li>
                 <label>
-                    <input type="checkbox" id="fixVideos">
-                    Remove tracking from videos <em>(Currently breaks most videos)</em>
+                    <input type="checkbox" id="inlineVids">
+                    Inline videos on mobile <em>(Only affects mobile; May increase data usage)</em>
                 </label>
             </li>
             <li>
@@ -52,10 +61,10 @@
                     Hide inline suggestions <em>(eg: Suggested Posts, People You May Know)</em>
                 </label>
             </li>
-            <li id="hideMethod">
+            <li id="_hideMethod">
                 Hide method:
-                <label><input type="radio" name="hm" value="collapse"> Collapse</label>
-                <label><input type="radio" name="hm" value="remove"> Remove</label>
+                <label><input type="radio" name="hideMethod" value="collapse"> Collapse</label>
+                <label><input type="radio" name="hideMethod" value="remove"> Remove</label>
             </li>
             <li>
                 <label>
@@ -64,9 +73,9 @@
                 </label>
             </li>
             <li>
-                <fieldset style="border-style: inset">
-                    <legend><a id="toggleExpert"><span>Show</span> Advanced Options</a></legend>
-                    <div id="expertOpts">
+                <details>
+                    <summary>Advanced Options</summary>
+                    <div>
                         <label>
                             Custom CSS style to be added to modified elements: <span id="preview">STYLE PREVIEW</span>
                             <textarea id="modStyle" cols="50" rows="1"></textarea>
@@ -76,7 +85,7 @@
                             Display log messages in the console
                         </label>
                     </div>
-                </fieldset>
+                </details>
             </li>
         </ul>
         <button type="button" id="reset" class="addon-control">Restore Defaults</button>

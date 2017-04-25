@@ -7,5 +7,9 @@ const defaultOptions = {
     "hideMethod": "collapse",
     "useStyle":   true,
     "logging":    false,
-    "modStyle":   "border: 1px dashed green"
+    "modStyle":   "border: 1px dashed green !important;"
+};
+
+const localOptions = {
+    "enableSync": false
 };
