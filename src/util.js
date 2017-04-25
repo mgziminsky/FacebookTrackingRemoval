@@ -4,10 +4,10 @@ const ALLOWED_CLICK_ELEMENTS = ["A", "INPUT", "SELECT", "BUTTON"];
 function isAllowedTarget(e) {
     let checkTarget = e.target;
 
-    // Walk through event target and parents until the currentTarget looking for an element
+    // Walk through event target and parents until the currentTarget looking for an element that clicks are allowed on
     while (e.currentTarget !== checkTarget) {
         let role = checkTarget.attributes.role;
-        if (ALLOWED_CLICK_ELEMENTS.includes(checkTarget.tagName) || (role && role.value.toUpperCase() == "BUTTON"))
+        if (ALLOWED_CLICK_ELEMENTS.includes(checkTarget.tagName) || checkTarget.classList.contains("FBTR-SAFE") || (role && role.value.toUpperCase() == "BUTTON"))
             return true;
         checkTarget = checkTarget.parentNode;
     }
@@ -48,4 +48,11 @@ function buildCollapsible(label) {
     collapsible.appendChild(content);
 
     return collapsible;
+}
+
+function getOptions() {
+    return browser.storage.local.get(localOptions).then(opts => {
+        const storage = browser.storage[opts.enableSync ? "sync" : "local"] || browser.storage.local;
+        return storage.get();
+    });
 }
