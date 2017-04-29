@@ -100,6 +100,28 @@ const FBTR = {
         return trackedLinks.length;
     },
 
+    stripRefs: function(node) {
+        const intLinks = node.querySelectorAll("a[href^='/'],a[href^='#'][ajaxify]");
+        for (let a of intLinks) {
+            const before = a.cloneNode();
+            const href = a.href;
+            a.href = cleanLinkParams(href);
+
+            let cleaned = (a.href != href);
+
+            if (a.hasAttribute("ajaxify")) {
+                cleaned = true;
+                a.setAttribute("ajaxify", cleanLinkParams(a.getAttribute("ajaxify")));
+            }
+
+            if (cleaned) {
+                FBTR.applyStyle(a);
+                log("Cleaned internal link params: " + before);
+            }
+        }
+        return intLinks.length;
+    },
+
     removeLinkTracking: function(node) {
         return FBTR.cleanShimLinks(node)
                + FBTR.fixVideoLinks(node)
@@ -118,9 +140,9 @@ const FBTR = {
     },
 
     removeSuggestions: function(node) {
-        const elements = node.querySelectorAll("div._5g-l,span.fcb,h3._5x3-");
+        const elements = node.querySelectorAll("div._3653,div._5g-l,span.fcb,h3._5x3-");
         for (let e of elements) {
-            FBTR.hide(e.closest("div.mbm,div._55wo"), e.innerText);
+            FBTR.hide(e.closest("div.pagelet,div.mbm,div._55wo"), e.innerText);
         }
     },
 
@@ -144,11 +166,14 @@ const FBTR = {
                     if (mutation.addedNodes.length) {
                         const target = mutation.target;
 
-                        if (FBTR.options.delPixeled)
-                            FBTR.removeSponsored(target);
+                        if (FBTR.options.internalRefs)
+                            FBTR.stripRefs(target);
 
                         if (FBTR.options.delSuggest)
                             FBTR.removeSuggestions(target);
+
+                        if (FBTR.options.delPixeled)
+                            FBTR.removeSponsored(target);
 
                         if (FBTR.options.fixLinks) {
                             for (let node of mutation.addedNodes) {
@@ -162,13 +187,13 @@ const FBTR = {
                 });
             }).observe(body, { childList: true, subtree: true, attributes: false, characterData: false });
 
+            if (FBTR.options.internalRefs)
+                FBTR.stripRefs(body);
             if (FBTR.options.delSuggest)
                 FBTR.removeSuggestions(body);
-            if (FBTR.options.delPixeled) {
-                const ego_pane = document.getElementById("pagelet_ego_pane");
-                if (ego_pane) FBTR.hide(ego_pane, "Sponsored Ads");
+            if (FBTR.options.delPixeled)
                 FBTR.removeSponsored(body);
-            }
+
             if (FBTR.options.fixLinks && FBTR.removeLinkTracking(body) && document.getElementById("newsFeedHeading")) {
                 const feed = document.getElementById("newsFeedHeading").parentNode;
                 for (let stream of feed.querySelectorAll("div._4ikz")) {

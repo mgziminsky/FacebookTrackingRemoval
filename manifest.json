@@ -1,7 +1,7 @@
 {
-  "name": "Facebook Tracking Removal",
-  "version": "1.4.0",
-  "description": "Removes Facebook's tracking from links and videos",
+  "name": "Facebook™ Tracking & Ad Removal",
+  "version": "1.4.1",
+  "description": "Provides options to remove Facebook™'s tracking from links and videos, and to remove ads from your feed",
   "icons": { "96": "src/icon.png" },
 
   "author": "Michael Ziminsky",
@@ -28,6 +28,7 @@
 
   "content_scripts": [
     {
+      "all_frames": true,
       "matches": ["*://*.facebook.com/*"],
       "css": ["src/app.css"],
       "js": ["browser-polyfill.min.js", "src/common.js", "src/util.js", "src/app.js"],
