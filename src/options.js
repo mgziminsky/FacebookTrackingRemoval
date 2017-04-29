@@ -61,11 +61,11 @@
 
 
     function init() {
-        browser.storage.local.get(localOptions).then(localOpts => {
+        return browser.storage.local.get(localOptions).then(localOpts => {
             enableSync.checked = localOpts.enableSync;
             storage = browser.storage[selectedStorage()] || browser.storage.local;
 
-            storage.get(defaultOptions).then(opts => {
+            return storage.get(defaultOptions).then(opts => {
                 for (let key in opts) {
                     const value = opts[key];
                     const item = document.getElementById(key);
@@ -88,5 +88,9 @@
             });
         });
     }
-    init();
+    init().then(() => {
+        let dirty = false;
+        browser.storage.onChanged.addListener(() => dirty = true);
+        window.addEventListener("unload", () => { if (dirty) browser.runtime.sendMessage("RELOAD"); });
+    });
 }());

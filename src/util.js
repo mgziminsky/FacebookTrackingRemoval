@@ -44,10 +44,23 @@ function buildCollapsible(label) {
     content.classList.add("fbtrLabel");
 
     const collapsible = document.createElement("details");
-    collapsible.classList.add("fbtrCollapsible", "mbm");
+    collapsible.classList.add("fbtrCollapsible", "mbm", "_4-u8");
     collapsible.appendChild(content);
 
     return collapsible;
+}
+
+const STRIPPED_PARAMS = ["ref", "ref_type", "source"];
+function cleanLinkParams(link) {
+    try {
+        const url = new URL(link, location.origin);
+        const cleanParams = new URLSearchParams(url.search);
+        STRIPPED_PARAMS.forEach(cleanParams.delete.bind(cleanParams));
+        url.search = cleanParams;
+        return url.pathname + url.search;
+    } catch (e) {
+        return link;
+    }
 }
 
 function getOptions() {
