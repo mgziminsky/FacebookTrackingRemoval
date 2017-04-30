@@ -1,0 +1,65 @@
+v1.4.1
+- Option to remove referrer tracking on internal links
+- Auto refresh Facebook™ pages after changing options
+- Improved sidebar ad blocking
+
+v1.4.0
+- Add icon and options page action
+- Fixes for mobile
+- Option to sync options across devices [FF 53+]
+
+v1.3.9
+- Hide "A video you may like"
+
+v1.3.8
+- Hide "People You May Know"
+- Use HTML5 details for collapsing posts
+
+v1.3.7
+- Hide sponsored ads panel
+- Fix non-link click tracking prevention
+- Fix options reset
+
+v1.3.6
+- Fix suggested posts not being removed
+- Add option to collapse suggested posts and sponsored/pixeled articles instead of remove
+- Changed default for some settings 
+
+v1.3.5
+- Fix buttons in certain overlays not being clickable 
+
+v1.3.4
+- Option to remove inline suggestions
+- Fix buttons on menus in the settings not being clickable
+- Fix logging option not showing proper state on options page
+
+v1.3.3
+- Fix Facebook page links no longer opening in an overlay.
+
+v1.3.2
+- Fix mobile article links not being clickable
+BUG - Facebook page links that are meant to open in an overlay instead open in a new window/tab
+
+v1.3.1
+- Make log messages optional
+
+v1.3.0
+- Add support for mobile site
+- Add a link to the options page to the menu on mobile site
+- Option to remove pixeled articles like "Suggested Posts"
+- Options page improvements
+
+v1.2.0
+- Add support for videos
+- Add options to enable/disable link and video tracking removal independently
+- Misc code cleanup
+
+v1.1.1
+- Make backwards compatible with older FF
+- Make style applied to 'fixed' links configurable
+
+v1.1.0 (FF v48+ only)
+- Add options page with outline toggle
+
+v1.0.0:
+- Remove link tracking and add green dashed border to fixed links.
