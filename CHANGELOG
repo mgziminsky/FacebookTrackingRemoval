@@ -1,0 +1,23 @@
+
+v1.4.1
+- Option to remove referrer tracking on internal links
+- Improved sidebar ad blocking
+
+v1.4.0
+- Add icon and options page action
+- Fixes for mobile
+- Option to sync options across devices [FF 53+]
+
+v1.3.9
+- Hide "A video you may like"
+
+v1.3.8
+- Hide "People You May Know"
+- Use HTML5 details for collapsing posts
+
+v1.3.7
+- Hide sponsored ads panel
+- Fix non-link click tracking prevention
+- Fix options reset
+
+Older versions only available on Firefox
