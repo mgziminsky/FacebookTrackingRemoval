@@ -100,8 +100,9 @@ const FBTR = {
         return trackedLinks.length;
     },
 
+    _internalLinkSelector: "a[href^='/'],a[href^='#'][ajaxify],a[href^='" + location.origin + "']",
     stripRefs: function(node) {
-        const intLinks = node.querySelectorAll("a[href^='/'],a[href^='#'][ajaxify]");
+        const intLinks = node.querySelectorAll(FBTR._internalLinkSelector);
         for (let a of intLinks) {
             const before = a.cloneNode();
             const href = a.href;
@@ -110,13 +111,14 @@ const FBTR = {
             let cleaned = (a.href != href);
 
             if (a.hasAttribute("ajaxify")) {
-                cleaned = true;
-                a.setAttribute("ajaxify", cleanLinkParams(a.getAttribute("ajaxify")));
+                const ajaxify = a.getAttribute("ajaxify");
+                a.setAttribute("ajaxify", cleanLinkParams(ajaxify));
+                cleaned = (ajaxify != a.getAttribute("ajaxify"));
             }
 
             if (cleaned) {
                 FBTR.applyStyle(a);
-                log("Cleaned internal link params: " + before);
+                log("Cleaned internal link params:\n\t" + before + "\n\t" + a.href);
             }
         }
         return intLinks.length;

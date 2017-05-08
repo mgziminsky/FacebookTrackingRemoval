@@ -1,3 +1,7 @@
+v1.4.2
+- Ad blocking enabled by default
+- Improved internal link cleaning
+
 v1.4.1
 - Option to remove referrer tracking on internal links
 - Auto refresh Facebook™ pages after changing options

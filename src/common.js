@@ -3,7 +3,7 @@ const defaultOptions = {
     "internalRefs":    false,
     "inlineVids":      false,
     "fixVideos":       false,
-    "delPixeled":      false,
+    "delPixeled":      true,
     "delSuggest":      true,
     "hideMethod":      "collapse",
     "useStyle":        true,

@@ -50,14 +50,14 @@ function buildCollapsible(label) {
     return collapsible;
 }
 
-const STRIPPED_PARAMS = ["ref", "ref_type", "source"];
+const STRIPPED_PARAMS = ["ref", "ref_type", "fref", "hc_ref", "rc", "source", "placement", "comment_tracking"];
 function cleanLinkParams(link) {
     try {
         const url = new URL(link, location.origin);
         const cleanParams = new URLSearchParams(url.search);
         STRIPPED_PARAMS.forEach(cleanParams.delete.bind(cleanParams));
         url.search = cleanParams;
-        return url.pathname + url.search;
+        return url.pathname + url.search + url.hash;
     } catch (e) {
         return link;
     }
