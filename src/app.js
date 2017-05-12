@@ -4,7 +4,7 @@ const FBTR = {
 
     applyStyle: function(elem) {
         if (FBTR.options.useStyle)
-            elem.style.cssText = FBTR.options.modStyle;
+            elem.style.cssText += FBTR.options.modStyle;
     },
 
     hide: function(elem, label) {
