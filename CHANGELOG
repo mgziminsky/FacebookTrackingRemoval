@@ -1,3 +1,6 @@
+v1.4.3
+- Preserve existing element styles
+
 v1.4.2
 - Ad blocking enabled by default
 - Improved internal link cleaning
@@ -27,10 +30,10 @@ v1.3.7
 v1.3.6
 - Fix suggested posts not being removed
 - Add option to collapse suggested posts and sponsored/pixeled articles instead of remove
-- Changed default for some settings 
+- Changed default for some settings
 
 v1.3.5
-- Fix buttons in certain overlays not being clickable 
+- Fix buttons in certain overlays not being clickable
 
 v1.3.4
 - Option to remove inline suggestions
