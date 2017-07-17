@@ -1,3 +1,7 @@
+v1.5.0
+- Remove cross-device sync option. It needed some enhancements, but I didn't feel the feature was useful
+- Add option to enable/disable the plugin entirely
+
 v1.4.3
 - Preserve existing element styles
 

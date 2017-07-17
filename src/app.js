@@ -1,78 +1,79 @@
-const FBTR = {
-    options: defaultOptions,
-    inited: false,
+'use strict';
+app.init().then(() => {
+    if (!app.options.enabled)
+        return;
 
-    applyStyle: function(elem) {
-        if (FBTR.options.useStyle)
-            elem.style.cssText += FBTR.options.modStyle;
-    },
+    function applyStyle(elem) {
+        if (app.options.useStyle)
+            elem.style.cssText += app.options.modStyle;
+    }
 
-    hide: function(elem, label) {
-        if (FBTR.options.hideMethod === "collapse") {
+    function hide(elem, label) {
+        if (app.options.hideMethod === "collapse") {
             if (elem.closest(".fbtrCollapsible"))
                 return;
 
             const wrapper = buildCollapsible(label);
-            FBTR.applyStyle(wrapper);
+            applyStyle(wrapper);
             for (let c of elem.classList)
                 wrapper.classList.add(c);
 
             elem.parentNode.appendChild(wrapper);
             wrapper.appendChild(elem);
-            log("Collapsed " + label);
+            app.log("Collapsed " + label);
         } else {
             elem.remove();
-            log("Removed " + label);
+            app.log("Removed " + label);
         }
-    },
+    }
 
-    cleanLink: function(a, href) {
+    function cleanLink(a, href) {
         removeAllAttrs(a);
         a.href = href;
         a.target = "_blank";
         a.addEventListener("click", stopPropagation, false);
         a.addEventListener("mousedown", stopPropagation, false);
-        FBTR.applyStyle(a);
-    },
+        applyStyle(a);
+    }
 
-    buildVideo: function(src, poster) {
+    function buildVideo(src, poster) {
         const video = document.createElement("video");
         video.preload = "metadata";
         video.controls = true;
         video.poster = poster;
         video.setAttribute("width", "100%");
         video.src = src;
-        FBTR.applyStyle(video);
+        applyStyle(video);
         return video;
-    },
+    }
 
     /**** LINK TRACKING ****/
 
     // Desktop only
-    cleanShimLinks: function(node) {
+    function cleanShimLinks(node) {
         const trackedLinks = node.querySelectorAll("a[onclick^='LinkshimAsyncLink.referrer_log']");
         for (let a of trackedLinks) {
-            FBTR.cleanLink(a, extractQuotedString(a.getAttribute("onmouseover")).replace(/\\(.)/g, '$1'));
-            log("Removed tracking from shim link: " + a);
+            cleanLink(a, extractQuotedString(a.getAttribute("onmouseover")).replace(/\\(.)/g, '$1'));
+            app.log("Removed tracking from shim link: " + a);
         }
         return trackedLinks.length;
-    },
+    }
 
     // Mobile only
-    fixVideoLinks: function(node) {
+    function fixVideoLinks(node) {
         const videoLinks = node.querySelectorAll("div[data-sigil=inlineVideo]");
         for (let vid of videoLinks) {
             const vidSrc = JSON.parse(vid.getAttribute("data-store")).src;
 
             const replaceVideo = target => {
                 const poster = extractQuotedString(target.querySelector(".img").style.backgroundImage);
-                const video = FBTR.buildVideo(vidSrc, poster);
+                const video = buildVideo(vidSrc, poster);
                 target.parentNode.replaceChild(video, target);
                 return video;
             };
 
-            if (FBTR.options.inlineVids) {
-                log("Inlined video: " + replaceVideo(vid).src);
+            if (app.options.inlineVids) {
+                app.log("Inlined video: " + replaceVideo(vid).src);
             } else {
                 removeAllAttrs(vid);
                 const target = vid.cloneNode(true);
@@ -83,26 +84,26 @@ const FBTR = {
                     replaceVideo(target).play();
                 }, true);
                 vid.parentNode.replaceChild(target, vid);
-                log("Cleaned deferred inline video: " + vidSrc)
+                app.log("Cleaned deferred inline video: " + vidSrc)
             }
         }
         return videoLinks.length;
-    },
+    }
 
     // Desktop and Mobile
-    cleanRedirectLinks: function(node) {
+    function cleanRedirectLinks(node) {
         const trackedLinks = node.querySelectorAll("a[href*='facebook.com/l.php?']");
         for (let a of trackedLinks) {
             const newHref = decodeURIComponent((/\bu=([^&]*)/).exec(a.href)[1]);
-            FBTR.cleanLink(a, newHref);
-            log("Removed tracking from redirect link: " + a);
+            cleanLink(a, newHref);
+            app.log("Removed tracking from redirect link: " + a);
         }
         return trackedLinks.length;
-    },
+    }
 
-    _internalLinkSelector: "a[href^='/'],a[href^='#'][ajaxify],a[href^='" + location.origin + "']",
-    stripRefs: function(node) {
-        const intLinks = node.querySelectorAll(FBTR._internalLinkSelector);
+    const _internalLinkSelector = `a[href^='/'],a[href^='#'][ajaxify],a[href^='${location.origin}']`;
+    function stripRefs(node) {
+        const intLinks = node.querySelectorAll(_internalLinkSelector);
         for (let a of intLinks) {
             const before = a.cloneNode();
             const href = a.href;
@@ -117,123 +118,106 @@ const FBTR = {
             }
 
             if (cleaned) {
-                FBTR.applyStyle(a);
-                log("Cleaned internal link params:\n\t" + before + "\n\t" + a.href);
+                applyStyle(a);
+                app.log("Cleaned internal link params:\n\t" + before + "\n\t" + a.href);
             }
         }
         return intLinks.length;
-    },
+    }
 
-    removeLinkTracking: function(node) {
-        return FBTR.cleanShimLinks(node)
-               + FBTR.fixVideoLinks(node)
-               + FBTR.cleanRedirectLinks(node)
+    function removeLinkTracking(node) {
+        return cleanShimLinks(node)
+               + fixVideoLinks(node)
+               + cleanRedirectLinks(node)
                ;
-    },
+    }
 
     /**** END LINK TRACKING ****/
 
-    removeSponsored: function(node) {
+    function removeSponsored(node) {
         const pixels = node.querySelectorAll(".fbEmuTracking");
         for (let pixel of pixels) {
-            FBTR.hide(pixel.parentNode, "Sponsored Article");
+            hide(pixel.parentNode, "Sponsored Article");
             pixel.remove();
         }
-    },
+    }
 
-    removeSuggestions: function(node) {
+    function removeSuggestions(node) {
         const elements = node.querySelectorAll("div._3653,div._5g-l,span.fcb,h3._5x3-");
         for (let e of elements) {
-            FBTR.hide(e.closest("div.pagelet,div.mbm,div._55wo"), e.innerText);
+            hide(e.closest("div.pagelet,div.mbm,div._55wo"), e.innerText);
         }
-    },
+    }
 
-    init: function() {
-        return getOptions().then(options => {
-            if (FBTR.inited) return;
+    app.log("Initializing Tracking Removal");
+    app.log(JSON.stringify(app.options));
+    const body = document.body;
 
-            FBTR.options = Object.assign({}, FBTR.options, options);
+    new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.addedNodes.length) {
+                const target = mutation.target;
 
-            if (FBTR.options.logging)
-                log = console.log.bind(console);
-            else
-                log = function(){};
+                if (app.options.internalRefs)
+                    stripRefs(target);
 
-            log("Initializing Tracking Removal");
-            log(FBTR.options);
-            const body = document.body;
+                if (app.options.delSuggest)
+                    removeSuggestions(target);
 
-            new MutationObserver(function(mutations) {
-                mutations.forEach(function(mutation) {
-                    if (mutation.addedNodes.length) {
-                        const target = mutation.target;
+                if (app.options.delPixeled)
+                    removeSponsored(target);
 
-                        if (FBTR.options.internalRefs)
-                            FBTR.stripRefs(target);
-
-                        if (FBTR.options.delSuggest)
-                            FBTR.removeSuggestions(target);
-
-                        if (FBTR.options.delPixeled)
-                            FBTR.removeSponsored(target);
-
-                        if (FBTR.options.fixLinks) {
-                            for (let node of mutation.addedNodes) {
-                                if (node.nodeType == Node.ELEMENT_NODE && FBTR.removeLinkTracking(node)) {
-                                    node.addEventListener("click", restrictEventPropagation, true);
-                                    node.addEventListener("mousedown", restrictEventPropagation, true);
-                                }
-                            }
+                if (app.options.fixLinks) {
+                    for (let node of mutation.addedNodes) {
+                        if (node.nodeType == Node.ELEMENT_NODE && removeLinkTracking(node)) {
+                            node.addEventListener("click", restrictEventPropagation, true);
+                            node.addEventListener("mousedown", restrictEventPropagation, true);
                         }
                     }
-                });
-            }).observe(body, { childList: true, subtree: true, attributes: false, characterData: false });
-
-            if (FBTR.options.internalRefs)
-                FBTR.stripRefs(body);
-            if (FBTR.options.delSuggest)
-                FBTR.removeSuggestions(body);
-            if (FBTR.options.delPixeled)
-                FBTR.removeSponsored(body);
-
-            if (FBTR.options.fixLinks && FBTR.removeLinkTracking(body) && document.getElementById("newsFeedHeading")) {
-                const feed = document.getElementById("newsFeedHeading").parentNode;
-                for (let stream of feed.querySelectorAll("div._4ikz")) {
-                    stream.addEventListener("click", restrictEventPropagation, true);
-                    stream.addEventListener("mousedown", restrictEventPropagation, true);
                 }
             }
-
-            if (FBTR.options.fixVideos) {
-                // Desktop only
-                function removeVideoTracking(video) {
-                    if (video.nodeName === "VIDEO" && video.src) {
-                        const img = video.parentNode.querySelector("img._1445");
-                        if (!img) return;
-
-                        const poster = extractQuotedString(img.style.backgroundImage);
-                        const cleanVideo = FBTR.buildVideo(video.src, poster);
-
-                        const replaceTarget = video.closest("span._3m6-") || video.parentNode;
-                        replaceTarget.parentNode.replaceChild(cleanVideo, replaceTarget);
-
-                        log("Removed tracking from video: " + cleanVideo.src);
-                    }
-                }
-
-                new MutationObserver(function(mutations) {
-                    mutations.forEach(function(mutation) {
-                        removeVideoTracking(mutation.target);
-                    });
-                }).observe(body, { attributes: true, attributeFilter: ["src"], subtree: true, childList: false, characterData: false });
-
-                for (let video of body.querySelectorAll("video[src]"))
-                    removeVideoTracking(video);
-            }
-
-            FBTR.inited = true;
         });
-    }
-};
+    }).observe(body, { childList: true, subtree: true, attributes: false, characterData: false });
 
-FBTR.init().catch(console.log);
+    if (app.options.internalRefs)
+        stripRefs(body);
+    if (app.options.delSuggest)
+        removeSuggestions(body);
+    if (app.options.delPixeled)
+        removeSponsored(body);
+
+    if (app.options.fixLinks && removeLinkTracking(body) && document.getElementById("newsFeedHeading")) {
+        const feed = document.getElementById("newsFeedHeading").parentNode;
+        for (let stream of feed.querySelectorAll("div._4ikz")) {
+            stream.addEventListener("click", restrictEventPropagation, true);
+            stream.addEventListener("mousedown", restrictEventPropagation, true);
+        }
+    }
+
+    if (app.options.fixVideos) {
+        // Desktop only
+        function removeVideoTracking(video) {
+            if (video.nodeName === "VIDEO" && video.src) {
+                const img = video.parentNode.querySelector("img._1445");
+                if (!img) return;
+
+                const poster = extractQuotedString(img.style.backgroundImage);
+                const cleanVideo = buildVideo(video.src, poster);
+
+                const replaceTarget = video.closest("span._3m6-") || video.parentNode;
+                replaceTarget.parentNode.replaceChild(cleanVideo, replaceTarget);
+
+                app.log("Removed tracking from video: " + cleanVideo.src);
+            }
+        }
+
+        new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                removeVideoTracking(mutation.target);
+            });
+        }).observe(body, { attributes: true, attributeFilter: ["src"], subtree: true, childList: false, characterData: false });
+
+        for (let video of body.querySelectorAll("video[src]"))
+            removeVideoTracking(video);
+    }
+}, console.log);

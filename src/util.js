@@ -1,4 +1,4 @@
-var log = function(){};
+'use strict';
 
 const ALLOWED_CLICK_ELEMENTS = ["A", "INPUT", "SELECT", "BUTTON"];
 function isAllowedTarget(e) {
@@ -61,11 +61,4 @@ function cleanLinkParams(link) {
     } catch (e) {
         return link;
     }
-}
-
-function getOptions() {
-    return browser.storage.local.get(localOptions).then(opts => {
-        const storage = browser.storage[opts.enableSync ? "sync" : "local"] || browser.storage.local;
-        return storage.get();
-    });
 }
