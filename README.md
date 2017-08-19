@@ -1,4 +1,4 @@
-[![Mozilla Add-on](https://img.shields.io/amo/v/facebook-tracking-removal.svg)](https://addons.mozilla.org/addon/facebook-tracking-removal?src=external-github)
+[![Mozilla Add-on](https://img.shields.io/amo/v/facebook-tracking-removal.svg)](https://addons.mozilla.org/firefox/downloads/latest/facebook-tracking-removal/addon-716014-latest.xpi?src=external-github)
 [![Mozilla Add-on](https://img.shields.io/amo/d/facebook-tracking-removal.svg)](https://addons.mozilla.org/addon/facebook-tracking-removal?src=external-github)
 [![Mozilla Add-on](https://img.shields.io/amo/users/facebook-tracking-removal.svg)](https://addons.mozilla.org/addon/facebook-tracking-removal?src=external-github)
 [![Mozilla Add-on](https://img.shields.io/amo/stars/facebook-tracking-removal.svg)](https://addons.mozilla.org/addon/facebook-tracking-removal?src=external-github)
