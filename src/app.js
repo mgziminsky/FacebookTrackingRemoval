@@ -142,8 +142,16 @@ app.init().then(() => {
         }
     }
 
+    const _suggestionsSelector = [
+        "div._3653", // Sidebar Content
+        "div._50f4", // Related Articles
+        "div._5_xt", // Popular Across Facebook
+        "div._5g-l", // A Video You May Like
+        "h3._5x3-",  // Suggested Post???
+        "span.fcb"   // People You May Know
+    ].join(",");
     function removeSuggestions(node) {
-        const elements = node.querySelectorAll("div._3653,div._5g-l,span.fcb,h3._5x3-");
+        const elements = node.querySelectorAll(_suggestionsSelector);
         for (let e of elements) {
             hide(e.closest("div.pagelet,div.mbm,div._55wo"), e.innerText);
         }
