@@ -137,7 +137,7 @@ app.init().then(() => {
     function removeSponsored(node) {
         const pixels = node.querySelectorAll(".fbEmuTracking");
         for (let pixel of pixels) {
-            hide(pixel.parentNode, "Sponsored Article");
+            hide(pixel.parentNode, "Sponsored Article (This setting is misbehaving, I suggest disabling it for now)");
             pixel.remove();
         }
     }
@@ -148,7 +148,9 @@ app.init().then(() => {
         "div._5_xt", // Popular Across Facebook
         "div._5g-l", // A Video You May Like
         "h3._5x3-",  // Suggested Post???
-        "span.fcb"   // People You May Know
+        "span.fcb",  // People You May Know
+        "div._d_q",  // Page Stories You May Like
+        "div.fsl"    // Games You May Like
     ].join(",");
     function removeSuggestions(node) {
         const elements = node.querySelectorAll(_suggestionsSelector);

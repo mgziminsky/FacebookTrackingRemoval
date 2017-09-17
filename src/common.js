@@ -10,7 +10,7 @@ const app = {};
         internalRefs: false,
         inlineVids: false,
         fixVideos: false,
-        delPixeled: true,
+        delPixeled: false,
         delSuggest: true,
         hideMethod: "collapse",
         useStyle: true,
