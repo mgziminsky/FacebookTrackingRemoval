@@ -1,3 +1,9 @@
+v1.5.3
+- Fix Sponsored hiding
+- Fix Mobile hiding
+- Include new "Suggested Post" class
+- Hide suggestions on photo overlay
+
 v1.5.2
 - Hide "Page Stories You May Like"
 - Hide "Games You May Like"

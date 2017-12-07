@@ -3,6 +3,28 @@ app.init().then(() => {
     if (!app.options.enabled)
         return;
 
+    const _suggestionsSelector = [
+        "div._3653",                    // Sidebar Content
+        "div._50f4",                    // Related Articles/FB Promotions
+        "div._5_xt",                    // Popular Across Facebook
+        "div._5g-l",                    // A Video You May Like
+        "h3._5x3-",                     // Suggested Post???
+        "div.y_1hcf_5qplr",             // Suggested Post
+        "header._5rgs",                 // Suggested Post (Mobile)
+        "span.fcb",                     // People You May Know
+        "div._d_q",                     // Page Stories You May Like
+        "div.fsl",                      // Games You May Like
+        "div.ego_section h6"            // Photo overlay suggestions
+    ].join(",");
+
+    const _sponsoredSelector = [
+        ".h_1hcf_5rdlb",               // From CSS
+        ".x_1hcf_5o896",               // From CSS
+        ".w_1hcf_5oxu9 > a",           // From document
+        "div._5qc4 > span:first-child" // Mobile
+    ].join(",");
+
+
     function applyStyle(elem) {
         if (app.options.useStyle)
             elem.style.cssText += app.options.modStyle;
@@ -31,8 +53,8 @@ app.init().then(() => {
         removeAllAttrs(a);
         a.href = href;
         a.target = "_blank";
-        a.addEventListener("click", stopPropagation, false);
-        a.addEventListener("mousedown", stopPropagation, false);
+        a.addEventListener("click", stopPropagation, true);
+        a.addEventListener("mousedown", stopPropagation, true);
         applyStyle(a);
     }
 
@@ -134,28 +156,10 @@ app.init().then(() => {
 
     /**** END LINK TRACKING ****/
 
-    function removeSponsored(node) {
-        const pixels = node.querySelectorAll(".fbEmuTracking");
-        for (let pixel of pixels) {
-            hide(pixel.parentNode, "Sponsored Article (This setting is misbehaving, I suggest disabling it for now)");
-            pixel.remove();
-        }
-    }
-
-    const _suggestionsSelector = [
-        "div._3653", // Sidebar Content
-        "div._50f4", // Related Articles
-        "div._5_xt", // Popular Across Facebook
-        "div._5g-l", // A Video You May Like
-        "h3._5x3-",  // Suggested Post???
-        "span.fcb",  // People You May Know
-        "div._d_q",  // Page Stories You May Like
-        "div.fsl"    // Games You May Like
-    ].join(",");
-    function removeSuggestions(node) {
-        const elements = node.querySelectorAll(_suggestionsSelector);
+    function removeArticles(node, selector) {
+        const elements = node.querySelectorAll(selector);
         for (let e of elements) {
-            hide(e.closest("div.pagelet,div.mbm,div._55wo"), e.innerText);
+            hide(e.closest("div.pagelet,div.mbm,div._55wo,article"), e.innerText || getComputedStyle(e, ":after").content);
         }
     }
 
@@ -171,11 +175,11 @@ app.init().then(() => {
                 if (app.options.internalRefs)
                     stripRefs(target);
 
-                if (app.options.delSuggest)
-                    removeSuggestions(target);
-
                 if (app.options.delPixeled)
-                    removeSponsored(target);
+                    removeArticles(target, _sponsoredSelector);
+
+                if (app.options.delSuggest)
+                    removeArticles(target, _suggestionsSelector);
 
                 if (app.options.fixLinks) {
                     for (let node of mutation.addedNodes) {
@@ -191,10 +195,10 @@ app.init().then(() => {
 
     if (app.options.internalRefs)
         stripRefs(body);
-    if (app.options.delSuggest)
-        removeSuggestions(body);
     if (app.options.delPixeled)
-        removeSponsored(body);
+        removeArticles(body, _sponsoredSelector);
+    if (app.options.delSuggest)
+        removeArticles(body, _suggestionsSelector);
 
     if (app.options.fixLinks && removeLinkTracking(body) && document.getElementById("newsFeedHeading")) {
         const feed = document.getElementById("newsFeedHeading").parentNode;
