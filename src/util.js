@@ -1,6 +1,6 @@
 'use strict';
 
-const ALLOWED_CLICK_ELEMENTS = ["A", "INPUT", "SELECT", "BUTTON"];
+const ALLOWED_CLICK_ELEMENTS = ["INPUT", "SELECT", "BUTTON"];
 function isAllowedTarget(e) {
     let checkTarget = e.target;
 
@@ -19,9 +19,9 @@ function isAllowedTarget(e) {
 function restrictEventPropagation(e) {
     if (!isAllowedTarget(e))
     {
-        log("Prevented propagation of " + e.type + " to " + e.target);
         e.stopImmediatePropagation();
         e.stopPropagation();
+        app.log("Prevented propagation of " + e.type + " to " + e.target);
     }
 }
 

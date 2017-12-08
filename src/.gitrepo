@@ -6,6 +6,6 @@
 [subrepo]
 	remote = .
 	branch = master
-	commit = 2577edac2ab5f60a128a55de2b166cbd209d23e4
-	parent = 32da52fa372282601b921dd2ce982c2d32e669d3
+	commit = 9d92f48acaa9be6e6841216259ab7ccd4198fe7f
+	parent = 1978215ff86b7d9e9300ad2953d428c804136e12
 	cmdver = 0.3.1
