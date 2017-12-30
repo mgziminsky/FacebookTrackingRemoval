@@ -13,7 +13,7 @@ const app = {};
         delPixeled: true,
         delSuggest: true,
         hideMethod: "collapse",
-        useStyle: true,
+        useStyle: false,
         logging: false,
         modStyle: "border: 1px dashed green !important;"
     };
