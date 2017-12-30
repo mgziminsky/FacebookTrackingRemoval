@@ -1,3 +1,7 @@
+v1.5.4
+- Fix GIFs not playing (issue #4)
+- Disable styling by default
+
 v1.5.3
 - Fix Sponsored hiding
 - Fix Mobile hiding
