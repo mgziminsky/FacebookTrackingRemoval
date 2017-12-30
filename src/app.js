@@ -31,6 +31,9 @@ app.init().then(() => {
     }
 
     function hide(elem, label) {
+        if (!elem)
+            return;
+
         if (app.options.hideMethod === "collapse") {
             if (elem.closest(".fbtrCollapsible"))
                 return;

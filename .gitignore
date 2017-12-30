@@ -1,1 +1,3 @@
 *.zip
+webextension-polyfill/package-lock.json
+browser-polyfill.min.js*

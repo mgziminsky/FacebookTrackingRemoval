@@ -4,6 +4,7 @@
     <title>Facebook Tracking &amp; Ad Removal Options</title>
     <meta charset="UTF-8">
     <style type="text/css">
+        body { width: max-content; }
         ul { list-style: none; }
         li { margin: 10px; }
         textarea { display: block; }
@@ -23,7 +24,7 @@
 <body>
     <fieldset>
         <legend>Options</legend>
-        <p><strong>
+        <p title="Doesn't work in Chrome"><strong>
             **Changes will cause all Facebook tabs to be automatically reloaded after this page is closed**
         </strong></p>
 
@@ -103,6 +104,7 @@
         <button type="button" id="reset" class="addon-control">Restore Defaults</button>
     </fieldset>
 
+    <script type="text/javascript" src="/browser-polyfill.min.js"></script>
     <script type="text/javascript" src="common.js"></script>
     <script type="text/javascript" src="options.js"></script>
 </body>

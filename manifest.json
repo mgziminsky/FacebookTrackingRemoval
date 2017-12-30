@@ -5,7 +5,7 @@
   "icons": { "96": "src/icon.png" },
 
   "author": "Michael Ziminsky",
-  "homepage_url": "https://github.com/mgziminsky/FacebookTrackingRemoval/tree/Firefox",
+  "homepage_url": "https://github.com/mgziminsky/FacebookTrackingRemoval",
 
   "applications": {
     "gecko": {
@@ -24,7 +24,7 @@
   },
 
   "background": {
-    "scripts": ["src/background.js"]
+    "scripts": ["browser-polyfill.min.js", "src/background.js"]
   },
 
   "page_action": {
@@ -38,10 +38,12 @@
       "all_frames": true,
       "matches": ["*://*.facebook.com/*"],
       "css": ["src/app.css"],
-      "js": ["src/common.js", "src/util.js", "src/app.js"],
+      "js": ["browser-polyfill.min.js", "src/common.js", "src/util.js", "src/app.js"],
       "run_at": "document_end"
     }
   ],
+
+  "incognito": "spanning",
 
   "manifest_version": 2
 }
