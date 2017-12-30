@@ -147,11 +147,47 @@ app.init().then(() => {
         return intLinks.length;
     }
 
+    function fixGifs(node) {
+        const gifs = node.querySelectorAll("div._5b-_");
+        for (let g of gifs) {
+            const target = g.closest("div._2lhm");
+
+            const gif = target.querySelector("img.img").cloneNode(false);
+            gif.classList.add("FBTR-SAFE");
+            gif.dataset.placeholder = gif.src;
+            gif.dataset.src = g.parentNode.href;
+
+            const controls = target.querySelector("div._393-").parentNode.cloneNode(true);
+            controls.classList.add("FBTR-SAFE");
+
+            const toggle = (e) => {
+                gif.src = controls.classList.toggle("fbtrHide")
+                    ? gif.dataset.src
+                    : gif.dataset.placeholder;
+                stopPropagation(e);
+            };
+            gif.addEventListener("click", toggle, true);
+            controls.addEventListener("click", toggle, true);
+
+            const wrapper = document.createElement("div");
+            wrapper.appendChild(gif);
+            wrapper.appendChild(controls);
+
+            for (let c of target.classList)
+                wrapper.classList.add(c);
+
+            target.parentNode.replaceChild(wrapper, target);
+            app.log("Fixed GIF: " + gif.dataset.src);
+        }
+    }
+
     function removeLinkTracking(node) {
-        return cleanShimLinks(node)
-               + fixVideoLinks(node)
-               + cleanRedirectLinks(node)
-               ;
+       const cleaned = cleanShimLinks(node)
+           + fixVideoLinks(node)
+           + cleanRedirectLinks(node)
+           ;
+       fixGifs(node);
+       return cleaned;
     }
 
     /**** END LINK TRACKING ****/

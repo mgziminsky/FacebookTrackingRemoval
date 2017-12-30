@@ -44,7 +44,7 @@ function buildCollapsible(label) {
     content.classList.add("fbtrLabel");
 
     const collapsible = document.createElement("details");
-    collapsible.classList.add("fbtrCollapsible", "mbm", "_4-u8");
+    collapsible.classList.add("fbtrCollapsible");
     collapsible.appendChild(content);
 
     return collapsible;

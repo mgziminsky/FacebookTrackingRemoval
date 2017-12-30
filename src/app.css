@@ -17,3 +17,7 @@ summary.fbtrLabel {
     cursor: pointer;
     font-size: 0.8rem;
 }
+
+.fbtrHide {
+    display: none;
+}
