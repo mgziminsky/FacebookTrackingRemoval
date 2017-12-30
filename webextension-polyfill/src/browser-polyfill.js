@@ -132,36 +132,27 @@ if (typeof browser === "undefined") {
         }
 
         return new Promise((resolve, reject) => {
-          function callAPIWithNoCallback() {
-            try {
-              target[name](...args);
-
-              // Update the API method metadata, so that the next API calls will not try to
-              // use the unsupported callback anymore.
-              metadata.fallbackToNoCallback = false;
-              metadata.noCallback = true;
-
-              resolve();
-            } catch (error) {
-              // Catch API parameters validation errors and rejects the promise.
-              reject(error);
-            }
-          }
-
-          if (metadata.fallbackToNoCallback) {
+          if (metadata.noCallback) {
+            target[name](...args);
+            resolve();
+          } else if (metadata.fallbackToNoCallback) {
             // This API method has currently no callback on Chrome, but it return a promise on Firefox,
             // and so the polyfill will try to call it with a callback first, and it will fallback
             // to not passing the callback if the first call fails.
             try {
               target[name](...args, makeCallback({resolve, reject}, metadata));
             } catch (cbError) {
-              console.warn(`${name} API method doesn't seem to support the callback parameter, ` +
-                           "falling back to call it without a callback: ", cbError);
+              console.log(`${name} API method doesn't seem to support the callback parameter, falling back to call it without a callback`);
 
-              callAPIWithNoCallback();
+              target[name](...args);
+
+              // If successful, update the API method metadata so that future API calls will not try to
+              // use the unsupported callback anymore.
+              metadata.fallbackToNoCallback = false;
+              metadata.noCallback = true;
+
+              resolve();
             }
-          } else if (metadata.noCallback) {
-            callAPIWithNoCallback();
           } else {
             target[name](...args, makeCallback({resolve, reject}, metadata));
           }
