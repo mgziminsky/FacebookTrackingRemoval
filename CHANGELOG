@@ -1,3 +1,9 @@
+v1.5.5
+- Strip __md__ param from internal links
+- Handle new "SponSsored" posts
+    * FB has been trying to get sneaky with their sponsored posts lately. First by setting the text
+      using CSS, and now misspelled with the extra letter hidden.
+
 v1.5.4
 - Fix GIFs not playing (issue #4)
 - Disable styling by default

@@ -18,10 +18,11 @@ app.init().then(() => {
     ].join(",");
 
     const _sponsoredSelector = [
-        ".h_1hcf_5rdlb",               // From CSS
-        ".x_1hcf_5o896",               // From CSS
-        ".w_1hcf_5oxu9 > a",           // From document
-        "div._5qc4 > span:first-child" // Mobile
+        ".h_1hcf_5rdlb",                // From CSS
+        ".x_1hcf_5o896",                // From CSS
+        ".w_1hcf_5oxu9 > a",            // From document
+        "div._5qc4 > span:first-child", // Mobile
+        "a._m8c",                       // "SponSsored" - From document
     ].join(",");
 
 

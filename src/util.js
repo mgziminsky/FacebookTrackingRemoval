@@ -50,7 +50,7 @@ function buildCollapsible(label) {
     return collapsible;
 }
 
-const STRIPPED_PARAMS = ["ref", "ref_type", "fref", "hc_ref", "rc", "source", "placement", "comment_tracking"];
+const STRIPPED_PARAMS = ["ref", "ref_type", "fref", "hc_ref", "rc", "source", "placement", "comment_tracking", "__md__"];
 function cleanLinkParams(link) {
     try {
         const url = new URL(link, location.origin);
