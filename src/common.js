@@ -71,6 +71,10 @@ const app = {};
                     });
                 }
                 Object.seal(app.options);
+
+                app.log("Initialized Tracking Removal");
+                app.log(JSON.stringify(app.options));
+
                 inited = true;
             })
         }

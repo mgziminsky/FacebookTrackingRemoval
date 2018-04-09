@@ -1,3 +1,7 @@
+v1.5.6
+- Fix external links on mobile
+- Improved mobile video inlining
+
 v1.5.5
 - Strip __md__ param from internal links
 - Handle new "SponSsored" posts

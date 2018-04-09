@@ -17,6 +17,8 @@
 */
 
 'use strict';
+
+if (top === self || top.document.domain !== 'facebook.com') // Ignore IFrames inside FB
 app.init().then(() => {
     if (!app.options.enabled)
         return;
@@ -72,7 +74,7 @@ app.init().then(() => {
     }
 
     function cleanLink(a, href) {
-        removeAllAttrs(a);
+        cleanAttrs(a);
         a.href = href;
         a.target = "_blank";
         a.addEventListener("click", stopPropagation, true);
@@ -105,12 +107,15 @@ app.init().then(() => {
 
     // Mobile only
     function fixVideoLinks(node) {
-        const videoLinks = node.querySelectorAll("div[data-sigil=inlineVideo]");
+        const videoLinks = node.querySelectorAll("div[data-sigil=inlineVideo],a[href^='/video_redirect/']");
         for (let vid of videoLinks) {
-            const vidSrc = JSON.parse(vid.getAttribute("data-store")).src;
+            const vidSrc = vid.tagName === 'DIV'
+                           ? JSON.parse(vid.getAttribute("data-store")).src // Phone
+                           : new URL(vid.href).searchParams.get('src'); // m.facebook
 
             const replaceVideo = target => {
-                const poster = extractQuotedString(target.querySelector(".img").style.backgroundImage);
+                const img = target.querySelector(".img,img"); // phone,m.facebook
+                const poster = extractQuotedString(img.style.backgroundImage) || img.src;
                 const video = buildVideo(vidSrc, poster);
                 target.parentNode.replaceChild(video, target);
                 return video;
@@ -119,8 +124,9 @@ app.init().then(() => {
             if (app.options.inlineVids) {
                 app.log("Inlined video: " + replaceVideo(vid).src);
             } else {
-                removeAllAttrs(vid);
+                cleanAttrs(vid);
                 const target = vid.cloneNode(true);
+                applyStyle(target);
                 target.classList.add("FBTR-SAFE")
                 target.addEventListener("click", e => {
                     e.stopImmediatePropagation();
@@ -138,7 +144,7 @@ app.init().then(() => {
     function cleanRedirectLinks(node) {
         const trackedLinks = node.querySelectorAll("a[href*='facebook.com/l.php?']");
         for (let a of trackedLinks) {
-            const newHref = decodeURIComponent((/\bu=([^&]*)/).exec(a.href)[1]);
+            const newHref = new URL(a.href).searchParams.get('u');
             cleanLink(a, newHref);
             app.log("Removed tracking from redirect link: " + a);
         }
@@ -221,8 +227,6 @@ app.init().then(() => {
         }
     }
 
-    app.log("Initializing Tracking Removal");
-    app.log(JSON.stringify(app.options));
     const body = document.body;
 
     new MutationObserver(function(mutations) {

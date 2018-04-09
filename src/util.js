@@ -51,9 +51,12 @@ function extractQuotedString(s) {
     return s.substring(s.indexOf('"') + 1, s.lastIndexOf('"'));
 }
 
-function removeAllAttrs(elem) {
-    while (elem.attributes.length)
-        elem.removeAttribute(elem.attributes[0].name);
+function cleanAttrs(elem) {
+    for (let i = elem.attributes.length - 1; i >= 0; --i) {
+        const attr = elem.attributes[i];
+        if (attr.name !== 'class' && !attr.name.startsWith('aria-'))
+            elem.removeAttribute(attr.name);
+    }
 }
 
 function buildCollapsible(label) {
