@@ -30,6 +30,7 @@ app.init().then(() => {
         "div._5g-l",                    // A Video You May Like
         "h3._5x3-",                     // Suggested Post???
         "div.y_1hcf_5qplr",             // Suggested Post
+        "span.b_1hcf_5oed7",            // Suggested Post
         "header._5rgs",                 // Suggested Post (Mobile)
         "span.fcb",                     // People You May Know
         "div._d_q",                     // Page Stories You May Like
