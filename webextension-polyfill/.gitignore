@@ -1,6 +1,0 @@
-node_modules/*
-dist/*
-
-## code coverage
-coverage/
-.nyc_output/

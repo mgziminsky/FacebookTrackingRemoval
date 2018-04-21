@@ -1,0 +1,3 @@
+[submodule "webextension-polyfill"]
+	path = webextension-polyfill
+	url = git@github.com:mozilla/webextension-polyfill.git
