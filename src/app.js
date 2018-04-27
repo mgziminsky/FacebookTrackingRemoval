@@ -44,6 +44,7 @@ app.init().then(() => {
         ".w_1hcf_5oxu9 > a",            // From document
         "div._5qc4 > span:first-child", // Mobile
         "a._m8c",                       // "SponSsored" - From document
+        "div.b_1hcf_5rqfd",             // "SponSsored" - From document
     ].join(",");
 
 
@@ -152,7 +153,7 @@ app.init().then(() => {
         return trackedLinks.length;
     }
 
-    const _internalLinkSelector = `a[href^='/'],a[href^='#'][ajaxify],a[href^='${location.origin}']`;
+    const _internalLinkSelector = `a[href^='/'],a[href^='#'][ajaxify],a[href^='/'][ajaxify],a[href^='${location.origin}']`;
     function stripRefs(node) {
         const intLinks = node.querySelectorAll(_internalLinkSelector);
         for (let a of intLinks) {
@@ -238,11 +239,11 @@ app.init().then(() => {
                 if (app.options.internalRefs)
                     stripRefs(target);
 
-                if (app.options.delPixeled)
-                    removeArticles(target, _sponsoredSelector);
-
                 if (app.options.delSuggest)
                     removeArticles(target, _suggestionsSelector);
+
+                if (app.options.delPixeled)
+                    removeArticles(target, _sponsoredSelector);
 
                 if (app.options.fixLinks) {
                     for (let node of mutation.addedNodes) {
@@ -258,10 +259,10 @@ app.init().then(() => {
 
     if (app.options.internalRefs)
         stripRefs(body);
-    if (app.options.delPixeled)
-        removeArticles(body, _sponsoredSelector);
     if (app.options.delSuggest)
         removeArticles(body, _suggestionsSelector);
+    if (app.options.delPixeled)
+        removeArticles(body, _sponsoredSelector);
 
     if (app.options.fixLinks && removeLinkTracking(body) && document.getElementById("newsFeedHeading")) {
         const feed = document.getElementById("newsFeedHeading").parentNode;

@@ -1,3 +1,10 @@
+v1.5.8
+- Handle new class of "Sponsored"
+- Handle additional type of internal link
+
+v1.5.7
+- Handle new class of "Suggested Posts"
+
 v1.5.6
 - Fix external links on mobile
 - Improved mobile video inlining
