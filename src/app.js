@@ -99,7 +99,7 @@ app.init().then(() => {
 
     // Desktop only
     function cleanShimLinks(node) {
-        const trackedLinks = node.querySelectorAll("a[onclick^='LinkshimAsyncLink.referrer_log']");
+        const trackedLinks = selectAllWithBase(node, "a[onclick^='LinkshimAsyncLink.referrer_log']");
         for (let a of trackedLinks) {
             cleanLink(a, extractQuotedString(a.getAttribute("onmouseover")).replace(/\\(.)/g, '$1'));
             app.log("Removed tracking from shim link: " + a);
@@ -109,7 +109,7 @@ app.init().then(() => {
 
     // Mobile only
     function fixVideoLinks(node) {
-        const videoLinks = node.querySelectorAll("div[data-sigil=inlineVideo],a[href^='/video_redirect/']");
+        const videoLinks = selectAllWithBase(node, "div[data-sigil=inlineVideo],a[href^='/video_redirect/']");
         for (let vid of videoLinks) {
             const vidSrc = vid.tagName === 'DIV'
                            ? JSON.parse(vid.getAttribute("data-store")).src // Phone
@@ -144,7 +144,7 @@ app.init().then(() => {
 
     // Desktop and Mobile
     function cleanRedirectLinks(node) {
-        const trackedLinks = node.querySelectorAll("a[href*='facebook.com/l.php?']");
+        const trackedLinks = selectAllWithBase(node, "a[href*='facebook.com/l.php?']");
         for (let a of trackedLinks) {
             const newHref = new URL(a.href).searchParams.get('u');
             cleanLink(a, newHref);
@@ -155,7 +155,7 @@ app.init().then(() => {
 
     const _internalLinkSelector = `a[href^='/'],a[href^='#'][ajaxify],a[href^='/'][ajaxify],a[href^='${location.origin}']`;
     function stripRefs(node) {
-        const intLinks = node.querySelectorAll(_internalLinkSelector);
+        const intLinks = selectAllWithBase(node, _internalLinkSelector);
         for (let a of intLinks) {
             const before = a.cloneNode();
             const href = a.href;
@@ -178,7 +178,7 @@ app.init().then(() => {
     }
 
     function fixGifs(node) {
-        const gifs = node.querySelectorAll("div._5b-_");
+        const gifs = selectAllWithBase(node, "div._5b-_");
         for (let g of gifs) {
             const target = g.closest("div._2lhm");
 
@@ -223,7 +223,7 @@ app.init().then(() => {
     /**** END LINK TRACKING ****/
 
     function removeArticles(node, selector) {
-        const elements = node.querySelectorAll(selector);
+        const elements = selectAllWithBase(node, selector);
         for (let e of elements) {
             hide(e.closest("div.pagelet,div.mbm,div._55wo,article"), e.innerText || getComputedStyle(e, ":after").content);
         }

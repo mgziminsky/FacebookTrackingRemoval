@@ -83,3 +83,14 @@ function cleanLinkParams(link) {
         return link;
     }
 }
+
+function selectAllWithBase(node, selector) {
+    const childResults = node.querySelectorAll(selector);
+    const nodeMatches = node.matches(selector);
+    const results = (function*() {
+        if (nodeMatches) yield node;
+        yield* childResults;
+    })();
+    results.length = childResults.length + nodeMatches;
+    return results;
+}
