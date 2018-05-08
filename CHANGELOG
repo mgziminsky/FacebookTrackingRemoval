@@ -1,3 +1,7 @@
+v1.5.10
+- Hide "Suggested Shows"
+- Don't hide emergency broadcasts such as Amber Alerts and highlight them red
+
 v1.5.9
 - Fix for some links not getting cleaned
 

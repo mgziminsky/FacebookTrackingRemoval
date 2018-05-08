@@ -35,7 +35,8 @@ app.init().then(() => {
         "span.fcb",                     // People You May Know
         "div._d_q",                     // Page Stories You May Like
         "div.fsl",                      // Games You May Like
-        "div.ego_section h6"            // Photo overlay suggestions
+        "div.ego_section h6",           // Photo overlay suggestions
+        "span._38my"                    // Suggested Shows
     ].join(",");
 
     const _sponsoredSelector = [

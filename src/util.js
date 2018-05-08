@@ -44,6 +44,7 @@ function restrictEventPropagation(e) {
 }
 
 function stopPropagation(e) {
+    e.stopImmediatePropagation();
     e.stopPropagation();
 }
 
