@@ -39,3 +39,8 @@ summary.fbtrLabel {
 .fbtrHide {
     display: none;
 }
+
+/* Emergency Broadcast posts. eg: Amber Alert */
+._3j6k {
+    border: medium solid red !important;
+}

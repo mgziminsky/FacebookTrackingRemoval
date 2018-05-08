@@ -225,7 +225,9 @@ app.init().then(() => {
     function removeArticles(node, selector) {
         const elements = selectAllWithBase(node, selector);
         for (let e of elements) {
-            hide(e.closest("div.pagelet,div.mbm,div._55wo,article"), e.innerText || getComputedStyle(e, ":after").content);
+            if (!e.closest("._3j6k")) { // Skip Emergency Broadcasts. eg: Amber Alert
+                hide(e.closest("div.pagelet,div.mbm,div._55wo,article"), e.innerText || getComputedStyle(e, ":after").content);
+            }
         }
     }
 
