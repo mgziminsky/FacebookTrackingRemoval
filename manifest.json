@@ -1,6 +1,6 @@
 {
   "name": "Facebook™ Tracking & Ad Removal",
-  "version": "1.5.10",
+  "version": "1.5.11",
   "description": "Provides options to remove Facebook™'s tracking from links and videos, and to remove ads from your feed",
   "icons": { "96": "src/icon.png" },
 
@@ -36,7 +36,10 @@
   "content_scripts": [
     {
       "all_frames": true,
-      "matches": ["*://*.facebook.com/*"],
+      "matches": [
+        "*://*.facebook.com/*",
+        "*://*.facebookcorewwwi.onion/*"
+      ],
       "css": ["src/app.css"],
       "js": ["browser-polyfill.min.js", "src/common.js", "src/util.js", "src/app.js"],
       "run_at": "document_end"

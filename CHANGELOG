@@ -1,3 +1,7 @@
+v1.5.11
+- Update to work on FB tor/onion service
+- Add rel=noreferrer to cleaned links
+
 v1.5.10
 - Hide "Suggested Shows"
 - Don't hide emergency broadcasts such as Amber Alerts and highlight them red

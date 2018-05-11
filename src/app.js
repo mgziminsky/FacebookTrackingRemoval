@@ -146,7 +146,7 @@ app.init().then(() => {
 
     // Desktop and Mobile
     function cleanRedirectLinks(node) {
-        const trackedLinks = selectAllWithBase(node, "a[href*='facebook.com/l.php?']");
+        const trackedLinks = selectAllWithBase(node, `a[href*='${document.domain}/l.php?']`);
         for (let a of trackedLinks) {
             const newHref = new URL(a.href).searchParams.get('u');
             cleanLink(a, newHref);
