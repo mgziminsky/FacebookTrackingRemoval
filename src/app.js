@@ -80,6 +80,7 @@ app.init().then(() => {
         cleanAttrs(a);
         a.href = href;
         a.target = "_blank";
+        a.rel = "noreferrer";
         a.addEventListener("click", stopPropagation, true);
         a.addEventListener("mousedown", stopPropagation, true);
         applyStyle(a);
