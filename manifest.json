@@ -2,7 +2,7 @@
   "name": "Facebook™ Tracking & Ad Removal",
   "version": "1.5.11",
   "description": "Provides options to remove Facebook™'s tracking from links and videos, and to remove ads from your feed",
-  "icons": { "96": "src/icon.png" },
+  "icons": { "128": "src/icon.png" },
 
   "author": "Michael Ziminsky",
   "homepage_url": "https://github.com/mgziminsky/FacebookTrackingRemoval",
