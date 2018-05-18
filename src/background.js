@@ -15,10 +15,15 @@
 
     Copyright (C) 2016-2018 Michael Ziminsky
 */
-
+'use strict';
 if (browser.pageAction) {
+    function checkHost(url) {
+        const hostname = new URL(url).hostname;
+        return app.domains.some(d => hostname.endsWith("." + d));
+    }
+
     browser.tabs.onUpdated.addListener((id, changes, tab) => {
-        if (tab.active && tab.url && new URL(tab.url).hostname.endsWith("facebook.com"))
+        if (tab.url && checkHost(tab.url))
             browser.pageAction.show(id);
         else
             browser.pageAction.hide(id);

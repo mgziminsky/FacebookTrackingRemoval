@@ -18,7 +18,7 @@
 
 'use strict';
 
-if (top === self || top.document.domain !== 'facebook.com') // Ignore IFrames inside FB
+if (top === self || app.domains.includes(top.document.domain)) // Ignore IFrames inside FB
 app.init().then(() => {
     if (!app.options.enabled)
         return;

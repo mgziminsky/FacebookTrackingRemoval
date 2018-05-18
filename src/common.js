@@ -50,6 +50,14 @@ const app = {};
             value: () => {},
             writable: true
         },
+        host_patterns: {
+            value: Object.freeze([...new Set([].concat(...browser.runtime.getManifest().content_scripts.map(cs => cs.matches)))]),
+            enumerable: true
+        },
+        domains: {
+            value: Object.freeze([...new Set([].concat(...browser.runtime.getManifest().content_scripts.map(cs => cs.matches.map(m => m.replace(/\W*\*\W?/g, '')))))]),
+            enumerable: true
+        },
         init: {
             value: () => app.storage.get(defaultOpts).then(o => {
                 Object.assign(opts, o);
