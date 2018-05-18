@@ -25,12 +25,17 @@
 
   "background": {
     "scripts": ["browser-polyfill.min.js", "src/common.js", "src/background.js"],
+    "persistent": false
   },
 
   "page_action": {
     "browser_style": true,
     "default_icon": "src/icon.png",
-    "default_popup": "src/options.html"
+    "default_popup": "src/options.html",
+    "show_matches": [
+      "*://*.facebook.com/*",
+      "*://*.facebookcorewwwi.onion/*"
+    ]
   },
 
   "content_scripts": [
