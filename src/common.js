@@ -22,22 +22,25 @@ const app = {};
 
 (function() {
     const opts = {};
-    const defaultOpts = {
-        enabled: true,
-        fixLinks: true,
-        internalRefs: false,
-        inlineVids: false,
-        fixVideos: false,
-        delPixeled: true,
-        delSuggest: true,
-        hideMethod: "collapse",
-        useStyle: false,
-        logging: false,
-        modStyle: "border: 1px dashed green !important;"
-    };
 
     let inited = false;
     Object.defineProperties(app, {
+        defaults: {
+            value: Object.seal(Object.freeze({
+                enabled: true,
+                fixLinks: true,
+                internalRefs: false,
+                inlineVids: false,
+                fixVideos: false,
+                delPixeled: true,
+                delSuggest: true,
+                hideMethod: "collapse",
+                useStyle: false,
+                logging: false,
+                modStyle: "border: 1px dashed green !important;"
+            })),
+            enumerable: true
+        },
         options: {
             value: {},
             enumerable: true
@@ -59,7 +62,7 @@ const app = {};
             enumerable: true
         },
         init: {
-            value: () => app.storage.get(defaultOpts).then(o => {
+            value: () => app.storage.get(app.defaults).then(o => {
                 Object.assign(opts, o);
 
                 if (opts.logging)
@@ -92,7 +95,7 @@ const app = {};
     Object.defineProperty(app.options, "reset", {
         value: () => {
             app.storage.clear();
-            Object.assign(opts, defaultOpts);
+            Object.assign(opts, app.defaults);
         }
     });
 }());

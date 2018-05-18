@@ -27,6 +27,10 @@ app.init().then(() => {
     const modStyle = document.getElementById("modStyle");
     const preview  = document.getElementById("preview");
 
+    // Set version text
+    document.title += ` - v${browser.runtime.getManifest().version}`;
+    document.getElementById("legend").textContent += ` - v${browser.runtime.getManifest().version}`;
+
     function handleCheckbox() { app.options[this.id] = this.checked; }
     for (let checkbox of document.querySelectorAll("input[type=checkbox]")) {
         checkbox.addEventListener("change", handleCheckbox);
@@ -79,11 +83,9 @@ app.init().then(() => {
     }
     init();
 
-    let dirty = false;
-    const wasEnabled = app.options.enabled;
-    browser.storage.onChanged.addListener(() => dirty = true);
-    window.addEventListener("unload", () => {
-        if (dirty && (app.options.enabled || wasEnabled))
-            browser.runtime.sendMessage("RELOAD");
-    });
+    // Keep in sync with other options pages
+    browser.storage.onChanged.addListener(() => app.init().then(init));
+
+    // Tell the background script a new options window was opened
+    browser.runtime.sendMessage("OPTIONS");
 }, console.log);

@@ -15,7 +15,9 @@
 
     Copyright (C) 2016-2018 Michael Ziminsky
 */
+
 'use strict';
+
 if (browser.pageAction) {
     function checkHost(url) {
         const hostname = new URL(url).hostname;
@@ -30,8 +32,48 @@ if (browser.pageAction) {
     });
 }
 
-browser.runtime.onMessage.addListener(() => {
-    browser.tabs.query({url: "*://*.facebook.com/*", windowType: "normal"})
-                .then(tabs => tabs.forEach(t => browser.tabs.reload(t.id)))
-                .catch(console.log);
-});
+/*
+    Keep track of open options windows and the currently
+    active options. When an options window is closed,
+    check for any changed options and reload all tabs
+*/
+app.init().then(() => {
+    const optionsWindows = new Set();
+    let activeOptions = app.options;
+
+    function checkChanged(a, b) {
+        if (!(a.enabled || b.enabled))
+            return Promise.reject("Disabled");
+
+        for (const k in a)
+            if (a[k] != b[k])
+                return Promise.resolve(b);
+
+        return Promise.reject("No Changes");
+    }
+
+    function reloadTabs() {
+        return browser.tabs
+            .query({url: app.host_patterns, windowType: "normal"})
+            .then(tabs => tabs.forEach(t => browser.tabs.reload(t.id)));
+    }
+
+    function onUnload(w) {
+        optionsWindows.delete(w);
+
+        app.storage.get(app.defaults)
+            .then(opts => checkChanged(activeOptions, opts))
+            .then(opts => activeOptions = opts)
+            .then(reloadTabs)
+            .catch(app.log);
+    }
+
+    browser.runtime.onMessage.addListener(msg => {
+        browser.extension.getViews()
+            .filter(w => !optionsWindows.has(w) && (w.location.pathname === "/src/options.html"))
+            .forEach(w => {
+                optionsWindows.add(w);
+                w.addEventListener("unload", () => onUnload(w));
+            });
+    });
+}, console.log);
