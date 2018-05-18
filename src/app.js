@@ -64,7 +64,7 @@ app.init().then(() => {
 
             const wrapper = buildCollapsible(label);
             applyStyle(wrapper);
-            for (let c of elem.classList)
+            for (const c of elem.classList)
                 wrapper.classList.add(c);
 
             elem.parentNode.appendChild(wrapper);
@@ -81,8 +81,9 @@ app.init().then(() => {
         a.href = href;
         a.target = "_blank";
         a.rel = "noreferrer";
-        a.addEventListener("click", stopPropagation, true);
+        a.addEventListener("mouseover", stopPropagation, true);
         a.addEventListener("mousedown", stopPropagation, true);
+        a.addEventListener("click", stopPropagation, true);
         applyStyle(a);
     }
 
@@ -102,7 +103,7 @@ app.init().then(() => {
     // Desktop only
     function cleanShimLinks(node) {
         const trackedLinks = selectAllWithBase(node, "a[onclick^='LinkshimAsyncLink.referrer_log']");
-        for (let a of trackedLinks) {
+        for (const a of trackedLinks) {
             cleanLink(a, extractQuotedString(a.getAttribute("onmouseover")).replace(/\\(.)/g, '$1'));
             app.log("Removed tracking from shim link: " + a);
         }
@@ -112,7 +113,7 @@ app.init().then(() => {
     // Mobile only
     function fixVideoLinks(node) {
         const videoLinks = selectAllWithBase(node, "div[data-sigil=inlineVideo],a[href^='/video_redirect/']");
-        for (let vid of videoLinks) {
+        for (const vid of videoLinks) {
             const vidSrc = vid.tagName === 'DIV'
                            ? JSON.parse(vid.getAttribute("data-store")).src // Phone
                            : new URL(vid.href).searchParams.get('src'); // m.facebook
@@ -147,7 +148,7 @@ app.init().then(() => {
     // Desktop and Mobile
     function cleanRedirectLinks(node) {
         const trackedLinks = selectAllWithBase(node, `a[href*='${document.domain}/l.php?']`);
-        for (let a of trackedLinks) {
+        for (const a of trackedLinks) {
             const newHref = new URL(a.href).searchParams.get('u');
             cleanLink(a, newHref);
             app.log("Removed tracking from redirect link: " + a);
@@ -158,7 +159,7 @@ app.init().then(() => {
     const _internalLinkSelector = `a[href^='/'],a[href^='#'][ajaxify],a[href^='/'][ajaxify],a[href^='${location.origin}']`;
     function stripRefs(node) {
         const intLinks = selectAllWithBase(node, _internalLinkSelector);
-        for (let a of intLinks) {
+        for (const a of intLinks) {
             const before = a.cloneNode();
             const href = a.href;
             a.href = cleanLinkParams(href);
@@ -181,7 +182,7 @@ app.init().then(() => {
 
     function fixGifs(node) {
         const gifs = selectAllWithBase(node, "div._5b-_");
-        for (let g of gifs) {
+        for (const g of gifs) {
             const target = g.closest("div._2lhm");
 
             const gif = target.querySelector("img.img").cloneNode(false);
@@ -205,7 +206,7 @@ app.init().then(() => {
             wrapper.appendChild(gif);
             wrapper.appendChild(controls);
 
-            for (let c of target.classList)
+            for (const c of target.classList)
                 wrapper.classList.add(c);
 
             target.parentNode.replaceChild(wrapper, target);
@@ -226,7 +227,7 @@ app.init().then(() => {
 
     function removeArticles(node, selector) {
         const elements = selectAllWithBase(node, selector);
-        for (let e of elements) {
+        for (const e of elements) {
             if (!e.closest("._3j6k")) { // Skip Emergency Broadcasts. eg: Amber Alert
                 hide(e.closest("div.pagelet,div.mbm,div._55wo,article"), e.innerText || getComputedStyle(e, ":after").content);
             }
@@ -250,7 +251,7 @@ app.init().then(() => {
                     removeArticles(target, _sponsoredSelector);
 
                 if (app.options.fixLinks) {
-                    for (let node of mutation.addedNodes) {
+                    for (const node of mutation.addedNodes) {
                         if (node.nodeType == Node.ELEMENT_NODE && removeLinkTracking(node)) {
                             node.addEventListener("click", restrictEventPropagation, true);
                             node.addEventListener("mousedown", restrictEventPropagation, true);
@@ -270,7 +271,7 @@ app.init().then(() => {
 
     if (app.options.fixLinks && removeLinkTracking(body) && document.getElementById("newsFeedHeading")) {
         const feed = document.getElementById("newsFeedHeading").parentNode;
-        for (let stream of feed.querySelectorAll("div._4ikz")) {
+        for (const stream of feed.querySelectorAll("div._4ikz")) {
             stream.addEventListener("click", restrictEventPropagation, true);
             stream.addEventListener("mousedown", restrictEventPropagation, true);
         }
@@ -299,7 +300,7 @@ app.init().then(() => {
             });
         }).observe(body, { attributes: true, attributeFilter: ["src"], subtree: true, childList: false, characterData: false });
 
-        for (let video of body.querySelectorAll("video[src]"))
+        for (const video of body.querySelectorAll("video[src]"))
             removeVideoTracking(video);
     }
 }, console.log);
