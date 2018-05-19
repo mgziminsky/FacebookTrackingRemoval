@@ -18,7 +18,6 @@
 
 'use strict';
 
-if (top === self || app.domains.includes(top.document.domain)) // Ignore IFrames inside FB
 app.init().then(() => {
     if (!app.options.enabled)
         return;
@@ -84,9 +83,6 @@ app.init().then(() => {
         a.href = href;
         a.target = "_blank";
         a.rel = "noreferrer";
-        a.addEventListener("mouseover", stopPropagation, true);
-        a.addEventListener("mousedown", stopPropagation, true);
-        a.addEventListener("click", stopPropagation, true);
         applyStyle(a);
     }
 
@@ -177,6 +173,7 @@ app.init().then(() => {
 
             if (cleaned) {
                 applyStyle(a);
+                applyEventBlockers(a.parentNode);
                 app.log("Cleaned internal link params:\n\t" + before + "\n\t" + a.href);
             }
         }
@@ -256,8 +253,7 @@ app.init().then(() => {
                 if (app.options.fixLinks) {
                     for (const node of mutation.addedNodes) {
                         if (node.nodeType == Node.ELEMENT_NODE && removeLinkTracking(node)) {
-                            node.addEventListener("click", restrictEventPropagation, true);
-                            node.addEventListener("mousedown", restrictEventPropagation, true);
+                            applyEventBlockers(node);
                         }
                     }
                 }
@@ -275,8 +271,7 @@ app.init().then(() => {
     if (app.options.fixLinks && removeLinkTracking(body) && document.getElementById("newsFeedHeading")) {
         const feed = document.getElementById("newsFeedHeading").parentNode;
         for (const stream of feed.querySelectorAll("div._4ikz")) {
-            stream.addEventListener("click", restrictEventPropagation, true);
-            stream.addEventListener("mousedown", restrictEventPropagation, true);
+            applyEventBlockers(stream);
         }
     }
 

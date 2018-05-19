@@ -16,7 +16,11 @@
 
   "permissions": [
     "storage",
-    "tabs"
+    "tabs",
+    "*://*.facebook.com/*",
+    "*://*.facebookcorewwwi.onion/*",
+    "webRequest",
+    "webRequestBlocking"
   ],
 
   "options_ui": {
@@ -25,7 +29,7 @@
 
   "background": {
     "scripts": ["browser-polyfill.min.js", "src/common.js", "src/background.js"],
-    "persistent": false
+    "persistent": true
   },
 
   "page_action": {

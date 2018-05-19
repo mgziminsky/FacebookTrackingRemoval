@@ -18,14 +18,13 @@
 
 'use strict';
 
-const ALLOWED_CLICK_ELEMENTS = ["INPUT", "SELECT", "BUTTON"];
 function isAllowedTarget(e) {
     let checkTarget = e.target;
 
     // Walk through event target and parents until the currentTarget looking for an element that clicks are allowed on
     while (e.currentTarget !== checkTarget) {
         let role = checkTarget.attributes.role;
-        if (ALLOWED_CLICK_ELEMENTS.includes(checkTarget.tagName) || checkTarget.classList.contains("FBTR-SAFE") || (role && role.value.toUpperCase() == "BUTTON"))
+        if (role && role.value.toUpperCase() == "BUTTON")
             return true;
         checkTarget = checkTarget.parentNode;
     }
@@ -39,13 +38,24 @@ function restrictEventPropagation(e) {
     {
         e.stopImmediatePropagation();
         e.stopPropagation();
-        app.log("Prevented propagation of " + e.type + " to " + e.target);
+        app.log("Blocked propagation of " + e.type + " to " + e.target);
     }
 }
 
 function stopPropagation(e) {
     e.stopImmediatePropagation();
     e.stopPropagation();
+    app.log("Blocked propagation of " + e.type + " to " + e.target);
+}
+
+function applyEventBlockers(target) {
+    target.addEventListener("mousedown", stopPropagation, true);
+    target.addEventListener("focusin", stopPropagation, true);
+    target.addEventListener("focus", stopPropagation, true);
+    target.addEventListener("click", restrictEventPropagation, true);
+    target.addEventListener("mouseup", stopPropagation, true);
+    target.addEventListener("focusout", stopPropagation, true);
+    target.addEventListener("blur", stopPropagation, true);
 }
 
 function extractQuotedString(s) {

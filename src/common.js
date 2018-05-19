@@ -67,6 +67,8 @@ const app = {};
 
                 if (opts.logging)
                     app.log = console.log.bind(console);
+                else
+                    app.log = () => {};
 
                 if (inited) return;
 

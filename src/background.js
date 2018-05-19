@@ -39,7 +39,6 @@ if (browser.pageAction) {
 */
 app.init().then(() => {
     const optionsWindows = new Set();
-    let activeOptions = app.options;
 
     function checkChanged(a, b) {
         if (!(a.enabled || b.enabled))
@@ -47,7 +46,7 @@ app.init().then(() => {
 
         for (const k in a)
             if (a[k] != b[k])
-                return Promise.resolve(b);
+                return Promise.resolve();
 
         return Promise.reject("No Changes");
     }
@@ -62,9 +61,9 @@ app.init().then(() => {
         optionsWindows.delete(w);
 
         app.storage.get(app.defaults)
-            .then(opts => checkChanged(activeOptions, opts))
-            .then(opts => activeOptions = opts)
+            .then(opts => checkChanged(app.options, opts))
             .then(reloadTabs)
+            .then(app.init)
             .catch(app.log);
     }
 
@@ -76,4 +75,18 @@ app.init().then(() => {
                 w.addEventListener("unload", () => onUnload(w));
             });
     });
+
+
+    function blockRequest(details) {
+        if (app.options.enabled) {
+          app.log("Blocking tracking request to " + details.url);
+          return {cancel: true};
+        }
+    }
+
+    browser.webRequest.onBeforeRequest.addListener(
+        blockRequest,
+        {urls: [...app.host_patterns.map(h => h.replace(/\*$/, "ajax/bz")), ...app.host_patterns.map(h => h.replace(/\*$/, "xti.php?*"))]},
+        ["blocking"]
+    );
 }, console.log);
