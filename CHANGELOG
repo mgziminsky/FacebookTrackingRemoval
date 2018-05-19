@@ -1,3 +1,8 @@
+v1.5.12
+- Sync options pages
+- Fix auto page reload in chrome and FF 60+
+- New classes for Sponsored and Suggested posts
+
 v1.5.11
 - Update to work on FB tor/onion service
 - Add rel=noreferrer to cleaned links

@@ -31,12 +31,14 @@ app.init().then(() => {
         "h3._5x3-",                     // Suggested Post???
         "div.y_1hcf_5qplr",             // Suggested Post
         "span.b_1hcf_5oed7",            // Suggested Post
+        "span.l_8yb3p1a9o",             // Suggested Post
         "header._5rgs",                 // Suggested Post (Mobile)
         "span.fcb",                     // People You May Know
         "div._d_q",                     // Page Stories You May Like
         "div.fsl",                      // Games You May Like
         "div.ego_section h6",           // Photo overlay suggestions
-        "span._38my"                    // Suggested Shows
+        "span._38my",                   // Suggested Shows
+        "a._pmj",                       // TV Watchlist
     ].join(",");
 
     const _sponsoredSelector = [
@@ -46,6 +48,7 @@ app.init().then(() => {
         "div._5qc4 > span:first-child", // Mobile
         "a._m8c",                       // "SponSsored" - From document
         "div.b_1hcf_5rqfd",             // "SponSsored" - From document
+        "div.v_8yb3ozf_y",              // "SponSsored" - From document
     ].join(",");
 
 
