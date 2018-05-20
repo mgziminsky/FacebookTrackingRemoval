@@ -1,3 +1,6 @@
+v1.5.13
+- Block ajax tracking requests. Closes issue #10
+
 v1.5.12
 - Sync options pages
 - Fix auto page reload in chrome and FF 60+
