@@ -1,3 +1,8 @@
+v1.5.14
+- Fix regression in user interactions
+- Minor performace improvements
+- Remove desktop video cleaning option until I find a solution to the broken videos
+
 v1.5.13
 - Block ajax tracking requests. Closes issue #10
 

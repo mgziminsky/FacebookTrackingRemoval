@@ -18,13 +18,15 @@
 
 'use strict';
 
+const ALLOWED_CLICK_ELEMENTS = ["INPUT", "SELECT", "BUTTON"];
+const ALLOWED_ROLES = ["BUTTON", "MENUITEM"];
 function isAllowedTarget(e) {
     let checkTarget = e.target;
 
     // Walk through event target and parents until the currentTarget looking for an element that clicks are allowed on
     while (e.currentTarget !== checkTarget) {
         let role = checkTarget.attributes.role;
-        if (role && role.value.toUpperCase() == "BUTTON")
+        if (ALLOWED_CLICK_ELEMENTS.includes(checkTarget.tagName) || checkTarget.classList.contains("FBTR-SAFE") || (role && ALLOWED_ROLES.includes(role.value.toUpperCase())))
             return true;
         checkTarget = checkTarget.parentNode;
     }
@@ -34,8 +36,7 @@ function isAllowedTarget(e) {
 
 // Meant to be used as a capturing event handler
 function restrictEventPropagation(e) {
-    if (!isAllowedTarget(e))
-    {
+    if (!isAllowedTarget(e)) {
         e.stopImmediatePropagation();
         e.stopPropagation();
         app.log("Blocked propagation of " + e.type + " to " + e.target);
@@ -82,14 +83,14 @@ function buildCollapsible(label) {
     return collapsible;
 }
 
-const STRIPPED_PARAMS = ["ref", "ref_type", "fref", "hc_ref", "rc", "source", "placement", "comment_tracking", "__md__"];
+const STRIPPED_PARAMS = ["ref", "ref_type", "fref", "hc_ref", "rc", "source", "placement", "comment_tracking", "__md__", "from"];
 function cleanLinkParams(link) {
     try {
         const url = new URL(link, location.origin);
         const cleanParams = new URLSearchParams(url.search);
         STRIPPED_PARAMS.forEach(cleanParams.delete.bind(cleanParams));
         url.search = cleanParams;
-        return url.pathname + url.search + url.hash;
+        return url.href.substr(url.origin.length);
     } catch (e) {
         return link;
     }

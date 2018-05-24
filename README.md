@@ -14,7 +14,4 @@ Modified elements can optionally have a custom CSS style applied to them so that
 
 For links, the event listeners on the link and its parents are removed and/or disabled and a proper href is set on the link.
 
-For videos, all Facebook™ event-listeners and custom controls are removed, and the video is simplified into just the bare HTML5 video tag.
-* _If videos are broken for you, you can disable the video setting from the add-on options without losing all the other features_
-
-FF 48+: All functionality is configurable from the options page
+For videos on mobile, all Facebook™ event-listeners and custom controls are removed, and the video is simplified into just the bare HTML5 video tag.

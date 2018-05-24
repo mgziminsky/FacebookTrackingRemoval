@@ -155,26 +155,27 @@ app.init().then(() => {
         return trackedLinks.length;
     }
 
-    const _internalLinkSelector = `a[href^='/'],a[href^='#'][ajaxify],a[href^='/'][ajaxify],a[href^='${location.origin}']`;
+    const _internalLinkSelector = `a[href^='/'],a[href^='#'],a[ajaxify],a[href^='${location.origin}']`;
     function stripRefs(node) {
         const intLinks = selectAllWithBase(node, _internalLinkSelector);
         for (const a of intLinks) {
-            const before = a.cloneNode();
-            const href = a.href;
+            applyEventBlockers(a.parentNode);
+
+            let href = a.href;
             a.href = cleanLinkParams(href);
 
             let cleaned = (a.href != href);
 
             if (a.hasAttribute("ajaxify")) {
-                const ajaxify = a.getAttribute("ajaxify");
-                a.setAttribute("ajaxify", cleanLinkParams(ajaxify));
-                cleaned = (ajaxify != a.getAttribute("ajaxify"));
+                href = a.getAttribute("ajaxify");
+                a.setAttribute("ajaxify", cleanLinkParams(href));
+                cleaned = (href != a.getAttribute("ajaxify"));
             }
 
             if (cleaned) {
                 applyStyle(a);
-                applyEventBlockers(a.parentNode);
-                app.log("Cleaned internal link params:\n\t" + before + "\n\t" + a.href);
+                a.classList.toggle("FBTR-SAFE");
+                app.log("Cleaned internal link params:\n\t" + href + "\n\t" + a.href);
             }
         }
         return intLinks.length;
@@ -225,7 +226,7 @@ app.init().then(() => {
 
     /**** END LINK TRACKING ****/
 
-    function removeArticles(node, selector) {
+    async function removeArticles(node, selector) {
         const elements = selectAllWithBase(node, selector);
         for (const e of elements) {
             if (!e.closest("._3j6k")) { // Skip Emergency Broadcasts. eg: Amber Alert
@@ -236,13 +237,18 @@ app.init().then(() => {
 
     const body = document.body;
 
-    new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
+    new MutationObserver(mutations => {
+        async function forEachAdded(mutation, cb) {
+            for (const node of mutation.addedNodes) {
+                if (node.nodeType == Node.ELEMENT_NODE && !node.classList.contains("FBTR-PROCESSED")) {
+                    cb(node);
+                }
+            }
+        }
+
+        for (const mutation of mutations) {
             if (mutation.addedNodes.length) {
                 const target = mutation.target;
-
-                if (app.options.internalRefs)
-                    stripRefs(target);
 
                 if (app.options.delSuggest)
                     removeArticles(target, _suggestionsSelector);
@@ -250,15 +256,19 @@ app.init().then(() => {
                 if (app.options.delPixeled)
                     removeArticles(target, _sponsoredSelector);
 
+                if (app.options.internalRefs)
+                    forEachAdded(mutation, stripRefs);
+
                 if (app.options.fixLinks) {
-                    for (const node of mutation.addedNodes) {
-                        if (node.nodeType == Node.ELEMENT_NODE && removeLinkTracking(node)) {
+                    forEachAdded(mutation, node => {
+                        if (removeLinkTracking(node))
                             applyEventBlockers(node);
-                        }
-                    }
+                    });
                 }
+
+                forEachAdded(mutation, node => node.classList.toggle("FBTR-PROCESSED", true));
             }
-        });
+        }
     }).observe(body, { childList: true, subtree: true, attributes: false, characterData: false });
 
     if (app.options.internalRefs)
@@ -274,4 +284,4 @@ app.init().then(() => {
             applyEventBlockers(stream);
         }
     }
-}, console.log);
+}, console.warn);
