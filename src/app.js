@@ -274,31 +274,4 @@ app.init().then(() => {
             applyEventBlockers(stream);
         }
     }
-
-    if (app.options.fixVideos) {
-        // Desktop only
-        function removeVideoTracking(video) {
-            if (video.nodeName === "VIDEO" && video.src) {
-                const img = video.parentNode.querySelector("img._1445");
-                if (!img) return;
-
-                const poster = extractQuotedString(img.style.backgroundImage);
-                const cleanVideo = buildVideo(video.src, poster);
-
-                const replaceTarget = video.closest("span._3m6-") || video.parentNode;
-                replaceTarget.parentNode.replaceChild(cleanVideo, replaceTarget);
-
-                app.log("Removed tracking from video: " + cleanVideo.src);
-            }
-        }
-
-        new MutationObserver(function(mutations) {
-            mutations.forEach(function(mutation) {
-                removeVideoTracking(mutation.target);
-            });
-        }).observe(body, { attributes: true, attributeFilter: ["src"], subtree: true, childList: false, characterData: false });
-
-        for (const video of body.querySelectorAll("video[src]"))
-            removeVideoTracking(video);
-    }
 }, console.log);
