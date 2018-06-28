@@ -36,7 +36,6 @@ app.init().then(() => {
         "div._d_q",                     // Page Stories You May Like
         "div.fsl",                      // Games You May Like
         "div.ego_section h6",           // Photo overlay suggestions
-        "span._38my",                   // Suggested Shows
         "a._pmj",                       // TV Watchlist
     ].join(",");
 
