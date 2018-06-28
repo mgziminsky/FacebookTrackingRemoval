@@ -18,20 +18,32 @@
 
 'use strict';
 
-const ALLOWED_CLICK_ELEMENTS = ["INPUT", "SELECT", "BUTTON"];
+const ALLOWED_CLICK_ELEMENTS = ["INPUT", "SELECT", "BUTTON", "TEXTAREA"];
 const ALLOWED_ROLES = ["BUTTON", "MENUITEM"];
+const ALLOWED_SELECTOR = ["a[data-jsid='actionLink']", "form div.pam"].join(",");
 function isAllowedTarget(e) {
     let checkTarget = e.target;
+    let allow = false;
 
     // Walk through event target and parents until the currentTarget looking for an element that clicks are allowed on
-    while (e.currentTarget !== checkTarget) {
-        let role = checkTarget.attributes.role;
-        if (ALLOWED_CLICK_ELEMENTS.includes(checkTarget.tagName) || checkTarget.classList.contains("FBTR-SAFE") || (role && ALLOWED_ROLES.includes(role.value.toUpperCase())))
-            return true;
+    while (e.currentTarget.parentNode !== checkTarget) {
+        const role = checkTarget.attributes.role;
+        if (role && ALLOWED_ROLES.includes(role.value.toUpperCase())) {
+            allow = true;
+        } else if (checkTarget.tagName === "A" && checkTarget.href.substr(location.origin.length) == location.href.substr(location.origin.length)) {
+            allow = true;
+        } else if (ALLOWED_CLICK_ELEMENTS.includes(checkTarget.tagName) || checkTarget.classList.contains("FBTR-SAFE") || checkTarget.matches(ALLOWED_SELECTOR)) {
+            allow = true;
+        }
+        if (allow) break;
         checkTarget = checkTarget.parentNode;
     }
 
-    return false;
+    // prevent navigation on special links
+    if (allow && checkTarget.tagName === "A")
+        e.preventDefault();
+
+    return allow;
 }
 
 // Meant to be used as a capturing event handler
