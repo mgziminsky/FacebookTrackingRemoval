@@ -95,14 +95,24 @@ function buildCollapsible(label) {
     return collapsible;
 }
 
-const STRIPPED_PARAMS = ["ref", "ref_type", "fref", "hc_ref", "rc", "source", "placement", "comment_tracking", "__md__", "from"];
+const STRIPPED_PARAMS = ["ref", "ref_type", "fref", "rc", "placement", "comment_tracking", "from"];
+const STRIP_PATTERN = /^((source|hc)(\b|_)|ft\[|__)/;
 function cleanLinkParams(link) {
     try {
-        const url = new URL(link, location.origin);
+        const url = new URL(link, location.href);
         const cleanParams = new URLSearchParams(url.search);
+
         STRIPPED_PARAMS.forEach(cleanParams.delete.bind(cleanParams));
+        for (const [key, _] of cleanParams) { // .keys() doesn't work in FF... https://bugzilla.mozilla.org/show_bug.cgi?id=1414602
+            if (STRIP_PATTERN.test(key))
+                cleanParams.delete(key);
+        }
+
+        const origLength = url.search.length;
         url.search = cleanParams;
-        return url.href.substr(url.origin.length);
+        return (origLength === url.search.length)
+            ? link // No changes, avoid unintended modification
+            : url.href.substr(location.origin.length + (url.pathname.length == 1 && url.hash));
     } catch (e) {
         return link;
     }
