@@ -154,27 +154,38 @@ app.init().then(() => {
         return trackedLinks.length;
     }
 
-    const _internalLinkSelector = `a[href^='/'],a[href^='#'],a[ajaxify],a[href^='${location.origin}']`;
+    const _internalLinkSelector = `a[href^='/'],a[href^='#'],a[ajaxify],a[data-hovercard],a[href^='${location.origin}']`;
     function stripRefs(node) {
         const intLinks = selectAllWithBase(node, _internalLinkSelector);
         for (const a of intLinks) {
             applyEventBlockers(a.parentNode);
+            delete a.dataset.ft;
 
-            let href = a.href;
-            a.href = cleanLinkParams(href);
+            let orig = a.getAttribute("href"); // get unexpanded value
+            a.href = cleanLinkParams(orig);
 
-            let cleaned = (a.href != href);
-
-            if (a.hasAttribute("ajaxify")) {
-                href = a.getAttribute("ajaxify");
-                a.setAttribute("ajaxify", cleanLinkParams(href));
-                cleaned = (href != a.getAttribute("ajaxify"));
+            if (a.getAttribute("href") != orig) {
+                applyStyle(a);
+                app.log("Cleaned internal href:\n\t" + orig + "\n\t" + a.getAttribute("href"));
             }
 
-            if (cleaned) {
-                applyStyle(a);
-                a.classList.toggle("FBTR-SAFE");
-                app.log("Cleaned internal link params:\n\t" + href + "\n\t" + a.href);
+            if (a.hasAttribute("ajaxify")) {
+                orig = a.getAttribute("ajaxify");
+                a.setAttribute("ajaxify", cleanLinkParams(orig));
+                if (orig != a.getAttribute("ajaxify")) {
+                    applyStyle(a);
+                    app.log("Cleaned internal ajaxify link:\n\t" + orig + "\n\t" + a.getAttribute("ajaxify"));
+                }
+            }
+
+            if (a.dataset.hovercard) {
+                orig = a.dataset.hovercard;
+                a.dataset.hovercard = cleanLinkParams(orig);
+                delete a.dataset.hovercardReferrer;
+                if (orig != a.dataset.hovercard) {
+                    applyStyle(a);
+                    app.log("Cleaned internal hovercard link:\n\t" + orig + "\n\t" + a.dataset.hovercard);
+                }
             }
         }
         return intLinks.length;
@@ -239,7 +250,7 @@ app.init().then(() => {
     new MutationObserver(mutations => {
         async function forEachAdded(mutation, cb) {
             for (const node of mutation.addedNodes) {
-                if (node.nodeType == Node.ELEMENT_NODE && !node.classList.contains("FBTR-PROCESSED")) {
+                if (node.nodeType == Node.ELEMENT_NODE && !node.classList.contains(PROCESSED_CLASS)) {
                     cb(node);
                 }
             }
@@ -265,7 +276,7 @@ app.init().then(() => {
                     });
                 }
 
-                forEachAdded(mutation, node => node.classList.toggle("FBTR-PROCESSED", true));
+                forEachAdded(mutation, node => node.classList.toggle(PROCESSED_CLASS, true));
             }
         }
     }).observe(body, { childList: true, subtree: true, attributes: false, characterData: false });

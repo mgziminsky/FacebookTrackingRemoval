@@ -18,9 +18,11 @@
 
 'use strict';
 
+const PROCESSED_CLASS = "FBTR-PROCESSED";
+
 const ALLOWED_CLICK_ELEMENTS = ["INPUT", "SELECT", "BUTTON", "TEXTAREA"];
 const ALLOWED_ROLES = ["BUTTON", "MENUITEM"];
-const ALLOWED_SELECTOR = ["a[data-jsid='actionLink']", "form div.pam"].join(",");
+const ALLOWED_SELECTOR = ["a[data-jsid='actionLink']", "a[ajaxify]", "a.see_more_link", "form div.pam"].join(",");
 function isAllowedTarget(e) {
     let checkTarget = e.target;
     let allow = false;
@@ -30,7 +32,7 @@ function isAllowedTarget(e) {
         const role = checkTarget.attributes.role;
         if (role && ALLOWED_ROLES.includes(role.value.toUpperCase())) {
             allow = true;
-        } else if (checkTarget.tagName === "A" && checkTarget.href.substr(location.origin.length) == location.href.substr(location.origin.length)) {
+        } else if (checkTarget.tagName === "A" && checkTarget.getAttribute("href") == "#") {
             allow = true;
         } else if (ALLOWED_CLICK_ELEMENTS.includes(checkTarget.tagName) || checkTarget.classList.contains("FBTR-SAFE") || checkTarget.matches(ALLOWED_SELECTOR)) {
             allow = true;
@@ -89,30 +91,50 @@ function buildCollapsible(label) {
     content.classList.add("fbtrLabel");
 
     const collapsible = document.createElement("details");
+    collapsible.classList.add(PROCESSED_CLASS);
     collapsible.classList.add("fbtrCollapsible");
     collapsible.appendChild(content);
 
     return collapsible;
 }
 
-const STRIPPED_PARAMS = ["ref", "ref_type", "fref", "rc", "placement", "comment_tracking", "from"];
-const STRIP_PATTERN = /^((source|hc)(\b|_)|ft\[|__)/;
+const STRIPPED_PARAMS = ["ref", "ref_type", "fref", "rc", "placement", "comment_tracking", "from", "referrer"];
+const STRIP_PATTERN = /^(((\w*_)?source|hc)(\b|_)|ft\[|__)/;
+const CLEANED_VALUES = ["extragetparams", "acontext"];
 function cleanLinkParams(link) {
     try {
         const url = new URL(link, location.href);
+
+        // Nothing to do
+        if (url.search.length <= 1)
+            return link;
+
         const cleanParams = new URLSearchParams(url.search);
 
-        STRIPPED_PARAMS.forEach(cleanParams.delete.bind(cleanParams));
-        for (const [key, _] of cleanParams) { // .keys() doesn't work in FF... https://bugzilla.mozilla.org/show_bug.cgi?id=1414602
-            if (STRIP_PATTERN.test(key))
-                cleanParams.delete(key);
-        }
+        const deleteParam = cleanParams.delete.bind(cleanParams);
+        STRIPPED_PARAMS.forEach(deleteParam);
+
+        // for..of loop stops early if items are removed
+        // .keys() doesn't work in FF... https://bugzilla.mozilla.org/show_bug.cgi?id=1414602
+        [...cleanParams].map(([key, _]) => key)
+            .filter(STRIP_PATTERN.test.bind(STRIP_PATTERN))
+            .forEach(deleteParam);
+
+        CLEANED_VALUES.filter(cleanParams.has.bind(cleanParams)).forEach(k => {
+            const v = JSON.parse(cleanParams.get(k));
+            STRIPPED_PARAMS.forEach(key => delete v[key]);
+            for (const key in v) {
+                if (STRIP_PATTERN.test(key))
+                    delete v[key];
+            }
+            cleanParams.set(k, JSON.stringify(v));
+        });
 
         const origLength = url.search.length;
         url.search = cleanParams;
         return (origLength === url.search.length)
             ? link // No changes, avoid unintended modification
-            : url.href.substr(location.origin.length + (url.pathname.length == 1 && url.hash));
+            : url.href.substr(location.origin.length);
     } catch (e) {
         return link;
     }
