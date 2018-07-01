@@ -31,8 +31,9 @@ app.init().then(() => {
         "div.y_1hcf_5qplr",             // Suggested Post
         "span.b_1hcf_5oed7",            // Suggested Post
         "span.l_8yb3p1a9o",             // Suggested Post
-        "header._5rgs",                 // Suggested Post (Mobile)
+        "article > header._5rgs",       // Suggested Post (Mobile)
         "span.fcb",                     // People You May Know
+        "header._21ik",                 // People You May Know (Mobile)
         "div._d_q",                     // Page Stories You May Like
         "div.fsl",                      // Games You May Like
         "div.ego_section h6",           // Photo overlay suggestions
