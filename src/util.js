@@ -21,7 +21,7 @@
 const PROCESSED_CLASS = "FBTR-PROCESSED";
 
 const ALLOWED_CLICK_ELEMENTS = ["INPUT", "SELECT", "BUTTON", "TEXTAREA"];
-const ALLOWED_ROLES = ["BUTTON", "MENUITEM"];
+const ALLOWED_ROLES = ["BUTTON"];
 const ALLOWED_SELECTOR = [
     "a[data-jsid='actionLink']", "a[ajaxify]", "a.see_more_link", "form div.pam", // Desktop
     "span[data-sigil='more']", // Mobile
