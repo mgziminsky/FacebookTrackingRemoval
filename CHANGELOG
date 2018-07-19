@@ -1,3 +1,7 @@
+v1.5.16
+- Fix potential XSS vulnerability (Thanks Bennett from EFF)
+- Fix a couple more clickables
+
 v1.5.15
 - Don't hide/remove group management controls; Closes issue #13
 - Fix various clickable components; Closes issue #15
