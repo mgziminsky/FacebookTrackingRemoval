@@ -36,7 +36,7 @@ function isAllowedTarget(e) {
         const role = checkTarget.attributes.role;
         if (role && ALLOWED_ROLES.includes(role.value.toUpperCase())) {
             allow = true;
-        } else if (checkTarget.tagName === "A" && checkTarget.getAttribute("href") == "#") {
+        } else if (checkTarget.tagName === "A" && (!checkTarget.hasAttribute("href") || checkTarget.getAttribute("href") == "#")) {
             allow = true;
         } else if (ALLOWED_CLICK_ELEMENTS.includes(checkTarget.tagName) || checkTarget.classList.contains("FBTR-SAFE") || checkTarget.matches(ALLOWED_SELECTOR)) {
             allow = true;

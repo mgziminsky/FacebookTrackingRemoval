@@ -78,9 +78,17 @@ app.init().then(() => {
         }
     }
 
+    const supportedProtos = ["http:", "https:", "ftp:"];
     function cleanLink(a, href) {
         cleanAttrs(a);
-        a.href = href;
+        try {
+            if (supportedProtos.includes(new URL(href, origin).protocol))
+                a.href = href;
+            else
+                app.log("Unsupported link protocol; leaving unchanged: " + href);
+        } catch (_) {
+            app.log("Link cleaning encountered an invalid url: " + href);
+        }
         a.target = "_blank";
         a.rel = "noreferrer";
         applyStyle(a);
