@@ -1,3 +1,6 @@
+v1.5.17
+- More clickable fixes
+
 v1.5.16
 - Fix potential XSS vulnerability (Thanks Bennett from EFF)
 - Fix a couple more clickables
