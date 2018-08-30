@@ -1,3 +1,7 @@
+v1.5.18
+- Fix stickers, gifs, and games in chat. Closes #17
+- Fix sponsored post removal deleting everything. Closes #18
+
 v1.5.17
 - More clickable fixes
 
