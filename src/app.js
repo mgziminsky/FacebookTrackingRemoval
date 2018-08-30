@@ -41,13 +41,13 @@ app.init().then(() => {
     ].join(",");
 
     const _sponsoredSelector = [
-        ".h_1hcf_5rdlb",                // From CSS
-        ".x_1hcf_5o896",                // From CSS
-        ".w_1hcf_5oxu9 > a",            // From document
-        "div._5qc4 > span:first-child", // Mobile
-        "a._m8c",                       // "SponSsored" - From document
-        "div.b_1hcf_5rqfd",             // "SponSsored" - From document
-        "div.v_8yb3ozf_y",              // "SponSsored" - From document
+        ".h_1hcf_5rdlb",                            // From CSS
+        ".x_1hcf_5o896",                            // From CSS
+        "div._5qc4 > span:first-child",             // Mobile
+        "a.h_1hcf_5rdlb > span:only-child",         // "SponSsored" - From document
+        "a._m8c",                                   // "SponSsored" - From document
+        "div.b_1hcf_5rqfd",                         // "SponSsored" - From document
+        "div.v_8yb3ozf_y",                          // "SponSsored" - From document
     ].join(",");
 
 
