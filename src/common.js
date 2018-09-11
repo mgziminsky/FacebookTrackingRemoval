@@ -37,7 +37,8 @@ const app = {};
                 hideMethod: "collapse",
                 useStyle: false,
                 logging: false,
-                modStyle: "border: 1px dashed green !important;"
+                modStyle: "border: 1px dashed green !important;",
+                userRules: "",
             })),
             enumerable: true
         },
@@ -83,6 +84,13 @@ const app = {};
                         enumerable: true
                     });
                 }
+                Object.defineProperty(app.options, "remove", {
+                    value: key => {
+                        app.storage.remove(key);
+                        opts[key] = app.defaults[key];
+                    },
+                    enumerable: false,
+                });
                 Object.seal(app.options);
 
                 app.log("Initialized Tracking Removal");

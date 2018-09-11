@@ -18,11 +18,6 @@
 
 'use strict';
 app.init().then(() => {
-    const optionsElem = document.getElementById("options");
-    // Standard Options
-    const fixLinks   = document.getElementById("fixLinks");
-    const inlineVids = document.getElementById("inlineVids");
-    const useStyle   = document.getElementById("useStyle");
     // Expert Options
     const modStyle = document.getElementById("modStyle");
     const preview  = document.getElementById("preview");
@@ -41,21 +36,27 @@ app.init().then(() => {
         checkbox.addEventListener("change", handleRadio);
     }
 
-    fixLinks.addEventListener("change", e => inlineVids.disabled = !e.target.checked);
-    useStyle.addEventListener("change", e => modStyle.disabled   = !e.target.checked);
+    function handleText() {
+        this.value = this.value.trim();
+        if (!this.value) {
+            this.value = this.placeholder;
+            app.options.remove(this.id);
+        } else {
+            app.options[this.id] = this.value;
+        }
+    }
+    for (let text of document.querySelectorAll("input[type=text],textarea")) {
+        text.addEventListener("change", handleText);
+    }
 
-    document.getElementById("enabled").addEventListener("change", e => optionsElem.classList.toggle("hidden", !e.target.checked));
+    document.getElementById("reset").addEventListener("click", app.options.reset);
 
-    document.getElementById("reset").addEventListener("click", () => {
-        app.options.reset();
-        init();
-    });
+    modStyle.addEventListener("change", e => preview.style.cssText = this.value);
 
-    modStyle.addEventListener("change", e => {
-        const target = e.target;
-        app.options[target.id] = target.value;
-        preview.style.cssText = target.value;
-    });
+    function handleToggle() { document.getElementById(this.dataset.toggle).classList.toggle("hidden", !this.checked); }
+
+    // Avoid duplicated event listeners
+    const dependFuncs = new Map();
 
     function init() {
         const opts = app.options;
@@ -63,10 +64,14 @@ app.init().then(() => {
             const value = opts[key];
             const item = document.getElementById(key);
             if (item) {
-                if (item.type === "checkbox")
+                if (item.type === "checkbox") {
                     item.checked = value;
-                else
+                } else if (item.type === "text" || item.tagName === "TEXTAREA") {
+                    item.placeholder = app.defaults[key];
                     item.value = value;
+                } else {
+                    item.value = value;
+                }
             } else {
                 const radio = document.querySelector("input[name=" + key + "][value=" + value + "]");
                 if (radio)
@@ -76,10 +81,20 @@ app.init().then(() => {
 
         preview.style.cssText = modStyle.value;
 
-        inlineVids.disabled = !fixLinks.checked;
-        modStyle.disabled   = !useStyle.checked;
+        for (let elem of document.querySelectorAll("[data-depends]")) {
+            const source = document.getElementById(elem.dataset.depends);
 
-        optionsElem.classList.toggle("hidden", !opts.enabled);
+            if (!dependFuncs.has(elem))
+                dependFuncs.set(elem, () => elem.disabled = !source.checked);
+
+            source.addEventListener("change", dependFuncs.get(elem));
+            elem.disabled = !source.checked;
+        }
+
+        for (let checkbox of document.querySelectorAll("input[data-toggle]")) {
+            checkbox.addEventListener("change", handleToggle);
+            handleToggle.apply(checkbox);
+        }
     }
     init();
 

@@ -50,6 +50,7 @@ app.init().then(() => {
         "div.v_8yb3ozf_y",                          // "SponSsored" - From document
     ].join(",");
 
+    const _userSelector = app.options.userRules.replace(/\s*$\s+/gm, ",");
 
     function applyStyle(elem) {
         if (app.options.useStyle)
@@ -285,6 +286,9 @@ app.init().then(() => {
                     });
                 }
 
+                if (_userSelector)
+                    removeArticles(target, _userSelector);
+
                 forEachAdded(mutation, node => node.classList.toggle(PROCESSED_CLASS, true));
             }
         }
@@ -296,6 +300,8 @@ app.init().then(() => {
         removeArticles(body, _suggestionsSelector);
     if (app.options.delPixeled)
         removeArticles(body, _sponsoredSelector);
+    if (_userSelector)
+        removeArticles(body, _userSelector);
 
     if (app.options.fixLinks && removeLinkTracking(body) && document.getElementById("newsFeedHeading")) {
         const feed = document.getElementById("newsFeedHeading").parentNode;

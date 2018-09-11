@@ -48,7 +48,7 @@
         <ul>
             <li>
                 <label>
-                    <input type="checkbox" id="enabled">
+                    <input type="checkbox" id="enabled" data-toggle="options">
                     Enabled
                 </label>
             </li>
@@ -69,7 +69,7 @@
             </li>
             <li>
                 <label>
-                    <input type="checkbox" id="inlineVids">
+                    <input type="checkbox" id="inlineVids" data-depends="fixLinks">
                     Inline videos on mobile <em>(Only affects mobile; May increase data usage)</em>
                 </label>
             </li>
@@ -102,7 +102,11 @@
                     <div>
                         <label>
                             Custom CSS style to be added to modified elements: <span id="preview">STYLE PREVIEW</span>
-                            <textarea id="modStyle" cols="50" rows="1"></textarea>
+                            <textarea id="modStyle" cols="50" rows="1" data-depends="useStyle"></textarea>
+                        </label>
+                        <label>
+                            Custom CSS selectors to hide, one per-line. <em>FOR TESTING PURPOSES ONLY</em>
+                            <textarea id="userRules" cols="50" title="If you identify a new selector, please submit it in a PR"></textarea>
                         </label>
                         <label>
                             <input type="checkbox" id="logging">
