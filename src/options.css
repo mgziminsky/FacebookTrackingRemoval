@@ -1,0 +1,110 @@
+:root {
+    --reset-btn-size: 16px;
+}
+
+*,
+*:before,
+*:after {
+    box-sizing: border-box;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Make checkboxes visible from page action popup */
+input {
+    display: initial !important;
+}
+
+body {
+    width: max-content;
+}
+
+ul {
+    list-style: none;
+}
+
+li {
+    margin: 10px;
+    position: relative;
+}
+
+label>input {
+    vertical-align: -2px;
+}
+
+textarea {
+    display: block;
+    resize: vertical;
+    padding: .25rem;
+    padding-right: calc(1.5 * var(--reset-btn-size));
+    min-height: 2rem;
+}
+
+details {
+    padding: 5px;
+    border: inset 1px;
+}
+
+details label {
+    display: block;
+    margin: 10px;
+}
+
+details>summary {
+    cursor: pointer;
+}
+
+#preview {
+    white-space: nowrap;
+}
+
+#_hideMethod>label {
+    margin: 0 5px;
+}
+
+/* Per-options buttons */
+img.reset {
+    cursor: pointer;
+    height: var(--reset-btn-size);
+}
+
+img.reset:first-child {
+    position: absolute;
+    top: 1pt;
+    left: calc(-1.5 * var(--reset-btn-size));
+}
+
+img.reset:last-child {
+    position: relative;
+    top: calc(.25 * var(--reset-btn-size));
+    right: calc(1.25 * var(--reset-btn-size));
+}
+
+/* Timer */
+.resetDone {
+    animation: blank 1s 1;
+}
+
+@keyframes blank {}
+
+.resetDone img.reset {
+    animation: spin .5s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+li.resetDone {
+    animation: outline .25s alternate ease-in-out 4;
+}
+
+@keyframes outline {
+    to {
+        outline: dotted 2px seagreen;
+    }
+}

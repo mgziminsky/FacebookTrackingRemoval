@@ -20,23 +20,7 @@
 <head>
     <title>Facebook Tracking &amp; Ad Removal Options</title>
     <meta charset="UTF-8">
-    <style type="text/css">
-        body { width: max-content; }
-        ul { list-style: none; }
-        li { margin: 10px; }
-        textarea { display: block; }
-
-        details { padding: 5px; border: inset 1px; }
-        details label { display: block; margin: 10px; }
-        details > summary { cursor: pointer; }
-
-        #preview { white-space: nowrap; }
-        #_hideMethod > label {  margin: 0 5px; }
-        .hidden { display: none; }
-
-        /* Make checkboxes visible from page action popup */
-        input { display: initial !important; }
-    </style>
+    <link rel="stylesheet" href="options.css">
 </head>
 <body>
     <fieldset>
@@ -56,41 +40,48 @@
         <hr>
         <ul id="options">
             <li>
+                <btn-reset></btn-reset>
                 <label>
                     <input type="checkbox" id="fixLinks">
                     Remove tracking from external links
                 </label>
             </li>
             <li>
+                <btn-reset></btn-reset>
                 <label>
                     <input type="checkbox" id="internalRefs">
                     Remove tracking values from internal links <em>(If something breaks, try disabling this first)</em>
                 </label>
             </li>
             <li>
+                <btn-reset></btn-reset>
                 <label>
                     <input type="checkbox" id="inlineVids" data-depends="fixLinks">
                     Inline videos on mobile <em>(Only affects mobile; May increase data usage)</em>
                 </label>
             </li>
             <li>
+                <btn-reset></btn-reset>
                 <label>
                     <input type="checkbox" id="delPixeled">
                     Hide Sponsored articles <em>(Includes most "Suggested Posts")</em>
                 </label>
             </li>
             <li>
+                <btn-reset></btn-reset>
                 <label>
                     <input type="checkbox" id="delSuggest">
                     Hide inline suggestions <em>(eg: Suggested Posts, People You May Know)</em>
                 </label>
             </li>
             <li id="_hideMethod">
+                <btn-reset></btn-reset>
                 Hide method:
                 <label><input type="radio" name="hideMethod" value="collapse"> Collapse</label>
                 <label><input type="radio" name="hideMethod" value="remove"> Remove</label>
             </li>
             <li>
+                <btn-reset></btn-reset>
                 <label>
                     <input type="checkbox" id="useStyle">
                     Add styling to modified elements
@@ -102,7 +93,10 @@
                     <div>
                         <label>
                             Custom CSS style to be added to modified elements: <span id="preview">STYLE PREVIEW</span>
-                            <textarea id="modStyle" cols="50" rows="1" data-depends="useStyle"></textarea>
+                            <span style="position: relative; display: flex;">
+                                <textarea id="modStyle" cols="50" rows="1" data-depends="useStyle"></textarea>
+                                <btn-reset></btn-reset>
+                            </span>
                         </label>
                         <label>
                             Custom CSS selectors to hide, one per-line. <em>FOR TESTING PURPOSES ONLY</em>
@@ -123,4 +117,7 @@
     <script type="text/javascript" src="common.js"></script>
     <script type="text/javascript" src="options.js"></script>
 </body>
+<template id="btnReset">
+    <img src="reset.svg" alt="Reset" class="reset" title="Default">
+</template>
 </html>

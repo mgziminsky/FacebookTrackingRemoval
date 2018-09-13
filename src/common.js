@@ -84,10 +84,15 @@ const app = {};
                         enumerable: true
                     });
                 }
-                Object.defineProperty(app.options, "remove", {
+                Object.defineProperty(app.options, "reset", {
                     value: key => {
-                        app.storage.remove(key);
-                        opts[key] = app.defaults[key];
+                        let result;
+                        if (key) {
+                            result = app.storage.remove(key).then(() => opts[key] = app.defaults[key]);
+                        } else {
+                            result = app.storage.clear().then(() => Object.assign(opts, app.defaults));
+                        }
+                        return result;
                     },
                     enumerable: false,
                 });
@@ -101,11 +106,4 @@ const app = {};
         }
     });
     Object.seal(app);
-
-    Object.defineProperty(app.options, "reset", {
-        value: () => {
-            app.storage.clear();
-            Object.assign(opts, app.defaults);
-        }
-    });
 }());

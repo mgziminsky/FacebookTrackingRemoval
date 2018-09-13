@@ -39,8 +39,7 @@ app.init().then(() => {
     function handleText() {
         this.value = this.value.trim();
         if (!this.value) {
-            this.value = this.placeholder;
-            app.options.remove(this.id);
+            app.options.reset(this.id);
         } else {
             app.options[this.id] = this.value;
         }
@@ -49,7 +48,10 @@ app.init().then(() => {
         text.addEventListener("change", handleText);
     }
 
-    document.getElementById("reset").addEventListener("click", app.options.reset);
+    document.getElementById("reset").addEventListener("click", () => {
+        app.options.reset()
+            .then(() => document.body.classList.add("resetDone"));
+    });
 
     modStyle.addEventListener("change", e => preview.style.cssText = this.value);
 
@@ -97,6 +99,20 @@ app.init().then(() => {
         }
     }
     init();
+
+    // Per-option reset functionality
+    function resetField(e) {
+        e.preventDefault();
+        const option = this.parentNode.querySelector("input[id],textarea[id],input[name]");
+        app.options.reset(option.id || option.name)
+            .then(() => this.parentNode.classList.add("resetDone"));
+    };
+    for (let reset of document.querySelectorAll("btn-reset")) {
+        const content = document.importNode(document.getElementById("btnReset").content, true);
+        content.firstElementChild.addEventListener("click", resetField);
+        reset.parentNode.replaceChild(content, reset);
+    }
+    document.body.addEventListener("animationend", e => e.target.classList.remove("resetDone"));
 
     // Keep in sync with other options pages
     browser.storage.onChanged.addListener(() => app.init().then(init));
