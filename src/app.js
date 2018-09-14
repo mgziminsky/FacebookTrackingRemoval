@@ -18,39 +18,25 @@
 
 'use strict';
 
-app.init().then(() => {
+app.init().then(async () => {
     if (!app.options.enabled)
         return;
 
-    const _suggestionsSelector = [
-        "div._3653",                    // Sidebar Content
-        "div._50f4",                    // Related Articles/FB Promotions
-        "div._5_xt",                    // Popular Across Facebook
-        "div._5g-l",                    // A Video You May Like
-        "h3._5x3-",                     // Suggested Post???
-        "div.y_1hcf_5qplr",             // Suggested Post
-        "span.b_1hcf_5oed7",            // Suggested Post
-        "span.l_8yb3p1a9o",             // Suggested Post
-        "article > header._5rgs",       // Suggested Post (Mobile)
-        "span.fcb",                     // People You May Know
-        "header._21ik",                 // People You May Know (Mobile)
-        "div._d_q",                     // Page Stories You May Like
-        "div.fsl",                      // Games You May Like
-        "div.ego_section h6",           // Photo overlay suggestions
-        "a._pmj",                       // TV Watchlist
-    ].join(",");
+    function joinSelectors(text) {
+        return text.trim().replace(/\/\*.*\*\//g, "").replace(/\s*$\s+/gm, ",");
+    }
 
-    const _sponsoredSelector = [
-        ".h_1hcf_5rdlb",                            // From CSS
-        ".x_1hcf_5o896",                            // From CSS
-        "div._5qc4 > span:first-child",             // Mobile
-        "a.h_1hcf_5rdlb > span:only-child",         // "SponSsored" - From document
-        "a._m8c",                                   // "SponSsored" - From document
-        "div.b_1hcf_5rqfd",                         // "SponSsored" - From document
-        "div.v_8yb3ozf_y",                          // "SponSsored" - From document
-    ].join(",");
+    function loadSelectorsFile(path) {
+        return fetch(browser.runtime.getURL(path))
+            .then(resp => resp.text())
+            .then(joinSelectors)
+            .catch(() => "");
+    }
 
-    const _userSelector = app.options.userRules.replace(/\s*$\s+/gm, ",");
+    // TODO: Move files out of extension and pull from hosting
+    const _suggestionsSelector = await loadSelectorsFile("src/hide_rules/suggestions");
+    const _sponsoredSelector = await loadSelectorsFile("src/hide_rules/sponsored");
+    const _userSelector = joinSelectors(app.options.userRules);
 
     function applyStyle(elem) {
         if (app.options.useStyle)
@@ -247,6 +233,9 @@ app.init().then(() => {
     /**** END LINK TRACKING ****/
 
     async function removeArticles(node, selector) {
+        if (!selector.trim())
+            return;
+
         const elements = selectAllWithBase(node, selector);
         for (const e of elements) {
             if (!e.closest("._3j6k")) { // Skip Emergency Broadcasts. eg: Amber Alert

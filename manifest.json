@@ -55,6 +55,10 @@
     }
   ],
 
+  "web_accessible_resources": [
+    "src/hide_rules/*"
+  ],
+
   "incognito": "spanning",
 
   "manifest_version": 2
