@@ -25,20 +25,20 @@ app.init().then(async () => {
     if (!app.options.enabled)
         return;
 
-    function joinSelectors(text) {
-        return text.trim().replace(/\/\*.*\*\//g, "").replace(/\s*$\s+/gm, ",");
-    }
-
-    function loadSelectorsFile(path) {
-        return fetch(browser.runtime.getURL(path))
-            .then(resp => resp.text())
-            .then(joinSelectors)
-            .catch(() => "");
-    }
-
-    // TODO: Move files out of extension and pull from hosting
-    const _suggestionsSelector = await loadSelectorsFile("src/hide_rules/suggestions");
-    const _sponsoredSelector = await loadSelectorsFile("src/hide_rules/sponsored");
+    // Yay destructuring?
+    const {
+        hide_rules: {
+            suggestions: {
+                selector: _suggestionsSelector = ""
+            } = {},
+            sponsored: {
+                selector: _sponsoredSelector = ""
+            } = {},
+            pending: {
+                selector: _pendingSelector = ""
+            } = {},
+        } = {},
+    } = await browser.storage.local.get("hide_rules");
     const _userSelector = joinSelectors(app.options.userRules);
 
     function applyStyle(elem) {
@@ -268,6 +268,9 @@ app.init().then(async () => {
                 if (app.options.delPixeled)
                     removeArticles(target, _sponsoredSelector);
 
+                if (app.options.pendingRules)
+                    removeArticles(target, _pendingSelector);
+
                 if (app.options.internalRefs)
                     forEachAdded(mutation, stripRefs);
 
@@ -292,6 +295,8 @@ app.init().then(async () => {
         removeArticles(body, _suggestionsSelector);
     if (app.options.delPixeled)
         removeArticles(body, _sponsoredSelector);
+    if (app.options.pendingRules)
+        removeArticles(body, _pendingSelector);
     if (_userSelector)
         removeArticles(body, _userSelector);
 

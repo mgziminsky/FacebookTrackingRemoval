@@ -23,6 +23,7 @@ body {
 
 ul {
     list-style: none;
+    padding-inline-start: calc(1.5 * var(--reset-btn-size));
 }
 
 li {

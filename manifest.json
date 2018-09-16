@@ -20,7 +20,8 @@
     "*://*.facebook.com/*",
     "*://*.facebookcorewwwi.onion/*",
     "webRequest",
-    "webRequestBlocking"
+    "webRequestBlocking",
+    "https://mgziminsky.gitlab.io/FacebookTrackingRemoval/*"
   ],
 
   "options_ui": {
@@ -28,7 +29,7 @@
   },
 
   "background": {
-    "scripts": ["browser-polyfill.min.js", "src/common.js", "src/background.js"],
+    "scripts": ["browser-polyfill.min.js", "src/common.js", "src/util.js", "src/rules_sync.js", "src/background.js"],
     "persistent": true
   },
 

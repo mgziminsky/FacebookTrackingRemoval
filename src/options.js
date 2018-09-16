@@ -48,10 +48,7 @@ app.init().then(() => {
         text.addEventListener("change", handleText);
     }
 
-    document.getElementById("reset").addEventListener("click", () => {
-        app.options.reset()
-            .then(() => document.body.classList.add("resetDone"));
-    });
+    document.getElementById("reset").addEventListener("click", _ => app.options.reset().then(() => document.body.classList.add("resetDone")));
 
     modStyle.addEventListener("change", e => preview.style.cssText = this.value);
 
@@ -113,6 +110,45 @@ app.init().then(() => {
         reset.parentNode.replaceChild(content, reset);
     }
     document.body.addEventListener("animationend", e => e.target.classList.remove("resetDone"));
+
+
+    // Refresh button
+    {
+        const btnRefresh = document.getElementById("btnRefresh");
+        btnRefresh.title = `Only once per ${RATE_LIMIT / 1000 / 60} min`;
+
+        let timer;
+        function btnRefreshTimer() {
+            if (timer)
+                return;
+
+            refreshRules({check: true}).then(timeout => {
+                if (timeout <= 0)
+                    return;
+
+                let remaining = Math.ceil(timeout / 1000);
+                const text = btnRefresh.textContent;
+
+                btnRefresh.disabled = true;
+                btnRefresh.textContent = `${text} - ${remaining--} seconds`;
+
+                timer = setInterval(() => {
+                    if (remaining <= 0) {
+                        clearInterval(timer);
+                        timer = null;
+                        btnRefresh.textContent = text;
+                        btnRefresh.disabled = false;
+                    } else {
+                        btnRefresh.textContent = `${text} - ${remaining--} seconds`;
+                    }
+                }, 1000);
+            });
+        }
+
+        btnRefreshTimer();
+        btnRefresh.addEventListener("click", _ => refreshRules({force: true}).then(app.reloadTabs).then(btnRefreshTimer, btnRefreshTimer));
+    }
+
 
     // Keep in sync with other options pages
     browser.storage.onChanged.addListener(() => app.init().then(init));

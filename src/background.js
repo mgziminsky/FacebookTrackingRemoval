@@ -32,6 +32,9 @@ if (browser.pageAction) {
     });
 }
 
+refreshRules();
+setInterval(refreshRules, 1000 * 60 * 60 * 12); // refresh every 12 hours
+
 /*
     Keep track of open options windows and the currently
     active options. When an options window is closed,
@@ -51,18 +54,12 @@ app.init().then(() => {
         return Promise.reject("No Changes");
     }
 
-    function reloadTabs() {
-        return browser.tabs
-            .query({url: app.host_patterns, windowType: "normal"})
-            .then(tabs => tabs.forEach(t => browser.tabs.reload(t.id)));
-    }
-
     function onUnload(w) {
         optionsWindows.delete(w);
 
         app.storage.get(app.defaults)
             .then(opts => checkChanged(app.options, opts))
-            .then(reloadTabs)
+            .then(app.reloadTabs)
             .then(app.init)
             .catch(app.log);
     }
@@ -95,4 +92,4 @@ app.init().then(() => {
         {urls: [...genBlockUrls(["ajax/bz", "xti.php?*"]), ...app.host_patterns.map(h => h.replace("*.", "pixel."))]},
         ["blocking"]
     );
-}, console.log);
+}).catch(console.log);

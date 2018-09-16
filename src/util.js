@@ -150,3 +150,7 @@ function selectAllWithBase(node, selector) {
     results.length = childResults.length + nodeMatches;
     return results;
 }
+
+function joinSelectors(text) {
+    return text.trim().replace(/\s*\/\*.*\*\//g, "").replace(/\s*$\s/gm, ",");
+}

@@ -103,8 +103,16 @@
                             <textarea id="userRules" cols="50" title="If you identify a new selector, please submit it in a PR"></textarea>
                         </label>
                         <label>
+                            <input type="checkbox" id="pendingRules">
+                            Enable pending/unconfirmed hiding rules -
+                            <em><a href="https://github.com/mgziminsky/FacebookTrackingRemoval/blob/master/src/hide_rules/pending" target="_blank">View list here</a></em>
+                        </label>
+                        <label>
                             <input type="checkbox" id="logging">
                             Display log messages in the console
+                        </label>
+                        <label>
+                            <button type="button" id="btnRefresh">Force Rule Refresh</button>
                         </label>
                     </div>
                 </details>
@@ -115,6 +123,8 @@
 
     <script type="text/javascript" src="/browser-polyfill.min.js"></script>
     <script type="text/javascript" src="common.js"></script>
+    <script type="text/javascript" src="util.js"></script>
+    <script type="text/javascript" src="rules_sync.js"></script>
     <script type="text/javascript" src="options.js"></script>
 </body>
 <template id="btnReset">

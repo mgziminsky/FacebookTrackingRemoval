@@ -39,6 +39,7 @@ const app = {};
                 logging: false,
                 modStyle: "border: 1px dashed green !important;",
                 userRules: "",
+                pendingRules: false,
             })),
             enumerable: true
         },
@@ -61,6 +62,10 @@ const app = {};
         domains: {
             value: Object.freeze([...new Set([].concat(...browser.runtime.getManifest().content_scripts.map(cs => cs.matches.map(m => m.replace(/\W*\*\W?/g, '')))))]),
             enumerable: true
+        },
+        reloadTabs: {
+            value: () => browser.tabs.query({url: app.host_patterns, windowType: "normal"}).then(tabs => tabs.forEach(t => browser.tabs.reload(t.id))),
+            enumerable: false
         },
         init: {
             value: () => app.storage.get(app.defaults).then(o => {
@@ -90,7 +95,7 @@ const app = {};
                         if (key) {
                             result = app.storage.remove(key).then(() => opts[key] = app.defaults[key]);
                         } else {
-                            result = app.storage.clear().then(() => Object.assign(opts, app.defaults));
+                            result = app.storage.remove(Object.keys(app.defaults)).then(() => Object.assign(opts, app.defaults));
                         }
                         return result;
                     },
