@@ -18,6 +18,9 @@
 
 'use strict';
 
+// Don't run in IFrames
+if (window.self === window.top) {
+
 app.init().then(async () => {
     if (!app.options.enabled)
         return;
@@ -298,4 +301,6 @@ app.init().then(async () => {
             applyEventBlockers(stream);
         }
     }
-}, console.warn);
+}).catch(console.warn);
+
+}
