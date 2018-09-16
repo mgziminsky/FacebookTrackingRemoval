@@ -84,9 +84,15 @@ app.init().then(() => {
         }
     }
 
+    function* genBlockUrls(paths) {
+        for (let h of app.host_patterns)
+            for (let p of paths)
+                yield h.replace(/\*$/, p);
+    }
+
     browser.webRequest.onBeforeRequest.addListener(
         blockRequest,
-        {urls: [...app.host_patterns.map(h => h.replace(/\*$/, "ajax/bz")), ...app.host_patterns.map(h => h.replace(/\*$/, "xti.php?*"))]},
+        {urls: [...genBlockUrls(["ajax/bz", "xti.php?*"]), ...app.host_patterns.map(h => h.replace("*.", "pixel."))]},
         ["blocking"]
     );
 }, console.log);
