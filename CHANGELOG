@@ -1,3 +1,9 @@
+v1.6.0
+- New advanced option for custom, user defined ad hiding rules
+- Block requests to pixel.facebook.com
+- Per-option reset and various other options enhancements
+- Load ad hiding rules from web. No more version bumps just for selector changes.
+
 v1.5.18
 - Fix stickers, gifs, and games in chat. Closes #17
 - Fix sponsored post removal deleting everything. Closes #18
