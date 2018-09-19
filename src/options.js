@@ -146,7 +146,17 @@ app.init().then(() => {
         }
 
         btnRefreshTimer();
-        btnRefresh.addEventListener("click", _ => refreshRules({force: true}).then(app.reloadTabs).then(btnRefreshTimer, btnRefreshTimer));
+        btnRefresh.addEventListener("click", e => refreshRules({force: e.ctrlKey}).then(app.reloadTabs).then(btnRefreshTimer, btnRefreshTimer));
+
+        window.addEventListener("keydown", e => {
+            if (!e.repeat && e.key === "Control")
+                btnRefresh.classList.add("ctrl");
+        });
+        window.addEventListener("keyup", e => {
+            if (e.key === "Control")
+                btnRefresh.classList.remove("ctrl");
+        });
+
     }
 
 

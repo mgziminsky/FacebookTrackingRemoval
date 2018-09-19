@@ -50,28 +50,28 @@
                 <btn-reset></btn-reset>
                 <label>
                     <input type="checkbox" id="internalRefs">
-                    Remove tracking values from internal links <em>(If something breaks, try disabling this first)</em>
+                    <span>Remove tracking values from internal links <em>(If something breaks, try disabling this first)</em></span>
                 </label>
             </li>
             <li>
                 <btn-reset></btn-reset>
                 <label>
                     <input type="checkbox" id="inlineVids" data-depends="fixLinks">
-                    Inline videos on mobile <em>(Only affects mobile; May increase data usage)</em>
+                    <span>Inline videos on mobile <em>(Only affects mobile; May increase data usage)</em></span>
                 </label>
             </li>
             <li>
                 <btn-reset></btn-reset>
                 <label>
                     <input type="checkbox" id="delPixeled">
-                    Hide Sponsored articles <em>(Includes most "Suggested Posts")</em>
+                    <span>Hide Sponsored articles <em>(Includes most "Suggested Posts")</em></span>
                 </label>
             </li>
             <li>
                 <btn-reset></btn-reset>
                 <label>
                     <input type="checkbox" id="delSuggest">
-                    Hide inline suggestions <em>(eg: Suggested Posts, People You May Know)</em>
+                    <span>Hide inline suggestions <em>(eg: Suggested Posts, People You May Know)</em></span>
                 </label>
             </li>
             <li id="_hideMethod">
@@ -90,31 +90,41 @@
             <li>
                 <details>
                     <summary>Advanced Options</summary>
-                    <div>
-                        <label>
-                            Custom CSS style to be added to modified elements: <span id="preview">STYLE PREVIEW</span>
-                            <span style="position: relative; display: flex;">
-                                <textarea id="modStyle" cols="50" rows="1" data-depends="useStyle"></textarea>
-                                <btn-reset></btn-reset>
-                            </span>
-                        </label>
-                        <label>
-                            Custom CSS selectors to hide, one per-line. <em>FOR TESTING PURPOSES ONLY</em>
-                            <textarea id="userRules" cols="50" title="If you identify a new selector, please submit it in a PR"></textarea>
-                        </label>
-                        <label>
-                            <input type="checkbox" id="pendingRules">
-                            Enable pending/unconfirmed hiding rules -
-                            <em><a href="https://github.com/mgziminsky/FacebookTrackingRemoval/blob/master/src/hide_rules/pending" target="_blank">View list here</a></em>
-                        </label>
-                        <label>
-                            <input type="checkbox" id="logging">
-                            Display log messages in the console
-                        </label>
-                        <label>
-                            <button type="button" id="btnRefresh">Force Rule Refresh</button>
-                        </label>
-                    </div>
+                    <ul>
+                        <li>
+                            <label class="flex-col">
+                                <span>Custom CSS style to be added to modified elements: <span id="preview">STYLE PREVIEW</span></span>
+                                <div style="position: relative;">
+                                    <textarea id="modStyle" cols="50" rows="1" data-depends="useStyle"></textarea>
+                                    <btn-reset></btn-reset>
+                                </div>
+                            </label>
+                        </li>
+                        <li>
+                            <label class="flex-col">
+                                <span>Custom CSS selectors to hide, one per-line. <em>FOR TESTING PURPOSES ONLY</em></span>
+                                <textarea id="userRules" cols="50" title="If you identify a new selector, please submit it in a PR"></textarea>
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                <input type="checkbox" id="pendingRules">
+                                Enable pending/unconfirmed hiding rules
+                            </label>
+                            - <em><a href="https://github.com/mgziminsky/FacebookTrackingRemoval/blob/master/src/hide_rules/pending" target="_blank">View list here</a></em>
+                        </li>
+                        <li>
+                            <label>
+                                <input type="checkbox" id="logging">
+                                Display log messages in the console
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                <button type="button" id="btnRefresh">Refresh Rules</button>
+                            </label>
+                        </li>
+                    </ul>
                 </details>
             </li>
         </ul>

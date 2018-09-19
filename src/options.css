@@ -8,6 +8,15 @@
     box-sizing: border-box;
 }
 
+
+#preview {
+    white-space: nowrap;
+}
+
+#btnRefresh.ctrl::before {
+    content: "Force ";
+}
+
 .hidden {
     display: none;
 }
@@ -31,8 +40,17 @@ li {
     position: relative;
 }
 
-label>input {
-    vertical-align: -2px;
+li,
+label {
+    display: flex;
+    column-gap: 5px;
+    align-items: center;
+}
+
+.flex-col {
+    flex-direction: column;
+    align-items: initial;
+    row-gap: 5px;
 }
 
 textarea {
@@ -48,39 +66,28 @@ details {
     border: inset 1px;
 }
 
-details label {
-    display: block;
-    margin: 10px;
+details ul {
+    padding-inline-start: 0;
 }
 
 details>summary {
     cursor: pointer;
 }
 
-#preview {
-    white-space: nowrap;
-}
-
-#_hideMethod>label {
-    margin: 0 5px;
-}
-
 /* Per-options buttons */
 img.reset {
+    position: absolute;
     cursor: pointer;
     height: var(--reset-btn-size);
 }
 
 img.reset:first-child {
-    position: absolute;
-    top: 1pt;
     left: calc(-1.5 * var(--reset-btn-size));
 }
 
 img.reset:last-child {
-    position: relative;
     top: calc(.25 * var(--reset-btn-size));
-    right: calc(1.25 * var(--reset-btn-size));
+    right: calc(.25 * var(--reset-btn-size));
 }
 
 /* Timer */
