@@ -1,3 +1,6 @@
+v1.6.1
+- Remove fbclid from links - Closes #20
+
 v1.6.0
 - New advanced option for custom, user defined ad hiding rules
 - Block requests to pixel.facebook.com

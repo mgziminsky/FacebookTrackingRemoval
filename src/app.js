@@ -153,6 +153,18 @@ app.init().then(async () => {
         return trackedLinks.length;
     }
 
+    function stripFBCLID(node) {
+        const trackedLinks = selectAllWithBase(node, `a[href*='fbclid='i]`);
+        for (const a of trackedLinks) {
+            const link = new URL(a.href);
+            link.searchParams.delete("fbclid");
+            a.href = link.href;
+            applyStyle(a);
+            app.log("Removed fbclid from link: " + a);
+        }
+        return trackedLinks.length;
+    }
+
     const _internalLinkSelector = `a[href^='/'],a[href^='#'],a[ajaxify],a[data-hovercard],a[href^='${location.origin}']`;
     function stripRefs(node) {
         const intLinks = selectAllWithBase(node, _internalLinkSelector);
@@ -228,6 +240,7 @@ app.init().then(async () => {
        const cleaned = cleanShimLinks(node)
            + fixVideoLinks(node)
            + cleanRedirectLinks(node)
+           + stripFBCLID(node)
            ;
        fixGifs(node);
        return cleaned;
