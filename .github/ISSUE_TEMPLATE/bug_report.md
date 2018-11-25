@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Create a report to help us improve
+about: Report broken functionality or other problems with the extension
 
 ---
 
@@ -20,16 +20,12 @@ A clear and concise description of what you expected to happen.
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
-
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
+**Please provide the following information:**
+ - Device: [e.g. Desktop, iPhone6, etc.]
+ - OS: [e.g. Windows, Linux, iOS]
+ - Browser [e.g. firefox, chrome]
+ - Extension Version [e.g. 1.6.1]
+ - Extension Options
 
 **Additional context**
 Add any other context about the problem here.
