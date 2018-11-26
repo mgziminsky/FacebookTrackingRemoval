@@ -4,6 +4,8 @@ about: Report broken functionality or other problems with the extension
 
 ---
 
+# Requests about ads not being hidden will be closed without response. Follow the instructions in the "Ad blocking support" template for that.
+
 **Describe the bug**
 A clear and concise description of what the bug is.
 
