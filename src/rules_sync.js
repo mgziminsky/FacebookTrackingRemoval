@@ -42,13 +42,15 @@ function shouldSkip(newDateString, oldDateString) {
     return newDate <= oldDate;
 }
 
-async function refreshRules(opts) {
-    const {force = false, check = false} = opts || {};
-
+async function refreshRules({ force = false, check = false } = {}) {
     const {hide_rules: currentRules = {}} = await browser.storage.local.get("hide_rules");
+    const devMode = (await browser.management.getSelf()).installType === "development";
 
     // Prevent abuse, max refresh once per 5 min
-    const timeout = RATE_LIMIT - (Date.now() - Date.parse(currentRules.lastRefresh));
+    const timeout = devMode
+        ? 0
+        : RATE_LIMIT - (Date.now() - Date.parse(currentRules.lastRefresh));
+
     if (check)
         return Promise.resolve(timeout > 0 ? timeout : 0);
 
@@ -59,7 +61,7 @@ async function refreshRules(opts) {
     const newRules = {};
     for (let file of RULE_FILES) {
         const current = currentRules[file];
-        const resp = await fetch(`https://mgziminsky.gitlab.io/FacebookTrackingRemoval/${file}`, { mode: 'cors' })
+        const resp = await fetch(`https://${devMode ? "localhost" : "mgziminsky.gitlab.io"}/FacebookTrackingRemoval/${file}`, { mode: 'cors' })
             .then(resp => resp && resp.ok ? resp : Promise.reject())
             .catch(_ => current ? new Response(current.selector, {headers: {[DATE_HEADER]: current[DATE_HEADER]}}) : Promise.reject()) // Use saved value if present
             .catch(_ => fetch(browser.runtime.getURL(`src/hide_rules/${file}`))); // Fallback to bundled copy as last resort, should never fail if file is present

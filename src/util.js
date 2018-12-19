@@ -152,5 +152,5 @@ function selectAllWithBase(node, selector) {
 }
 
 function joinSelectors(text) {
-    return text.trim().replace(/\s*\/\*.*\*\//g, "").replace(/\s*$\s/gm, ",");
+    return text.trim().replace(/\s*\/\*.*\*\//g, "").replace(/\s*$\s/gm, ",").replace(/\s+/g, "");
 }
