@@ -1,7 +1,7 @@
 {
-  "name": "Facebook™ Tracking & Ad Removal",
+  "name": "Tracking & Ad Removal for Facebook™",
   "version": "1.6.2",
-  "description": "Provides options to remove Facebook™'s tracking from links and videos, and to remove ads from your feed",
+  "description": "Removes Ads and the user interaction tracking from content on Facebook™",
   "icons": { "128": "src/icon.png" },
 
   "author": "Michael Ziminsky",

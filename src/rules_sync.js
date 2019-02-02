@@ -102,6 +102,10 @@ async function refreshRules({ force = false, check = false } = {}) {
                 rules[k].push(sel.trim());
             }
         }
+
+        if (rules.length == 0)
+            continue;
+
         for (let k in rules)
             rules[k] = rules[k].join(',');
 
