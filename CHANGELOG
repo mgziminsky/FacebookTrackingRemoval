@@ -1,3 +1,6 @@
+v1.6.2
+- Slightly smarter sponsored identification
+
 v1.6.1
 - Remove fbclid from links - Closes #20
 

@@ -37,6 +37,12 @@ app.init().then(async () => {
             pending: {
                 selector: _pendingSelector = ""
             } = {},
+            content: {
+                selector: _dynRules = {}
+            } = {},
+            content_pending: {
+                selector: _dynPendingRules = {}
+            } = {},
         } = {},
     } = await browser.storage.local.get("hide_rules");
     const _userSelector = joinSelectors(app.options.userRules);
@@ -260,6 +266,20 @@ app.init().then(async () => {
         }
     }
 
+    async function removeArticlesDyn(node, rules) {
+        if (rules.length === 0)
+            return;
+
+        for (let p in rules) {
+            const elements = selectAllWithBase(node, rules[p]);
+            for (const e of elements) {
+                if (normalizeString(e.textContent) == p) {
+                    hide(e.closest("div.pagelet,div.mbm,div._55wo,article"), e.innerText || getComputedStyle(e, ":after").content);
+                }
+            }
+        }
+    }
+
     const body = document.body;
 
     new MutationObserver(mutations => {
@@ -275,17 +295,26 @@ app.init().then(async () => {
             if (mutation.addedNodes.length) {
                 const target = mutation.target;
 
+                if (app.options.internalRefs)
+                    forEachAdded(mutation, stripRefs);
+
                 if (app.options.delSuggest)
                     removeArticles(target, _suggestionsSelector);
 
-                if (app.options.delPixeled)
+                if (app.options.delPixeled) {
                     removeArticles(target, _sponsoredSelector);
 
-                if (app.options.pendingRules)
+                    // Putting this here for now. If it works out, it can get its own
+                    // option and may replace the old static rules
+                    removeArticlesDyn(target, _dynRules)
+                }
+
+                if (app.options.pendingRules) {
                     removeArticles(target, _pendingSelector);
 
-                if (app.options.internalRefs)
-                    forEachAdded(mutation, stripRefs);
+                    // Same as above...
+                    removeArticlesDyn(target, _dynPendingRules)
+                }
 
                 if (app.options.fixLinks) {
                     forEachAdded(mutation, node => {

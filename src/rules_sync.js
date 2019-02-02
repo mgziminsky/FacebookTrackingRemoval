@@ -18,7 +18,8 @@
 
 'use strict';
 
-const RULE_FILES = ["suggestions", "sponsored", "pending"];
+const STATIC_RULE_FILES = ["suggestions", "sponsored", "pending"];
+const DYN_RULE_FILES = ["content", "content_pending"];
 const DATE_HEADER = "last-modified";
 const RATE_LIMIT = (1000 * 60 * 5); // 5 min
 
@@ -57,20 +58,55 @@ async function refreshRules({ force = false, check = false } = {}) {
     if (timeout > 0)
         return Promise.reject(timeout);
 
-
-    const newRules = {};
-    for (let file of RULE_FILES) {
-        const current = currentRules[file];
+    const fetchRule = async file => {
+        const current = currentRules[file] || {};
         const resp = await fetch(`https://${devMode ? "localhost" : "mgziminsky.gitlab.io"}/FacebookTrackingRemoval/${file}`, { mode: 'cors' })
             .then(resp => resp && resp.ok ? resp : Promise.reject())
             .catch(_ => current ? new Response(current.selector, {headers: {[DATE_HEADER]: current[DATE_HEADER]}}) : Promise.reject()) // Use saved value if present
             .catch(_ => fetch(browser.runtime.getURL(`src/hide_rules/${file}`))); // Fallback to bundled copy as last resort, should never fail if file is present
 
         if (!resp.ok || !force && shouldSkip(resp.headers.get(DATE_HEADER), (current || {})[DATE_HEADER]))
-            continue; // No updates, or no file
+            return null; // No updates, or no file
+
+        return resp;
+    };
+
+    const newRules = {};
+    for (let file of STATIC_RULE_FILES) {
+        const resp = await fetchRule(file);
+
+        if (resp === null)
+            continue;
 
         newRules[file] = {
             selector: await resp.text().then(joinSelectors),
+            [DATE_HEADER]: resp.headers.get(DATE_HEADER),
+        };
+    }
+
+    for (let file of DYN_RULE_FILES) {
+        const resp = await fetchRule(file);
+
+        if (resp === null)
+            continue;
+
+        const rules = {};
+        const lines = (await resp.text()).trim().replace(/\s*\/\*.*\*\/\s*/g, "").split(/\s*$\s*/m);
+        for (let line of lines) {
+            const [sel, ...filters] = line.split("||");
+            if (filters.length < 1)
+                continue;
+            for (let k of filters.map(normalizeString)) {
+                if (!rules.hasOwnProperty(k))
+                    rules[k] = [];
+                rules[k].push(sel.trim());
+            }
+        }
+        for (let k in rules)
+            rules[k] = rules[k].join(',');
+
+        newRules[file] = {
+            selector: rules,
             [DATE_HEADER]: resp.headers.get(DATE_HEADER),
         };
     }
