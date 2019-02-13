@@ -25,26 +25,6 @@ app.init().then(async () => {
     if (!app.options.enabled)
         return;
 
-    // Yay destructuring?
-    const {
-        hide_rules: {
-            suggestions: {
-                selector: _suggestionsSelector = ""
-            } = {},
-            sponsored: {
-                selector: _sponsoredSelector = ""
-            } = {},
-            pending: {
-                selector: _pendingSelector = ""
-            } = {},
-            content: {
-                selector: _dynRules = {}
-            } = {},
-            content_pending: {
-                selector: _dynPendingRules = {}
-            } = {},
-        } = {},
-    } = await browser.storage.local.get("hide_rules");
     const _userSelector = joinSelectors(app.options.userRules);
 
     function applyStyle(elem) {
@@ -297,21 +277,21 @@ app.init().then(async () => {
                     forEachAdded(mutation, stripRefs);
 
                 if (app.options.delSuggest)
-                    removeArticles(target, _suggestionsSelector);
+                    removeArticles(target, app.hide_rules.suggestions);
 
                 if (app.options.delPixeled) {
-                    removeArticles(target, _sponsoredSelector);
+                    removeArticles(target, app.hide_rules.sponsored);
 
                     // Putting this here for now. If it works out, it can get its own
                     // option and may replace the old static rules
-                    removeArticlesDyn(target, _dynRules)
+                    removeArticlesDyn(target, app.hide_rules.content)
                 }
 
                 if (app.options.pendingRules) {
-                    removeArticles(target, _pendingSelector);
+                    removeArticles(target, app.hide_rules.pending);
 
                     // Same as above...
-                    removeArticlesDyn(target, _dynPendingRules)
+                    removeArticlesDyn(target, app.hide_rules.content_pending)
                 }
 
                 if (app.options.fixLinks) {
@@ -332,11 +312,11 @@ app.init().then(async () => {
     if (app.options.internalRefs)
         stripRefs(body);
     if (app.options.delSuggest)
-        removeArticles(body, _suggestionsSelector);
+        removeArticles(body, app.hide_rules.suggestions);
     if (app.options.delPixeled)
-        removeArticles(body, _sponsoredSelector);
+        removeArticles(body, app.hide_rules.sponsored);
     if (app.options.pendingRules)
-        removeArticles(body, _pendingSelector);
+        removeArticles(body, app.hide_rules.pending);
     if (_userSelector)
         removeArticles(body, _userSelector);
 

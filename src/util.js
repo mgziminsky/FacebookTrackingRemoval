@@ -157,8 +157,12 @@ function selectAllWithBase(node, selector) {
     return results;
 }
 
+function stripComments(text) {
+    return text.trim().replace(/\s*\/\*.*\*\//g, "");
+}
+
 function joinSelectors(text) {
-    return text.trim().replace(/\s*\/\*.*\*\//g, "").replace(/\s*$\s/gm, ",").replace(/\s+/g, "");
+    return stripComments(text).replace(/\s*$\s/gm, ",").replace(/\s+/g, "");
 }
 
 function normalizeString(str) {

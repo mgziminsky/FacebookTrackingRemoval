@@ -91,7 +91,7 @@ async function refreshRules({ force = false, check = false } = {}) {
             continue;
 
         const rules = {};
-        const lines = (await resp.text()).trim().replace(/\s*\/\*.*\*\/\s*/g, "").split(/\s*$\s*/m);
+        const lines = stripComments(await resp.text()).split(/\s*$\s*/m);
         for (let line of lines) {
             const [sel, ...filters] = line.split("||");
             if (filters.length < 1)

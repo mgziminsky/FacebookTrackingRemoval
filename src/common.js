@@ -26,7 +26,7 @@ const app = {};
     let inited = false;
     Object.defineProperties(app, {
         defaults: {
-            value: Object.seal(Object.freeze({
+            value: Object.freeze({
                 enabled: true,
                 fixLinks: true,
                 internalRefs: false,
@@ -40,7 +40,7 @@ const app = {};
                 modStyle: "border: 1px dashed green !important;",
                 userRules: "",
                 pendingRules: false,
-            })),
+            }),
             enumerable: true
         },
         options: {
@@ -67,8 +67,18 @@ const app = {};
             value: () => browser.tabs.query({url: app.host_patterns, windowType: "normal"}).then(tabs => tabs.forEach(t => browser.tabs.reload(t.id))),
             enumerable: false
         },
+        hide_rules: {
+            value: Object.seal({
+                suggestions: "",
+                sponsored: "",
+                pending: "",
+                content: {},
+                content_pending: {},
+            }),
+            enumerable: true
+        },
         init: {
-            value: () => app.storage.get(app.defaults).then(o => {
+            value: () => app.storage.get(app.defaults).then(async o => {
                 Object.assign(opts, o);
 
                 if (opts.logging)
@@ -101,7 +111,9 @@ const app = {};
                     },
                     enumerable: false,
                 });
-                Object.seal(app.options);
+                Object.freeze(app.options);
+
+                await loadHideRules();
 
                 app.log("Initialized Tracking Removal");
                 app.log(JSON.stringify(app.options));
@@ -111,4 +123,28 @@ const app = {};
         }
     });
     Object.seal(app);
+
+    async function loadHideRules() {
+        const hr = app.hide_rules;
+        ({
+            hide_rules: {
+                suggestions: {
+                    selector: hr.suggestions = hr.suggestions
+                } = {},
+                sponsored: {
+                    selector: hr.sponsored = hr.sponsored
+                } = {},
+                pending: {
+                    selector: hr.pending = hr.pending
+                } = {},
+                content: {
+                    selector: hr.content = hr.content
+                } = {},
+                content_pending: {
+                    selector: hr.content_pending = hr.content_pending
+                } = {},
+            } = {},
+        } = await browser.storage.local.get("hide_rules"));
+        Object.freeze(app.hide_rules);
+    }
 }());
