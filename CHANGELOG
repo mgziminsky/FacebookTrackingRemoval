@@ -1,3 +1,7 @@
+v1.6.3
+- Fix reactions in chat and some breakages caused by internal link cleaning. Closes #25
+- Remove some new internal tracking parameters
+
 v1.6.2
 - Slightly smarter sponsored identification
 
