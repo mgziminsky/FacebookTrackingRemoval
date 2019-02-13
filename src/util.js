@@ -34,10 +34,10 @@ function isAllowedTarget(e) {
     // Walk through event target and parents until the currentTarget looking for an element that clicks are allowed on
     while (e.currentTarget.parentNode !== checkTarget) {
         const role = checkTarget.attributes.role;
-        if (role && ALLOWED_ROLES.includes(role.value.toUpperCase())) {
-            return true;
-        } else if (checkTarget.tagName === "A" && (!checkTarget.hasAttribute("href") || checkTarget.getAttribute("href") === "#")) {
+        if (checkTarget.tagName === "A" && (!checkTarget.hasAttribute("href") || checkTarget.getAttribute("href") === "#")) {
             e.preventDefault();
+            return true;
+        } else if (role && ALLOWED_ROLES.includes(role.value.toUpperCase())) {
             return true;
         } else if (ALLOWED_CLICK_ELEMENTS.includes(checkTarget.tagName) || checkTarget.classList.contains("FBTR-SAFE") || checkTarget.matches(ALLOWED_SELECTOR)) {
             return true;
@@ -53,14 +53,16 @@ function restrictEventPropagation(e) {
     if (!isAllowedTarget(e)) {
         e.stopImmediatePropagation();
         e.stopPropagation();
-        app.log("Blocked propagation of " + e.type + " to " + e.target);
+        app.log(`Stopped propagation of ${e.type} from ${e.target}`);
+    } else {
+        app.log(`Allowed propagation of ${e.type} from ${e.target} to ${e.currentTarget}`);
     }
 }
 
 function stopPropagation(e) {
     e.stopImmediatePropagation();
     e.stopPropagation();
-    app.log("Blocked propagation of " + e.type + " to " + e.target);
+    app.log(`Stopped propagation of ${e.type} from ${e.target}`);
 }
 
 function applyEventBlockers(target) {
@@ -102,6 +104,10 @@ const STRIPPED_PARAMS = ["ref", "ref_type", "fref", "rc", "placement", "comment_
 const STRIP_PATTERN = /^(((\w*_)?source|hc)(\b|_)|ft\[|__)/;
 const CLEANED_VALUES = ["extragetparams", "acontext"];
 function cleanLinkParams(link) {
+    // Don't mess with anchor links
+    if (link.startsWith("#"))
+        return link;
+
     try {
         const url = new URL(link, location.href);
 
