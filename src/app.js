@@ -53,23 +53,24 @@ app.init().then(async () => {
     }
 
     function hide(elem, label) {
-        if (!elem)
+        let target;
+        if (!elem || !(target = elem.closest("div.pagelet,div.mbm,div._55wo,article")))
             return;
 
         if (app.options.hideMethod === "collapse") {
-            if (elem.closest(".fbtrCollapsible"))
+            if (target.closest(".fbtrCollapsible"))
                 return;
 
             const wrapper = buildCollapsible(label);
             applyStyle(wrapper);
-            for (const c of elem.classList)
+            for (const c of target.classList)
                 wrapper.classList.add(c);
 
-            elem.parentNode.appendChild(wrapper);
-            wrapper.appendChild(elem);
+            target.parentNode.appendChild(wrapper);
+            wrapper.appendChild(target);
             app.log("Collapsed " + label);
         } else {
-            elem.remove();
+            target.remove();
             app.log("Removed " + label);
         }
     }
@@ -261,20 +262,17 @@ app.init().then(async () => {
         const elements = selectAllWithBase(node, selector);
         for (const e of elements) {
             if (!e.closest("._3j6k")) { // Skip Emergency Broadcasts. eg: Amber Alert
-                hide(e.closest("div.pagelet,div.mbm,div._55wo,article"), e.innerText || getComputedStyle(e, ":after").content);
+                hide(e, e.innerText || getComputedStyle(e, ":after").content);
             }
         }
     }
 
     async function removeArticlesDyn(node, rules) {
-        if (rules.length === 0)
-            return;
-
         for (let p in rules) {
             const elements = selectAllWithBase(node, rules[p]);
             for (const e of elements) {
                 if (normalizeString(e.textContent) == p) {
-                    hide(e.closest("div.pagelet,div.mbm,div._55wo,article"), e.innerText || getComputedStyle(e, ":after").content);
+                    hide(e, e.innerText || getComputedStyle(e, ":after").content);
                 }
             }
         }
