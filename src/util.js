@@ -98,7 +98,7 @@ function buildCollapsible(label) {
     return collapsible;
 }
 
-const STRIPPED_PARAMS = ["ref", "ref_type", "fref", "rc", "placement", "comment_tracking", "from", "referrer"];
+const STRIPPED_PARAMS = ["ref", "ref_type", "fref", "rc", "placement", "comment_tracking", "from", "referrer", "eid", "epa"];
 const STRIP_PATTERN = /^(((\w*_)?source|hc)(\b|_)|ft\[|__)/;
 const CLEANED_VALUES = ["extragetparams", "acontext"];
 function cleanLinkParams(link) {
