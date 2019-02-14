@@ -21,6 +21,10 @@
 const app = {};
 
 (function() {
+    const RULES_KEY = "hide_rules";
+    const PARAMS_KEY = "param_cleaning";
+    const WHITELIST_KEY = "click_whitelist";
+
     const opts = {};
 
     let inited = false;
@@ -67,7 +71,7 @@ const app = {};
             value: () => browser.tabs.query({url: app.host_patterns, windowType: "normal"}).then(tabs => tabs.forEach(t => browser.tabs.reload(t.id))),
             enumerable: false
         },
-        hide_rules: {
+        [RULES_KEY]: {
             value: Object.seal({
                 suggestions: "",
                 sponsored: "",
@@ -77,11 +81,19 @@ const app = {};
             }),
             enumerable: true
         },
-        param_cleaning: {
+        [PARAMS_KEY]: {
             value: Object.seal({
                 params: [],
                 pattern: /^$/,
                 values: [],
+            }),
+            enumerable: true
+        },
+        [WHITELIST_KEY]: {
+            value: Object.seal({
+                elements: [],
+                roles: [],
+                selector: "",
             }),
             enumerable: true
         },
@@ -123,6 +135,7 @@ const app = {};
 
                 await loadHideRules();
                 await loadParamCleaning();
+                await loadClickWhitelist();
 
                 app.log("Initialized Tracking Removal");
                 app.log(JSON.stringify(app.options));
@@ -134,9 +147,9 @@ const app = {};
     Object.seal(app);
 
     async function loadHideRules() {
-        const hr = app.hide_rules;
+        const hr = app[RULES_KEY];
         ({
-            hide_rules: {
+            [RULES_KEY]: {
                 suggestions: {
                     selector: hr.suggestions = hr.suggestions
                 } = {},
@@ -153,15 +166,15 @@ const app = {};
                     selector: hr.content_pending = hr.content_pending
                 } = {},
             } = {},
-        } = await browser.storage.local.get("hide_rules"));
-        Object.freeze(app.hide_rules);
+        } = await browser.storage.local.get(RULES_KEY));
+        Object.freeze(hr);
     }
 
     async function loadParamCleaning() {
-        const pc = app.param_cleaning;
+        const pc = app[PARAMS_KEY];
         let _patterns;
         ({
-            param_cleaning: {
+            [PARAMS_KEY]: {
                 params: {
                     value: pc.params = pc.params
                 } = {},
@@ -172,8 +185,28 @@ const app = {};
                     value: pc.values = pc.values
                 } = {},
             } = {},
-        } = await browser.storage.local.get("param_cleaning"));
+        } = await browser.storage.local.get(PARAMS_KEY));
         pc.pattern = new RegExp(`^(${_patterns.join('|')})`);
-        Object.freeze(app.param_cleaning);
+        Object.freeze(pc);
+    }
+
+    async function loadClickWhitelist() {
+        const cw = app[WHITELIST_KEY];
+        let _selectors;
+        ({
+            [WHITELIST_KEY]: {
+                elements: {
+                    value: cw.elements = cw.elements
+                } = {},
+                roles: {
+                    value: cw.roles = cw.roles
+                } = {},
+                selectors: {
+                    value: _selectors = []
+                } = {},
+            } = {},
+        } = await browser.storage.local.get(WHITELIST_KEY));
+        cw.selector = joinSelectors(_selectors.join("\n"));
+        Object.freeze(cw);
     }
 }());

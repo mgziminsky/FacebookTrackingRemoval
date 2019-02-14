@@ -20,15 +20,8 @@
 
 const PROCESSED_CLASS = "FBTR-PROCESSED";
 
-const ALLOWED_CLICK_ELEMENTS = ["INPUT", "SELECT", "BUTTON", "TEXTAREA"];
-const ALLOWED_ROLES = ["BUTTON", "MENUITEM", "LINK", "OPTION"];
-const ALLOWED_SELECTOR = [
-    "a[data-jsid='actionLink']", "a[ajaxify]", "a.see_more_link", "form div.pam", // Desktop
-    "span[data-sigil='more']", // Mobile
-    "div._5r8h", "img._358", // Chat
-].join(",");
-
 function isAllowedTarget(e) {
+    const config = app.click_whitelist;
     let checkTarget = e.target;
 
     // Walk through event target and parents until the currentTarget looking for an element that clicks are allowed on
@@ -37,9 +30,9 @@ function isAllowedTarget(e) {
         if (checkTarget.tagName === "A" && (!checkTarget.hasAttribute("href") || checkTarget.getAttribute("href") === "#")) {
             e.preventDefault();
             return true;
-        } else if (role && ALLOWED_ROLES.includes(role.value.toUpperCase())) {
+        } else if (role && config.roles.includes(role.value.toUpperCase())) {
             return true;
-        } else if (ALLOWED_CLICK_ELEMENTS.includes(checkTarget.tagName) || checkTarget.classList.contains("FBTR-SAFE") || checkTarget.matches(ALLOWED_SELECTOR)) {
+        } else if (config.elements.includes(checkTarget.tagName) || checkTarget.classList.contains("FBTR-SAFE") || checkTarget.matches(config.selector)) {
             return true;
         }
         checkTarget = checkTarget.parentNode;
@@ -165,7 +158,7 @@ function stripComments(text) {
 }
 
 function joinSelectors(text) {
-    return stripComments(text).replace(/\s*$\s/gm, ",").replace(/\s+/g, "");
+    return stripComments(text).replace(/\s*$\s/gm, ",").replace(/\s+/g, " ");
 }
 
 function normalizeString(str) {
