@@ -1,3 +1,7 @@
+v1.6.4
+- Internal code improvements and bug fixes
+- Moved remaining hard-coded data to hosting to support easier updates without version bumps
+
 v1.6.3
 - Fix reactions in chat and some breakages caused by internal link cleaning. Closes #25
 - Remove some new internal tracking parameters
