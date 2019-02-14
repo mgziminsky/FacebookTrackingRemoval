@@ -21,6 +21,32 @@
 const app = {};
 
 (function() {
+    // Adapted from https://stackoverflow.com/a/51086893
+    class Mutex {
+        constructor() {
+            this.current = Promise.resolve();
+            this._locks = [];
+        }
+
+        lock() {
+            let _resolve;
+            const p = new Promise(resolve => {
+                _resolve = () => resolve();
+            });
+            // Caller gets a promise that resolves when the current outstanding lock resolves
+            const rv = this.current.then(() => _resolve);
+            // Don't allow the next request until the new promise is done
+            this.current = p;
+            // Return the new promise
+            this._locks.push(rv);
+            return rv;
+        };
+
+        release() {
+            this._locks.shift()();
+        }
+    }
+
     const RULES_KEY = "hide_rules";
     const PARAMS_KEY = "param_cleaning";
     const WHITELIST_KEY = "click_whitelist";
@@ -28,6 +54,8 @@ const app = {};
     const opts = {};
 
     let inited = false;
+    const initMutex = new Mutex();
+
     Object.defineProperties(app, {
         defaults: {
             value: Object.freeze({
@@ -98,50 +126,59 @@ const app = {};
             enumerable: true
         },
         init: {
-            value: () => app.storage.get(app.defaults).then(async o => {
-                Object.assign(opts, o);
+            value: () => {
+                const lock = initMutex.lock();
+                return app.storage.get(app.defaults).then(async o => {
+                    await lock;
+                    Object.assign(opts, o);
 
-                if (opts.logging)
-                    app.log = console.log.bind(console);
-                else
-                    app.log = () => {};
+                    if (opts.logging)
+                        app.log = console.log.bind(console);
+                    else
+                        app.log = () => {};
 
-                if (inited) return;
+                    if (inited) return;
 
-                for (let key in opts) {
-                    Object.defineProperty(app.options, key, {
-                        get: () => opts[key],
-                        set: val => {
-                            const old = opts[key];
-                            opts[key] = val;
-                            app.storage.set({[key]: val}).catch(() => opts[key] = old);
+                    for (let key in opts) {
+                        Object.defineProperty(app.options, key, {
+                            get: () => opts[key],
+                            set: val => {
+                                const old = opts[key];
+                                opts[key] = val;
+                                app.storage.set({[key]: val}).catch(() => opts[key] = old);
+                            },
+                            enumerable: true
+                        });
+                    }
+                    Object.defineProperty(app.options, "reset", {
+                        value: key => {
+                            let result;
+                            if (key) {
+                                result = app.storage.remove(key).then(() => opts[key] = app.defaults[key]);
+                            } else {
+                                result = app.storage.remove(Object.keys(app.defaults)).then(() => Object.assign(opts, app.defaults));
+                            }
+                            return result;
                         },
-                        enumerable: true
+                        enumerable: false,
                     });
-                }
-                Object.defineProperty(app.options, "reset", {
-                    value: key => {
-                        let result;
-                        if (key) {
-                            result = app.storage.remove(key).then(() => opts[key] = app.defaults[key]);
-                        } else {
-                            result = app.storage.remove(Object.keys(app.defaults)).then(() => Object.assign(opts, app.defaults));
-                        }
-                        return result;
-                    },
-                    enumerable: false,
-                });
-                Object.freeze(app.options);
+                    Object.freeze(app.options);
 
-                await loadHideRules();
-                await loadParamCleaning();
-                await loadClickWhitelist();
+                    await loadHideRules();
+                    await loadParamCleaning();
+                    await loadClickWhitelist();
 
-                app.log("Initialized Tracking Removal");
-                app.log(JSON.stringify(app.options));
+                    app.log("Initialized Tracking Removal");
+                    app.log(JSON.stringify(app.options));
 
-                inited = true;
-            })
+                    inited = true;
+                })
+                .catch(e => {
+                    inited = false;
+                    return Promise.reject(e);
+                })
+                .finally(() => lock.then(release => release()));
+            }
         }
     });
     Object.seal(app);
@@ -151,19 +188,19 @@ const app = {};
         ({
             [RULES_KEY]: {
                 suggestions: {
-                    selector: hr.suggestions = hr.suggestions
+                    value: hr.suggestions = hr.suggestions
                 } = {},
                 sponsored: {
-                    selector: hr.sponsored = hr.sponsored
+                    value: hr.sponsored = hr.sponsored
                 } = {},
                 pending: {
-                    selector: hr.pending = hr.pending
+                    value: hr.pending = hr.pending
                 } = {},
                 content: {
-                    selector: hr.content = hr.content
+                    value: hr.content = hr.content
                 } = {},
                 content_pending: {
-                    selector: hr.content_pending = hr.content_pending
+                    value: hr.content_pending = hr.content_pending
                 } = {},
             } = {},
         } = await browser.storage.local.get(RULES_KEY));

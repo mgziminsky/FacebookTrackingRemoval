@@ -18,6 +18,26 @@
 
 'use strict';
 
+// Do some cleanup after updating to 1.6.4+ for the first time
+// to get rid of old storage data that is no longer used
+browser.runtime.onInstalled.addListener(details => {
+    // Not an update
+    if (!details.previousVersion)
+        return;
+
+    // Already cleaned
+    if (details.previousVersion > "1.6.3")
+        return;
+
+    app.init().then(async () => {
+        const currentOpts = await app.storage.get(Object.keys(app.defaults));
+        app.storage.clear();
+        browser.storage.local.clear();
+        app.storage.set(currentOpts);
+        browser.runtime.reload();
+    });
+});
+
 if (browser.pageAction) {
     function checkHost(url) {
         const hostname = new URL(url).hostname;

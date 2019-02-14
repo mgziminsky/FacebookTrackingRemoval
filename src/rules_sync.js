@@ -57,7 +57,7 @@ async function loadHideRules(fetchRule) {
             continue;
 
         newRules[file] = {
-            selector: await resp.text().then(joinSelectors),
+            value: await resp.text().then(joinSelectors),
             [DATE_HEADER]: resp.headers.get(DATE_HEADER),
         };
     }
@@ -88,7 +88,7 @@ async function loadHideRules(fetchRule) {
             rules[k] = rules[k].join(',');
 
         newRules[file] = {
-            selector: rules,
+            value: rules,
             [DATE_HEADER]: resp.headers.get(DATE_HEADER),
         };
     }
