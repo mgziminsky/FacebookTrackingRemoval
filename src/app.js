@@ -273,9 +273,6 @@ app.init().then(async () => {
             if (mutation.addedNodes.length) {
                 const target = mutation.target;
 
-                if (app.options.internalRefs)
-                    forEachAdded(mutation, stripRefs);
-
                 if (app.options.delSuggest)
                     removeArticles(target, app.hide_rules.suggestions);
 
@@ -294,6 +291,9 @@ app.init().then(async () => {
                     removeArticlesDyn(target, app.hide_rules.content_pending)
                 }
 
+                if (_userSelector)
+                    removeArticles(target, _userSelector);
+
                 if (app.options.fixLinks) {
                     forEachAdded(mutation, node => {
                         if (removeLinkTracking(node))
@@ -301,16 +301,14 @@ app.init().then(async () => {
                     });
                 }
 
-                if (_userSelector)
-                    removeArticles(target, _userSelector);
+                if (app.options.internalRefs)
+                    forEachAdded(mutation, stripRefs);
 
                 forEachAdded(mutation, node => node.classList.toggle(PROCESSED_CLASS, true));
             }
         }
     }).observe(body, { childList: true, subtree: true, attributes: false, characterData: false });
 
-    if (app.options.internalRefs)
-        stripRefs(body);
     if (app.options.delSuggest)
         removeArticles(body, app.hide_rules.suggestions);
     if (app.options.delPixeled)
@@ -319,6 +317,8 @@ app.init().then(async () => {
         removeArticles(body, app.hide_rules.pending);
     if (_userSelector)
         removeArticles(body, _userSelector);
+    if (app.options.internalRefs)
+        stripRefs(body);
 
     if (app.options.fixLinks && removeLinkTracking(body) && document.getElementById("newsFeedHeading")) {
         const feed = document.getElementById("newsFeedHeading").parentNode;
