@@ -18,8 +18,6 @@
 
 'use strict';
 
-const STATIC_RULE_FILES = ["suggestions", "sponsored", "pending"];
-const DYN_RULE_FILES = ["content", "content_pending"];
 const DATE_HEADER = "last-modified";
 const RATE_LIMIT = (1000 * 60 * 5); // 5 min
 
@@ -43,6 +41,8 @@ function shouldSkip(newDateString, oldDateString) {
     return newDate <= oldDate;
 }
 
+const STATIC_RULE_FILES = ["suggestions", "sponsored", "pending"];
+const DYN_RULE_FILES = ["content", "content_pending"];
 async function loadHideRules(fetchRule) {
     const { hide_rules: currentRules = {} } = await browser.storage.local.get("hide_rules");
 
@@ -66,7 +66,7 @@ async function loadHideRules(fetchRule) {
             continue;
 
         const rules = {};
-        const lines = stripComments(await resp.text()).split(/\s*$\s*/m);
+        const lines = await resp.text().then(stripComments).then(splitLines);
         for (let line of lines) {
             const [sel, ...filters] = line.split("||");
             if (filters.length < 1)
@@ -86,6 +86,26 @@ async function loadHideRules(fetchRule) {
 
         newRules[file] = {
             selector: rules,
+            [DATE_HEADER]: resp.headers.get(DATE_HEADER),
+        };
+    }
+
+    return Object.assign(currentRules, newRules);
+}
+
+const PARAM_CLEANING_FILES = ["params", "prefix_patterns", "values"];
+async function loadParamRules(fetchRule) {
+    const { param_cleaning: currentRules = {} } = await browser.storage.local.get("param_cleaning");
+
+    const newRules = {};
+    for (let file of PARAM_CLEANING_FILES) {
+        const resp = await fetchRule(`param_cleaning/${file}`, currentRules[file]);
+
+        if (resp === null)
+            continue;
+
+        newRules[file] = {
+            value: await resp.text().then(stripComments).then(splitLines),
             [DATE_HEADER]: resp.headers.get(DATE_HEADER),
         };
     }
@@ -123,6 +143,7 @@ async function refreshRules({ force = false, check = false } = {}) {
 
     browser.storage.local.set({
         hide_rules: await loadHideRules(fetchRule),
+        param_cleaning: await loadParamRules(fetchRule),
         lastRuleRefresh: new Date().toUTCString(),
     }).then(() => RATE_LIMIT);
 }

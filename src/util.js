@@ -100,9 +100,6 @@ function buildCollapsible(label) {
     return collapsible;
 }
 
-const STRIPPED_PARAMS = ["ref", "ref_type", "fref", "rc", "placement", "comment_tracking", "from", "referrer", "eid", "epa"];
-const STRIP_PATTERN = /^(((\w*_)?source|hc)(\b|_)|ft\[|__)/;
-const CLEANED_VALUES = ["extragetparams", "acontext"];
 function cleanLinkParams(link) {
     // Don't mess with anchor links
     if (link.startsWith("#"))
@@ -118,19 +115,21 @@ function cleanLinkParams(link) {
         const cleanParams = new URLSearchParams(url.search);
 
         const deleteParam = cleanParams.delete.bind(cleanParams);
-        STRIPPED_PARAMS.forEach(deleteParam);
+
+        const config = app.param_cleaning;
+        config.params.forEach(deleteParam);
 
         // for..of loop stops early if items are removed
         // .keys() doesn't work in FF... https://bugzilla.mozilla.org/show_bug.cgi?id=1414602
         [...cleanParams].map(([key, _]) => key)
-            .filter(STRIP_PATTERN.test.bind(STRIP_PATTERN))
+            .filter(config.pattern.test.bind(config.pattern))
             .forEach(deleteParam);
 
-        CLEANED_VALUES.filter(cleanParams.has.bind(cleanParams)).forEach(k => {
+        config.values.filter(cleanParams.has.bind(cleanParams)).forEach(k => {
             const v = JSON.parse(cleanParams.get(k));
-            STRIPPED_PARAMS.forEach(key => delete v[key]);
+            config.params.forEach(key => delete v[key]);
             for (const key in v) {
-                if (STRIP_PATTERN.test(key))
+                if (config.pattern.test(key))
                     delete v[key];
             }
             cleanParams.set(k, JSON.stringify(v));
@@ -157,8 +156,12 @@ function selectAllWithBase(node, selector) {
     return results;
 }
 
+function splitLines(text) {
+    return text.trim().split(/\s*$\s*/m);
+}
+
 function stripComments(text) {
-    return text.trim().replace(/\s*\/\*.*\*\//g, "");
+    return text.trim().replace(/\s*\/\*.*?\*\//g, "");
 }
 
 function joinSelectors(text) {

@@ -77,6 +77,14 @@ const app = {};
             }),
             enumerable: true
         },
+        param_cleaning: {
+            value: Object.seal({
+                params: [],
+                pattern: /^$/,
+                values: [],
+            }),
+            enumerable: true
+        },
         init: {
             value: () => app.storage.get(app.defaults).then(async o => {
                 Object.assign(opts, o);
@@ -114,6 +122,7 @@ const app = {};
                 Object.freeze(app.options);
 
                 await loadHideRules();
+                await loadParamCleaning();
 
                 app.log("Initialized Tracking Removal");
                 app.log(JSON.stringify(app.options));
@@ -146,5 +155,25 @@ const app = {};
             } = {},
         } = await browser.storage.local.get("hide_rules"));
         Object.freeze(app.hide_rules);
+    }
+
+    async function loadParamCleaning() {
+        const pc = app.param_cleaning;
+        let _patterns;
+        ({
+            param_cleaning: {
+                params: {
+                    value: pc.params = pc.params
+                } = {},
+                prefix_patterns: {
+                    value: _patterns = ['$']
+                } = {},
+                values: {
+                    value: pc.values = pc.values
+                } = {},
+            } = {},
+        } = await browser.storage.local.get("param_cleaning"));
+        pc.pattern = new RegExp(`^(${_patterns.join('|')})`);
+        Object.freeze(app.param_cleaning);
     }
 }());

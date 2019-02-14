@@ -5,6 +5,7 @@ pages:
   script:
   - mkdir .public
   - cp -r src/hide_rules/* .public
+  - cp -r src/hide_rules src/param_cleaning .public/
   - mv .public public
   artifacts:
     paths:
