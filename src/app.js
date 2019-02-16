@@ -67,7 +67,7 @@ app.init().then(async () => {
             app.log("Link cleaning encountered an invalid url: " + href);
         }
         a.target = "_blank";
-        a.rel = "noreferrer";
+        a.rel = "noreferrer noopener";
         applyStyle(a);
     }
 
@@ -261,7 +261,7 @@ app.init().then(async () => {
     const body = document.body;
 
     new MutationObserver(mutations => {
-        async function forEachAdded(mutation, cb) {
+        const forEachAdded = async (mutation, cb) => {
             for (const node of mutation.addedNodes) {
                 if (node.nodeType == Node.ELEMENT_NODE && !node.classList.contains(PROCESSED_CLASS)) {
                     cb(node);
@@ -305,9 +305,14 @@ app.init().then(async () => {
                     forEachAdded(mutation, stripRefs);
 
                 forEachAdded(mutation, node => node.classList.toggle(PROCESSED_CLASS, true));
+            } else if (mutation.target) {
+                // This is to handle FB resetting links that have already been cleaned,
+                // but it means any cleaned link will be processed at least twice... :(
+                // Added 10-20ms to processing time of home page in chrome.
+                removeLinkTracking(mutation.target);
             }
         }
-    }).observe(body, { childList: true, subtree: true, attributes: false, characterData: false });
+    }).observe(body, { childList: true, subtree: true, attributes: app.options.fixLinks, attributeFilter: ["href"], characterData: false });
 
     if (app.options.delSuggest)
         removeArticles(body, app.hide_rules.suggestions);
