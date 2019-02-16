@@ -4,6 +4,10 @@ a[ajaxify]
 a.see_more_link
 form div.pam
 
+/* Messenger page */
+a[aria-label='photo']       /* photos */
+span._40fu                  /* message actions */
+
 /* Mobile */
 span[data-sigil='more']
 
