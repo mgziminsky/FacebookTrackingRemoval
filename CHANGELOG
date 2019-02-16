@@ -1,3 +1,7 @@
+v1.6.5
+- Fixes for parts of messenger page - Closes #26
+- Prevent FB from resetting links after they've been cleaned
+
 v1.6.4
 - Internal code improvements and bug fixes
 - Moved remaining hard-coded data to hosting to support easier updates without version bumps
