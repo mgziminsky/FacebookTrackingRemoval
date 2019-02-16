@@ -1,6 +1,6 @@
 {
   "name": "Tracking & Ad Removal for Facebook™",
-  "version": "1.6.4",
+  "version": "1.6.5",
   "description": "Removes Ads and the user interaction tracking from content on Facebook™",
   "icons": { "128": "src/icon.png" },
 
@@ -10,7 +10,7 @@
   "applications": {
     "gecko": {
       "id": "{bb1b80be-e6b3-40a1-9b6e-9d4073343f0b}",
-      "strict_min_version": "49.0"
+      "strict_min_version": "52.0"
     }
   },
 
