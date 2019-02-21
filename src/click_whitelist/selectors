@@ -3,6 +3,7 @@ a[data-jsid='actionLink']
 a[ajaxify]
 a.see_more_link
 form div.pam
+a[rel='theater']
 
 /* Messenger page */
 a[aria-label='photo']       /* photos */

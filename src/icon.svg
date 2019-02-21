@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   width="128"
+   height="128"
+   viewBox="0 0 128 128"
+   version="1.1"
+   id="fbtr_icon">
+  <title
+     id="title839">FacebookTrackingRemoval-Logo</title>
+  <defs
+     id="defs2">
+    <filter
+       height="1.7578947"
+       y="-0.37894736"
+       x="-0.12857143"
+       width="1.2571429"
+       style="color-interpolation-filters:sRGB"
+       id="filter_cuff_shine">
+      <feGaussianBlur
+         stdDeviation="1.6892645"
+         result="blur"
+         id="feGaussianBlur1899" />
+      <feComposite
+         in="SourceGraphic"
+         in2="blur"
+         operator="atop"
+         result="composite1"
+         id="feComposite1901" />
+      <feComposite
+         in2="composite1"
+         operator="in"
+         result="composite2"
+         id="feComposite1903" />
+      <feComposite
+         in2="composite2"
+         operator="in"
+         result="composite3"
+         id="feComposite1905" />
+    </filter>
+    <filter
+       height="1.1283333"
+       y="-0.064166666"
+       width="1.1358824"
+       x="-0.067941177"
+       style="color-interpolation-filters:sRGB"
+       id="filter_button">
+      <feGaussianBlur
+         stdDeviation="0.27098617"
+         result="blur"
+         id="feGaussianBlur2081" />
+      <feComposite
+         in="SourceGraphic"
+         in2="blur"
+         operator="atop"
+         result="composite1"
+         id="feComposite2083" />
+      <feComposite
+         in2="composite1"
+         operator="in"
+         result="composite2"
+         id="feComposite2085" />
+      <feComposite
+         in2="composite2"
+         operator="in"
+         result="composite3"
+         id="feComposite2087" />
+    </filter>
+    <filter
+       height="1.02"
+       width="1.02"
+       y="-0.01"
+       x="-0.01"
+       style="color-interpolation-filters:sRGB"
+       id="filter_cuff">
+      <feGaussianBlur
+         stdDeviation="0.75"
+         result="blur"
+         id="feGaussianBlur1043" />
+      <feComposite
+         in="SourceGraphic"
+         in2="blur"
+         operator="atop"
+         result="composite1"
+         id="feComposite1045" />
+      <feComposite
+         in2="composite1"
+         operator="in"
+         result="composite2"
+         id="feComposite1047" />
+      <feComposite
+         in2="composite2"
+         operator="in"
+         result="composite3"
+         id="feComposite1049" />
+    </filter>
+    <filter
+       height="1.5487478"
+       width="1.2421278"
+       y="-0.27437392"
+       x="-0.1210639"
+       style="color-interpolation-filters:sRGB"
+       id="hand_shadow">
+      <feGaussianBlur
+         stdDeviation="4.0067235"
+         result="blur"
+         id="feGaussianBlur4745" />
+      <feComposite
+         in="SourceGraphic"
+         in2="blur"
+         operator="atop"
+         result="composite1"
+         id="feComposite4747" />
+      <feComposite
+         in2="composite1"
+         operator="in"
+         result="composite2"
+         id="feComposite4749" />
+      <feComposite
+         in2="composite2"
+         operator="out"
+         result="composite3"
+         id="feComposite4751" />
+    </filter>
+  </defs>
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>FacebookTrackingRemoval-Logo</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <path
+     style="fill:#1c2e63;fill-opacity:1;stroke:none;stroke-width:1.37199211;stroke-opacity:1"
+     d="m 122.96591,86.153962 c -0.3485,7.486164 0.60098,13.176775 -3.67262,19.732768 -3.80036,4.61759 -10.33281,11.68251 -16.80687,11.38989 -20.611124,0.10724 -41.22278,0.1447 -61.833661,0.3101 v 6.97486 c -11.38179,-0.002 -24.236878,-0.005 -35.6186691,-0.007 V 67.248368 H 40.652759 l 0.0362,4.833641 c 13.048227,0.367943 23.928654,0.32203 26.576122,-6.316996 3.199922,-5.421189 5.603135,-11.814276 12.060016,-14.403387 4.357901,-1.643622 9.614794,0.590386 10.197127,4.795213 1.640818,-4.267729 4.919139,-4.058839 5.98525,-7.957801 0.244732,-13.457662 -0.01351,-25.368567 1.685378,-38.7353684 1.781519,-7.7437667 18.282238,-8.55142784 19.262938,0.6842284 2.94609,19.181274 4.06717,37.402465 5.73195,56.726778 0.43259,6.41747 0.75165,12.845964 0.77817,19.279195 z"
+     id="BG" />
+  <g
+     id="Cuff">
+    <rect
+       transform="matrix(0.94980646,0,0,0.9293913,-12.61524,0.09478089)"
+       style="opacity:1;fill:#375496;fill-opacity:1;stroke-width:0.43150634;filter:url(#filter_cuff)"
+       y="75.653122"
+       x="21.90667"
+       height="54.549164"
+       width="31.532936"
+       id="cuff_bg" />
+    <rect
+       ry="0"
+       y="72.639648"
+       x="2.7450538"
+       height="10.698675"
+       width="31.532936"
+       id="cuff_shine"
+       style="opacity:1;fill:#5773b0;fill-opacity:1;stroke-width:0.35631177;filter:url(#filter_cuff_shine)"
+       transform="matrix(0.94484439,0,0,1.0271416,5.6764557,-3.9030409)" />
+    <ellipse
+       ry="5.0677934"
+       rx="4.7862492"
+       cy="119.72662"
+       cx="26.253984"
+       id="cuff_button"
+       style="opacity:0.9;fill:#8bafe0;fill-opacity:1;stroke:none;stroke-width:0.26458332;stroke-opacity:0;filter:url(#filter_button)"
+       transform="matrix(0.80425932,0,0,0.78697254,9.8892047,19.51255)" />
+  </g>
+  <path
+     id="Hand"
+     style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.1;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     d="m 104.34779,49.917146 c -4.17336,0.167064 -7.351813,2.866926 -11.606563,6.551003 -2.75173,2.752301 -4.38205,8.774581 -3.61328,12.777343 0.23074,5.220732 2.02381,8.025062 5.25,7.22461 4.4488,-0.338479 3.52526,-2.079258 5.06445,-5.902344 3.225983,-2.632019 -4.09178,-9.098596 -3.33008,-9.441406 1.07939,-0.822935 3.02578,3.347902 5.589853,4.444447 2.41525,-1.481675 4.16554,-8.673198 4.89423,-7.905869 -0.45228,1.470186 -0.89858,6.382928 -3.26641,9.262203 -0.94765,1.283864 0.63021,3.585098 0.48078,3.211501 2.44406,2.636772 2.14882,3.394468 1.60712,4.21124 0,-0.758582 -2.1464,-3.710442 -3.04102,-3.129732 -1.62249,1.444202 -2.923933,5.928916 -2.539063,7.486288 0.379663,1.536314 3.042753,2.208784 6.421873,3.823131 -5.98363,0.0546 -7.356813,-3.416872 -8.756723,-3.56558 -2.73045,-0.290045 -4.14231,0.733975 -6.34071,-0.207032 -2.29389,-1.150061 -5.13603,-4.042408 -4.70622,-11.231897 0.24293,-4.063571 2.64726,-11.355927 -1.488251,-12.99831 -5.866556,-2.329865 -10.921035,4.66823 -14.492187,14.25586 -7.410821,7.450648 -17.803428,6.68074 -27.898438,6.800781 -1.468083,15.688082 -1.353174,24.40496 0,38.079447 l 61.582059,-0.59375 c 5.26561,-1.89716 10.61056,-6.76387 13.06641,-11.13086 2.1086,-4.477327 2.12879,-19.236599 1.14843,-27.899759 -0.50689,-10.50438 -3.48293,-18.810924 -7.92078,-22.331165 -2.20767,-1.706918 -4.20849,-1.866089 -6.10547,-1.79015 z m -3.3663,-38.506273 c -0.88402,13.284162 -1.244623,23.825419 -1.388703,37.664533 2.714673,-2.164682 10.797403,-4.881653 16.958073,5.717901 0,0 -2.123,-39.163678 -4.25425,-42.079428 -1.0396,-7.0646804 -8.58129,-6.2708634 -11.31512,-1.303006 z" />
+  <path
+     style="fill:#000000;fill-opacity:0.58823529;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#hand_shadow)"
+     d="m 41.05777,106.25189 c 24.184946,1.23766 37.805893,1.16625 61.99084,-0.0398 8.90973,-3.16893 13.72607,-16.934886 17.3751,-26.11571 0.20297,12.43796 0.0178,16.567063 -1.92401,22.68546 -2.67632,5.29474 -7.6229,8.72089 -12.77267,11.5468 l -63.986849,0.8153 z"
+     id="HandShadow" />
+</svg>
