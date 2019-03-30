@@ -312,7 +312,14 @@ app.init().then(async () => {
                 removeLinkTracking(mutation.target);
             }
         }
-    }).observe(body, { childList: true, subtree: true, attributes: app.options.fixLinks, attributeFilter: ["href"], characterData: false });
+    }).observe(body, (() => {
+        const opts = { childList: true, subtree: true, characterData: false };
+        if (app.options.fixLinks) {
+            opts.attributes = true;
+            opts.attributeFilter = ["href"];
+        }
+        return opts;
+    })());
 
     if (app.options.delSuggest)
         removeArticles(body, app.hide_rules.suggestions);
