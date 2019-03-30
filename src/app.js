@@ -35,11 +35,11 @@ app.init().then(async () => {
     function hide(elem, label) {
         let target;
         if (!elem || !(target = elem.closest("div.pagelet,div.mbm,div._55wo,article")))
-            return;
+            return false;
 
         if (app.options.hideMethod === "collapse") {
             if (target.closest(".fbtrCollapsible"))
-                return;
+                return false;
 
             const wrapper = buildCollapsible(label);
             applyStyle(wrapper);
@@ -53,6 +53,7 @@ app.init().then(async () => {
             target.remove();
             app.log("Removed " + label);
         }
+        return true;
     }
 
     const supportedProtos = ["http:", "https:", "ftp:"];
@@ -242,17 +243,33 @@ app.init().then(async () => {
         const elements = selectAllWithBase(node, selector);
         for (const e of elements) {
             if (!e.closest("._3j6k")) { // Skip Emergency Broadcasts. eg: Amber Alert
-                hide(e, e.innerText || getComputedStyle(e, ":after").content);
+                if (hide(e, e.innerText || getComputedStyle(e, ":after").content))
+                    app.log(() => {
+                        for (const s of selector.split(",")) {
+                            if (e.matches(s)) {
+                                app.log(`>>> Static Rule matched for ${e.innerText}: ${s}`);
+                                return;
+                            }
+                        }
+                    });
             }
         }
     }
 
     async function removeArticlesDyn(node, rules) {
-        for (let p in rules) {
-            const elements = selectAllWithBase(node, rules[p]);
+        for (let text in rules) {
+            const elements = selectAllWithBase(node, rules[text]);
             for (const e of elements) {
-                if (normalizeString(e.textContent) == p) {
-                    hide(e, e.innerText || getComputedStyle(e, ":after").content);
+                if (normalizeString(e.textContent) == text) {
+                    if (hide(e, e.innerText || getComputedStyle(e, ":after").content))
+                        app.log(() => {
+                            for (const s of rules[text].split(",")) {
+                                if (e.matches(s)) {
+                                    app.log(`>>> Dynamic Rule matched for ${e.innerText}: ${text} = ${s}`);
+                                    return;
+                                }
+                            }
+                        });
                 }
             }
         }

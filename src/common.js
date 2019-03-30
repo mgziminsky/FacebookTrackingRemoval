@@ -133,7 +133,12 @@ const app = {};
                     Object.assign(opts, o);
 
                     if (opts.logging)
-                        app.log = console.log.bind(console);
+                        app.log = arg => {
+                            if (typeof(arg) === "function")
+                                arg();
+                            else
+                                console.log(arg);
+                        };
                     else
                         app.log = () => {};
 
