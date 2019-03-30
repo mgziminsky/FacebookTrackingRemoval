@@ -1,3 +1,7 @@
+v1.6.7
+- Fix extension not working at all when "Fix external links" is disabled
+- Add more details to log when something is hidden/removed
+
 v1.6.6
 - Support messenger.com - Closes #27
 
