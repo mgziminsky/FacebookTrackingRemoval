@@ -94,11 +94,11 @@ function buildCollapsible(label) {
 }
 
 function cleanLinkParams(link) {
-    // Don't mess with anchor links
-    if (link.startsWith("#"))
-        return link;
-
     try {
+        // Don't mess with anchor links
+        if (link.startsWith("#"))
+            return link;
+
         const url = new URL(link, location.href);
 
         // Nothing to do

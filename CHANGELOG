@@ -1,3 +1,7 @@
+v1.6.8
+- Fix minor bug when cleaning link info bubble
+- Fix fallback rule loading for whitelisted clicks and param cleaning
+
 v1.6.7
 - Fix extension not working at all when "Fix external links" is disabled
 - Add more details to log when something is hidden/removed
