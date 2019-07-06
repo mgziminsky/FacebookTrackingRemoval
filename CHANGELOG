@@ -1,4 +1,4 @@
-v1.6.8
+v1.6.8.1
 - Fix minor bug when cleaning link info bubble
 - Fix fallback rule loading for whitelisted clicks and param cleaning
 

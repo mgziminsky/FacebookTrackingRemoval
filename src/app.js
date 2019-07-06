@@ -160,16 +160,18 @@ app.init().then(async () => {
             applyEventBlockers(a.parentNode);
             delete a.dataset.ft;
 
-            let orig = a.getAttribute("href"); // get unexpanded value
-            a.href = cleanLinkParams(orig);
+            if (a.hasAttribute("href")) {
+                let orig = a.getAttribute("href"); // get unexpanded value
+                a.href = cleanLinkParams(orig);
 
-            if (a.getAttribute("href") != orig) {
-                applyStyle(a);
-                app.log("Cleaned internal href:\n\t" + orig + "\n\t" + a.getAttribute("href"));
+                if (a.getAttribute("href") != orig) {
+                    applyStyle(a);
+                    app.log("Cleaned internal href:\n\t" + orig + "\n\t" + a.getAttribute("href"));
+                }
             }
 
             if (a.hasAttribute("ajaxify")) {
-                orig = a.getAttribute("ajaxify");
+                let orig = a.getAttribute("ajaxify");
                 a.setAttribute("ajaxify", cleanLinkParams(orig));
                 if (orig != a.getAttribute("ajaxify")) {
                     applyStyle(a);
@@ -178,7 +180,7 @@ app.init().then(async () => {
             }
 
             if (a.dataset.hovercard) {
-                orig = a.dataset.hovercard;
+                let orig = a.dataset.hovercard;
                 a.dataset.hovercard = cleanLinkParams(orig);
                 delete a.dataset.hovercardReferrer;
                 if (orig != a.dataset.hovercard) {
