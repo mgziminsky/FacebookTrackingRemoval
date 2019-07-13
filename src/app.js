@@ -26,10 +26,10 @@ app.init().then(async () => {
         return;
 
     const _userSelector = joinSelectors(app.options.userRules);
+    const STYLE_CLASS = 'fbtrStyled';
 
     function applyStyle(elem) {
-        if (app.options.useStyle)
-            elem.style.cssText += app.options.modStyle;
+        elem.classList.add(STYLE_CLASS);
     }
 
     function hide(elem, label) {
@@ -323,7 +323,7 @@ app.init().then(async () => {
                 if (app.options.internalRefs)
                     forEachAdded(mutation, stripRefs);
 
-                forEachAdded(mutation, node => node.classList.toggle(PROCESSED_CLASS, true));
+                forEachAdded(mutation, node => node.classList.add(PROCESSED_CLASS));
             } else if (mutation.target) {
                 // This is to handle FB resetting links that have already been cleaned,
                 // but it means any cleaned link will be processed at least twice... :(
@@ -356,6 +356,13 @@ app.init().then(async () => {
         for (const stream of feed.querySelectorAll("div._4ikz")) {
             applyEventBlockers(stream);
         }
+    }
+
+    if (app.options.useStyle) {
+        const styleElement = document.createElement('style');
+        styleElement.id = 'fbtr-style';
+        body.after(styleElement);
+        styleElement.sheet.insertRule(`.${STYLE_CLASS} { ${app.options.modStyle}; }`);
     }
 }).catch(console.warn);
 
