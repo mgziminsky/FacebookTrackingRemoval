@@ -262,16 +262,16 @@ app.init().then(async () => {
         for (let text in rules) {
             const elements = selectAllWithBase(node, rules[text]);
             for (const e of elements) {
-                if (normalizeString(e.textContent) == text) {
-                    if (hide(e, e.innerText || getComputedStyle(e, ":after").content))
-                        app.log(() => {
-                            for (const s of rules[text].split(",")) {
-                                if (e.matches(s)) {
-                                    app.log(`>>> Dynamic Rule matched for ${e.innerText}: ${text} = ${s}`);
-                                    return;
-                                }
+                const elementText = e.innerText || [...e.querySelectorAll("span[data-content]")].filter(x => x.offsetParent != null).map(x => x.dataset.content).join("");
+                if (normalizeString(elementText) == text && hide(e, elementText)) {
+                    app.log(() => {
+                        for (const s of rules[text].split(",")) {
+                            if (e.matches(s)) {
+                                app.log(`>>> Dynamic Rule matched for ${e.innerText}: ${text} = ${s}`);
+                                return;
                             }
-                        });
+                        }
+                    });
                 }
             }
         }
