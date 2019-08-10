@@ -87,6 +87,10 @@ const app = {};
             value: () => {},
             writable: true
         },
+        warn: {
+            value: () => {},
+            writable: true
+        },
         host_patterns: {
             value: Object.freeze([...new Set([].concat(...browser.runtime.getManifest().content_scripts.map(cs => cs.matches)))]),
             enumerable: true
@@ -95,9 +99,9 @@ const app = {};
             value: Object.freeze([...new Set([].concat(...browser.runtime.getManifest().content_scripts.map(cs => cs.matches.map(m => m.replace(/\W*\*\W?/g, '')))))]),
             enumerable: true
         },
-        reloadTabs: {
-            value: () => browser.tabs.query({url: app.host_patterns, windowType: "normal"}).then(tabs => tabs.forEach(t => browser.tabs.reload(t.id))),
-            enumerable: false
+        styleClass: {
+            value: 'fbtrStyled',
+            enumerable: true
         },
         [RULES_KEY]: {
             value: Object.seal({
@@ -132,15 +136,12 @@ const app = {};
                     await lock;
                     Object.assign(opts, o);
 
-                    if (opts.logging)
-                        app.log = arg => {
-                            if (typeof(arg) === "function")
-                                arg();
-                            else
-                                console.log(arg);
-                        };
-                    else
-                        app.log = () => {};
+                    if (opts.logging) {
+                        app.log = arg => console.log(typeof(arg) === "function" ? arg() : arg);
+                        app.warn = arg => console.warn(typeof(arg) === "function" ? arg() : arg);
+                    } else {
+                        app.log = app.warn = () => {};
+                    }
 
                     if (inited) return;
 

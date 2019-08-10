@@ -1,6 +1,6 @@
 {
   "name": "Tracking & Ad Removal for Facebook™",
-  "version": "1.6.9",
+  "version": "1.7.0",
   "description": "Removes Ads and the user interaction tracking from content on Facebook™",
   "icons": { "128": "src/icon.png" },
 
@@ -16,7 +16,6 @@
 
   "permissions": [
     "storage",
-    "tabs",
     "*://*.facebook.com/*",
     "*://*.messenger.com/*",
     "*://*.facebookcorewwwi.onion/*",

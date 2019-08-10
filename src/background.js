@@ -38,61 +38,95 @@ browser.runtime.onInstalled.addListener(details => {
     });
 });
 
-if (browser.pageAction) {
-    function checkHost(url) {
-        const hostname = new URL(url).hostname;
-        return app.domains.some(d => hostname.endsWith("." + d));
-    }
-
-    browser.tabs.onUpdated.addListener((id, changes, tab) => {
-        if (tab.url && checkHost(tab.url))
-            browser.pageAction.show(id);
-        else
-            browser.pageAction.hide(id);
-    });
-}
-
 refreshRules();
 setInterval(refreshRules, 1000 * 60 * 60 * 12); // refresh every 12 hours
 
 /*
-    Keep track of open options windows and the currently
+    Keep track of open options and FB windows and the currently
     active options. When an options window is closed,
-    check for any changed options and reload all tabs
+    check for any changed options and refresh all FB tabs
 */
 app.init().then(() => {
     const optionsWindows = new Set();
+    const fbTabs = new Map();
 
-    function checkChanged(a, b) {
-        if (!(a.enabled || b.enabled))
+    browser.tabs.onUpdated.addListener(id => {
+        if (fbTabs.has(id))
+            browser.pageAction.show(id);
+        else
+            browser.pageAction.hide(id);
+    });
+
+    function updateCSS(tabId, opts) {
+        const prev = fbTabs.get(tabId);
+        const details = {
+            cssOrigin: "user",
+            code: opts.useStyle ? `.${app.styleClass} { ${opts.modStyle}; }` : "",
+        }
+        fbTabs.set(tabId, details);
+
+        // F***ing Chrome: https://bugs.chromium.org/p/chromium/issues/detail?id=608854
+        if (browser.tabs.removeCSS) {
+            if (prev && prev.code)
+                browser.tabs.removeCSS(tabId, prev).catch(app.warn);
+            if (details.code)
+                browser.tabs.insertCSS(tabId, details).catch(app.warn);
+        } else {
+            browser.tabs.sendMessage(tabId, details.code)
+        }
+    }
+
+    const STYLE_OPTS = ["useStyle", "modStyle"];
+    function handleChanged(old, mew) {
+        if (!(old.enabled || mew.enabled))
             return Promise.reject("Disabled");
 
-        for (const k in a)
-            if (a[k] != b[k])
-                return Promise.resolve();
+        let reload = false;
+        let restyle = false;
+        for (const k in old) {
+            if (old[k] != mew[k]) {
+                if (STYLE_OPTS.includes(k))
+                    restyle = true;
+                else {
+                    reload = true;
+                    break;
+                }
+            }
+        }
 
-        return Promise.reject("No Changes");
+        if (reload)
+            fbTabs.forEach((_, tabId) => browser.tabs.reload(tabId));
+        else if (restyle)
+            fbTabs.forEach((_, tabId) => updateCSS(tabId, mew));
+
+        return reload || restyle ? Promise.resolve() : Promise.reject("No Changes");
     }
 
     function onUnload(w) {
         optionsWindows.delete(w);
 
         app.storage.get(app.defaults)
-            .then(opts => checkChanged(app.options, opts))
-            .then(app.reloadTabs)
+            .then(opts => handleChanged(app.options, opts))
             .then(app.init)
             .catch(app.log);
     }
 
-    browser.runtime.onMessage.addListener(msg => {
-        browser.extension.getViews()
-            .filter(w => !optionsWindows.has(w) && (w.location.pathname === "/src/options.html"))
-            .forEach(w => {
-                optionsWindows.add(w);
-                w.addEventListener("unload", () => onUnload(w));
-            });
+    browser.runtime.onMessage.addListener((msg, sender) => {
+        if (msg === "OPTIONS") {
+            browser.extension.getViews()
+                .filter(w => !optionsWindows.has(w) && (w.location.pathname === "/src/options.html"))
+                .forEach(w => {
+                    optionsWindows.add(w);
+                    w.addEventListener("unload", () => onUnload(w));
+                });
+        } else {
+            updateCSS(sender.tab.id, msg);
+            browser.pageAction.show(sender.tab.id);
+        }
     });
 
+    browser.tabs.onRemoved.addListener(fbTabs.delete.bind(fbTabs));
+    browser.tabs.onReplaced.addListener(fbTabs.delete.bind(fbTabs));
 
     function blockRequest(details) {
         if (app.options.enabled) {
@@ -112,4 +146,4 @@ app.init().then(() => {
         {urls: [...genBlockUrls(["ajax/bz", "xti.php?*"]), ...app.host_patterns.map(h => h.replace("*.", "pixel."))]},
         ["blocking"]
     );
-}).catch(console.log);
+}).catch(console.warn);

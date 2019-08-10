@@ -1,3 +1,7 @@
+v1.7.0
+- No more tabs permission
+- Style changes now happen without reloading the page
+
 v1.6.9
 - Detect new form of sponsored posts
 - Improve performace when styling is enabled

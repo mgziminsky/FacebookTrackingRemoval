@@ -26,10 +26,9 @@ app.init().then(async () => {
         return;
 
     const _userSelector = joinSelectors(app.options.userRules);
-    const STYLE_CLASS = 'fbtrStyled';
 
     function applyStyle(elem) {
-        elem.classList.add(STYLE_CLASS);
+        elem.classList.add(app.styleClass);
     }
 
     function hide(elem, label) {
@@ -249,8 +248,7 @@ app.init().then(async () => {
                     app.log(() => {
                         for (const s of selector.split(",")) {
                             if (e.matches(s)) {
-                                app.log(`>>> Static Rule matched for ${e.innerText}: ${s}`);
-                                return;
+                                return `>>> Static Rule matched for ${e.innerText}: ${s}`;
                             }
                         }
                     });
@@ -267,8 +265,7 @@ app.init().then(async () => {
                     app.log(() => {
                         for (const s of rules[text].split(",")) {
                             if (e.matches(s)) {
-                                app.log(`>>> Dynamic Rule matched for ${e.innerText}: ${text} = ${s}`);
-                                return;
+                                return `>>> Dynamic Rule matched for ${e.innerText}: ${text} = ${s}`;
                             }
                         }
                     });
@@ -358,12 +355,26 @@ app.init().then(async () => {
         }
     }
 
-    if (app.options.useStyle) {
-        const styleElement = document.createElement('style');
-        styleElement.id = 'fbtr-style';
-        body.after(styleElement);
-        styleElement.sheet.insertRule(`.${STYLE_CLASS} { ${app.options.modStyle}; }`);
-    }
+    // Fallback for chrome based browsers that don't support tabs.removeCSS
+    browser.runtime.onMessage.addListener(msg => {
+        let styleElement = document.getElementById('fbtr-style');
+        if (!styleElement) {
+            styleElement = document.createElement('style');
+            styleElement.id = 'fbtr-style';
+            body.after(styleElement);
+        }
+
+        if (styleElement.sheet.cssRules.length)
+            styleElement.sheet.deleteRule(0);
+
+        if (msg) {
+            // Timeout required for page to reparse
+            setTimeout(() => styleElement.sheet.insertRule(msg), 50);
+        }
+    });
+
+    browser.runtime.sendMessage(app.options);
+
 }).catch(console.warn);
 
 }
