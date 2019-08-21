@@ -237,7 +237,7 @@ app.init().then(async () => {
 
     /**** END LINK TRACKING ****/
 
-    async function removeArticles(node, selector) {
+    function removeArticles(node, selector) {
         if (!selector.trim())
             return;
 
@@ -256,7 +256,7 @@ app.init().then(async () => {
         }
     }
 
-    async function removeArticlesDyn(node, rules) {
+    function removeArticlesDyn(node, rules) {
         for (let text in rules) {
             const elements = selectAllWithBase(node, rules[text]);
             for (const e of elements) {
@@ -276,8 +276,8 @@ app.init().then(async () => {
 
     const body = document.body;
 
-    new MutationObserver(mutations => {
-        const forEachAdded = async (mutation, cb) => {
+    new MutationObserver(async mutations => {
+        const forEachAdded = (mutation, cb) => {
             for (const node of mutation.addedNodes) {
                 if (node.nodeType == Node.ELEMENT_NODE && !node.classList.contains(PROCESSED_CLASS)) {
                     cb(node);
@@ -337,23 +337,25 @@ app.init().then(async () => {
         return opts;
     })());
 
-    if (app.options.delSuggest)
-        removeArticles(body, app.hide_rules.suggestions);
-    if (app.options.delPixeled)
-        removeArticles(body, app.hide_rules.sponsored);
-    if (app.options.pendingRules)
-        removeArticles(body, app.hide_rules.pending);
-    if (_userSelector)
-        removeArticles(body, _userSelector);
-    if (app.options.internalRefs)
-        stripRefs(body);
+    (async () => {
+        if (app.options.delSuggest)
+            removeArticles(body, app.hide_rules.suggestions);
+        if (app.options.delPixeled)
+            removeArticles(body, app.hide_rules.sponsored);
+        if (app.options.pendingRules)
+            removeArticles(body, app.hide_rules.pending);
+        if (_userSelector)
+            removeArticles(body, _userSelector);
+        if (app.options.internalRefs)
+            stripRefs(body);
 
-    if (app.options.fixLinks && removeLinkTracking(body) && document.getElementById("newsFeedHeading")) {
-        const feed = document.getElementById("newsFeedHeading").parentNode;
-        for (const stream of feed.querySelectorAll("div._4ikz")) {
-            applyEventBlockers(stream);
+        if (app.options.fixLinks && removeLinkTracking(body) && document.getElementById("newsFeedHeading")) {
+            const feed = document.getElementById("newsFeedHeading").parentNode;
+            for (const stream of feed.querySelectorAll("div._4ikz")) {
+                applyEventBlockers(stream);
+            }
         }
-    }
+    })();
 
     // Fallback for chrome based browsers that don't support tabs.removeCSS
     browser.runtime.onMessage.addListener(msg => {
