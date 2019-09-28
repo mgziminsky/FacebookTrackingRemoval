@@ -1,6 +1,9 @@
 ---
-name: Bug report
+name: Bug Report
 about: Report broken functionality or other problems with the extension
+title: ''
+labels: bug
+assignees: ''
 
 ---
 

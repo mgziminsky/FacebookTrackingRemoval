@@ -1,6 +1,9 @@
 ---
 name: Ad blocking support
 about: For if you're seeing ads. Request help with manually identifying ad CSS selectors
+title: ''
+labels: Ad Blocking
+assignees: ''
 
 ---
 
