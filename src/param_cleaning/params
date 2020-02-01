@@ -8,7 +8,6 @@ from
 referrer
 eid /* appears on everything... */
 epa /* appears on hashtags */
-acontext
 refid
 _ft_
 _sref_
