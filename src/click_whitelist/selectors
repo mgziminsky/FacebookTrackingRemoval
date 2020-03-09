@@ -4,6 +4,7 @@ a[ajaxify]
 a.see_more_link
 form div.pam
 a[rel='theater']
+#stories_tray
 
 /* Messenger page */
 a[aria-label='photo']       /* photos */
