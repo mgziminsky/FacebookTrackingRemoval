@@ -1,5 +1,4 @@
 div._3653                    /* Sidebar Content */
-div._50f4                    /* Related Articles/FB Promotions */
 div._5_xt                    /* Popular Across Facebook */
 div._5g-l                    /* A Video You May Like */
 h3._5x3-                     /* Suggested Post??? */
@@ -14,3 +13,6 @@ div.fsl                      /* Games You May Like */
 div.ego_section h6           /* Photo overlay suggestions */
 a._pmj                       /* TV Watchlist */
 div._1s31>div:first-child    /* Suggested For You */
+
+/* Temp disable for issue 33 */
+/*div._50f4                     Related Articles/FB Promotions */
