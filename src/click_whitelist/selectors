@@ -5,6 +5,7 @@ a.see_more_link
 form div.pam
 a[rel='theater']
 #stories_tray
+[role=presentation][data-tooltip-content]        /* Chat emoji categories */
 
 /* Messenger page */
 a[aria-label='photo']       /* photos */
