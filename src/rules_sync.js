@@ -70,22 +70,26 @@ async function loadHideRules(fetchRule) {
 
         const rules = {};
         const lines = await resp.text().then(stripComments).then(splitLines);
+        let empty = true;
         for (let line of lines) {
             const [sel, ...filters] = line.split("||");
+
             if (filters.length < 1)
                 continue;
-            for (let k of filters.map(normalizeString)) {
-                if (!rules.hasOwnProperty(k))
-                    rules[k] = [];
-                rules[k].push(sel.trim());
-            }
+
+            const cleanSel = sel.trim().replace(/\s+/, "");
+            if (!rules.hasOwnProperty(cleanSel))
+                rules[cleanSel] = new Set();
+
+            filters.map(normalizeString).forEach(rules[cleanSel].add.bind(rules[cleanSel]));
+            empty = false;
         }
 
-        if (rules.length == 0)
+        if (empty)
             continue;
 
         for (let k in rules)
-            rules[k] = rules[k].join(',');
+            rules[k] = Array.from(rules[k]); // Convert Set to Arrray. Sets not supported by storage api
 
         newRules[file] = {
             value: rules,

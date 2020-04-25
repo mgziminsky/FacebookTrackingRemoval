@@ -162,5 +162,5 @@ function joinSelectors(text) {
 }
 
 function normalizeString(str) {
-    return Array.from(new Set(str.trim().toLowerCase())).sort().join("");
+    return Array.from(new Set(str.replace(/\s+/g, "").toLowerCase())).sort().join("");
 }

@@ -189,6 +189,7 @@ const app = {};
     });
     Object.seal(app);
 
+    // This weird destructuring in the load* functions is doing assignment into a different variable
     async function loadHideRules() {
         const hr = app[RULES_KEY];
         ({

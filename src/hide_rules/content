@@ -1,1 +1,2 @@
-a>span:only-of-type,._3nlk,div>a:first-child,div>a[onmousedown]||Sponsored||ybkvwSvpjonvvbwSpkjvsboonrvsvowvvreded
+/* Syntax: css-selector[||innerText,..] */
+a>span:only-of-type,._3nlk,div>a:first-child,div>a[onmousedown]||Sponsored||ybkvwSvpjonvvbwSpkjvsboonrvsvowvvreded||Sponsorisé||Patrocinado||Publicidad||Gesponsert

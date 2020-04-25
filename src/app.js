@@ -195,6 +195,8 @@ app.init().then(async () => {
         const gifs = selectAllWithBase(node, "div._5b-_");
         for (const g of gifs) {
             const target = g.closest("div._2lhm");
+            if (!target)
+                continue;
 
             const gif = target.querySelector("img.img").cloneNode(false);
             gif.classList.add("FBTR-SAFE");
@@ -226,13 +228,13 @@ app.init().then(async () => {
     }
 
     function removeLinkTracking(node) {
-       const cleaned = cleanShimLinks(node)
-           + fixVideoLinks(node)
-           + cleanRedirectLinks(node)
-           + stripFBCLID(node)
-           ;
-       fixGifs(node);
-       return cleaned;
+        const cleaned = cleanShimLinks(node)
+            + fixVideoLinks(node)
+            + cleanRedirectLinks(node)
+            + stripFBCLID(node)
+            ;
+        fixGifs(node);
+        return cleaned;
     }
 
     /**** END LINK TRACKING ****/
@@ -257,15 +259,16 @@ app.init().then(async () => {
     }
 
     function removeArticlesDyn(node, rules) {
-        for (let text in rules) {
-            const elements = selectAllWithBase(node, rules[text]);
-            for (const e of elements) {
-                const elementText = e.innerText || [...e.querySelectorAll("span[data-content]")].filter(x => x.offsetParent != null).map(x => x.dataset.content).join("");
-                if (normalizeString(elementText) == text && hide(e, elementText)) {
+        for (const [sel, texts] of Object.entries(rules)) {
+            for (const e of selectAllWithBase(node, sel)) {
+                const elementText = e.innerText
+                    || [...e.querySelectorAll("span[data-content]")].filter(x => x.offsetParent != null).map(x => x.dataset.content).join("");
+
+                if (texts.includes(normalizeString(elementText)) && hide(e, elementText)) {
                     app.log(() => {
-                        for (const s of rules[text].split(",")) {
+                        for (const s of sel.split(",")) {
                             if (e.matches(s)) {
-                                return `>>> Dynamic Rule matched for ${e.innerText}: ${text} = ${s}`;
+                                return `>>> Dynamic Rule matched for ${elementText}: ${sel} = ${s}`;
                             }
                         }
                     });
@@ -274,88 +277,109 @@ app.init().then(async () => {
         }
     }
 
-    const body = document.body;
 
-    new MutationObserver(async mutations => {
-        const forEachAdded = (mutation, cb) => {
-            for (const node of mutation.addedNodes) {
-                if (node.nodeType == Node.ELEMENT_NODE && !node.classList.contains(PROCESSED_CLASS)) {
-                    cb(node);
+    let _running = false;
+    function run(body) {
+        if (_running)
+            return;
+
+        new MutationObserver(async mutations => {
+            const SKIP = ["SCRIPT", "STYLE"];
+
+            const forEachAdded = (mutation, cb) => {
+                for (const node of mutation.addedNodes) {
+                    if (node.nodeType == Node.ELEMENT_NODE && !SKIP.includes(node.nodeName) && !node.classList.contains(PROCESSED_CLASS)) {
+                        cb(node);
+                    }
+                }
+            };
+
+            for (const mutation of mutations) {
+                if (mutation.addedNodes.length && !SKIP.includes(mutation.target.nodeName)) {
+                    const target = mutation.target;
+
+                    if (app.options.delSuggest)
+                        removeArticles(target, app.hide_rules.suggestions);
+
+                    if (app.options.delPixeled) {
+                        removeArticles(target, app.hide_rules.sponsored);
+
+                        // Putting this here for now. If it works out, it can get its own
+                        // option and may replace the old static rules
+                        removeArticlesDyn(target, app.hide_rules.content);
+                    }
+
+                    if (app.options.pendingRules) {
+                        removeArticles(target, app.hide_rules.pending);
+
+                        // Same as above...
+                        removeArticlesDyn(target, app.hide_rules.content_pending);
+                    }
+
+                    if (_userSelector)
+                        removeArticles(target, _userSelector);
+
+                    if (app.options.fixLinks) {
+                        forEachAdded(mutation, node => {
+                            if (removeLinkTracking(node))
+                                applyEventBlockers(node);
+                        });
+                    }
+
+                    if (app.options.internalRefs)
+                        forEachAdded(mutation, stripRefs);
+
+                    forEachAdded(mutation, node => node.classList.add(PROCESSED_CLASS));
+                } else if (mutation.target) {
+                    // This is to handle FB resetting links that have already been cleaned,
+                    // but it means any cleaned link will be processed at least twice... :(
+                    // Added 10-20ms to processing time of home page in chrome.
+                    removeLinkTracking(mutation.target);
                 }
             }
-        }
-
-        for (const mutation of mutations) {
-            if (mutation.addedNodes.length) {
-                const target = mutation.target;
-
-                if (app.options.delSuggest)
-                    removeArticles(target, app.hide_rules.suggestions);
-
-                if (app.options.delPixeled) {
-                    removeArticles(target, app.hide_rules.sponsored);
-
-                    // Putting this here for now. If it works out, it can get its own
-                    // option and may replace the old static rules
-                    removeArticlesDyn(target, app.hide_rules.content)
-                }
-
-                if (app.options.pendingRules) {
-                    removeArticles(target, app.hide_rules.pending);
-
-                    // Same as above...
-                    removeArticlesDyn(target, app.hide_rules.content_pending)
-                }
-
-                if (_userSelector)
-                    removeArticles(target, _userSelector);
-
-                if (app.options.fixLinks) {
-                    forEachAdded(mutation, node => {
-                        if (removeLinkTracking(node))
-                            applyEventBlockers(node);
-                    });
-                }
-
-                if (app.options.internalRefs)
-                    forEachAdded(mutation, stripRefs);
-
-                forEachAdded(mutation, node => node.classList.add(PROCESSED_CLASS));
-            } else if (mutation.target) {
-                // This is to handle FB resetting links that have already been cleaned,
-                // but it means any cleaned link will be processed at least twice... :(
-                // Added 10-20ms to processing time of home page in chrome.
-                removeLinkTracking(mutation.target);
+        }).observe(body, (() => {
+            const opts = { childList: true, subtree: true, characterData: false };
+            if (app.options.fixLinks) {
+                opts.attributes = true;
+                opts.attributeFilter = ["href"];
             }
-        }
-    }).observe(body, (() => {
-        const opts = { childList: true, subtree: true, characterData: false };
-        if (app.options.fixLinks) {
-            opts.attributes = true;
-            opts.attributeFilter = ["href"];
-        }
-        return opts;
-    })());
+            return opts;
+        })());
 
-    (async () => {
-        if (app.options.delSuggest)
-            removeArticles(body, app.hide_rules.suggestions);
-        if (app.options.delPixeled)
-            removeArticles(body, app.hide_rules.sponsored);
-        if (app.options.pendingRules)
-            removeArticles(body, app.hide_rules.pending);
-        if (_userSelector)
-            removeArticles(body, _userSelector);
-        if (app.options.internalRefs)
-            stripRefs(body);
+        _running = true;
 
-        if (app.options.fixLinks && removeLinkTracking(body) && document.getElementById("newsFeedHeading")) {
-            const feed = document.getElementById("newsFeedHeading").parentNode;
-            for (const stream of feed.querySelectorAll("div._4ikz")) {
-                applyEventBlockers(stream);
+        (async () => {
+            if (app.options.delSuggest)
+                removeArticles(body, app.hide_rules.suggestions);
+            if (app.options.delPixeled)
+                removeArticles(body, app.hide_rules.sponsored);
+            if (app.options.pendingRules)
+                removeArticles(body, app.hide_rules.pending);
+            if (_userSelector)
+                removeArticles(body, _userSelector);
+            if (app.options.internalRefs)
+                stripRefs(body);
+
+            if (app.options.fixLinks && removeLinkTracking(body) && document.getElementById("newsFeedHeading")) {
+                const feed = document.getElementById("newsFeedHeading").parentNode;
+                for (const stream of feed.querySelectorAll("div._4ikz")) {
+                    applyEventBlockers(stream);
+                }
             }
-        }
-    })();
+        })();
+    }
+
+    if (document.body) {
+        run(document.body);
+    } else {
+        new MutationObserver((_, self) => {
+            const body = document.body;
+            if (!body)
+                return;
+            self.disconnect();
+            run(body);
+        }).observe(document.documentElement, { childList: true });
+    }
 
     // Fallback for chrome based browsers that don't support tabs.removeCSS
     browser.runtime.onMessage.addListener(msg => {
@@ -363,7 +387,7 @@ app.init().then(async () => {
         if (!styleElement) {
             styleElement = document.createElement('style');
             styleElement.id = 'fbtr-style';
-            body.after(styleElement);
+            document.head.append(styleElement);
         }
 
         if (styleElement.sheet.cssRules.length)

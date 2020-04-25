@@ -25,17 +25,21 @@ browser.runtime.onInstalled.addListener(details => {
     if (!details.previousVersion)
         return;
 
-    // Already cleaned
-    if (details.previousVersion > "1.6.3")
-        return;
+    let p = Promise.resolve();
+    const newVersion = browser.runtime.getManifest().version;
 
-    app.init().then(async () => {
-        const currentOpts = await app.storage.get(Object.keys(app.defaults));
-        app.storage.clear();
-        browser.storage.local.clear();
-        app.storage.set(currentOpts);
-        browser.runtime.reload();
-    });
+    // 1.8.0 changed the dynamic rules format
+    if (details.previousVersion < '1.8.0' && newVersion >= '1.8.0')
+        p = p.then(refreshRules.bind({ force: true }));
+
+    if (details.previousVersion <= "1.6.3")
+        p = p.then(app.init).then(async () => {
+            const currentOpts = await app.storage.get(Object.keys(app.defaults));
+            app.storage.clear();
+            browser.storage.local.clear();
+            app.storage.set(currentOpts);
+            browser.runtime.reload();
+        });
 });
 
 refreshRules();
