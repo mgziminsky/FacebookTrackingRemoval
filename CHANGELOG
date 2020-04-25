@@ -1,4 +1,5 @@
-v1.8.0
+v1.8.0.1
+- Force refresh rules on upgrade
 - Improved performance, hopefully by a noticeable amount
 
 v1.7.1

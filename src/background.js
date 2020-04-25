@@ -25,15 +25,13 @@ browser.runtime.onInstalled.addListener(details => {
     if (!details.previousVersion)
         return;
 
-    let p = Promise.resolve();
-    const newVersion = browser.runtime.getManifest().version;
-
+    // Always force refresh rules after an update for simplicity
     // 1.8.0 changed the dynamic rules format
-    if (details.previousVersion < '1.8.0' && newVersion >= '1.8.0')
-        p = p.then(refreshRules.bind({ force: true }));
+    browser.storage.local.remove("lastRuleRefresh")
+        .then(refreshRules.bind({ force: true }));
 
     if (details.previousVersion <= "1.6.3")
-        p = p.then(app.init).then(async () => {
+        app.init().then(async () => {
             const currentOpts = await app.storage.get(Object.keys(app.defaults));
             app.storage.clear();
             browser.storage.local.clear();
