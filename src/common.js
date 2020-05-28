@@ -69,7 +69,7 @@ const app = {};
                 hideMethod: "collapse",
                 useStyle: false,
                 logging: false,
-                modStyle: "border: 1px dashed green !important;",
+                modStyle: "outline: 1px dashed rgba(0, 128, 0, 0.5) !important;",
                 userRules: "",
                 pendingRules: false,
             }),
