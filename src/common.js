@@ -105,6 +105,7 @@ const app = {};
         },
         [RULES_KEY]: {
             value: Object.seal({
+                article_wrapper: "",
                 suggestions: "",
                 sponsored: "",
                 pending: "",
@@ -208,6 +209,9 @@ const app = {};
                 } = {},
                 content_pending: {
                     value: hr.content_pending = hr.content_pending
+                } = {},
+                article_wrapper: {
+                    value: hr.article_wrapper = hr.article_wrapper
                 } = {},
             } = {},
         } = await browser.storage.local.get(RULES_KEY));

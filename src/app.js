@@ -33,7 +33,7 @@ app.init().then(async () => {
 
     function hide(elem, label) {
         let target;
-        if (!elem || !(target = elem.closest("div.pagelet,div.mbm,div._55wo,article")))
+        if (!elem || !(target = elem.closest(app.hide_rules.article_wrapper)))
             return false;
 
         if (app.options.hideMethod === "collapse") {

@@ -18,7 +18,7 @@
 
 'use strict';
 
-const STATIC_RULE_FILES = ["suggestions", "sponsored", "pending"];
+const STATIC_RULE_FILES = ["suggestions", "sponsored", "pending", "article_wrapper"];
 const DYN_RULE_FILES = ["content", "content_pending"];
 const PARAM_CLEANING_FILES = ["params", "prefix_patterns", "values"];
 const CLICK_WHITELIST_FILES = ["elements", "roles", "selectors"];
@@ -56,8 +56,12 @@ async function loadHideRules(fetchRule) {
         if (resp === null)
             continue;
 
+        const value = await resp.text().then(joinSelectors);
+        if (!value)
+            continue;
+
         newRules[file] = {
-            value: await resp.text().then(joinSelectors),
+            value,
             [DATE_HEADER]: resp.headers.get(DATE_HEADER),
         };
     }
