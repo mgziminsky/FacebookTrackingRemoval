@@ -168,5 +168,28 @@ function joinSelectors(text) {
 }
 
 function normalizeString(str) {
-    return Array.from(new Set(str.replace(/\s+/g, "").toLowerCase())).sort().join("");
+    const prefix = str.split('\xb7', 2)[0]; // Some sponsored have the buyer appended after a · (0xb7). Just take what's in front.
+    return Array.from(new Set(prefix.replace(/\s+/g, "").toLowerCase())).sort().join("");
+}
+
+function visibleText(elem) {
+    // Using XPath adds about 30ms
+    const result = document.evaluate(".//*[text()|data-content]", elem, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE);
+    let text = "";
+
+    const bounds = elem.getBoundingClientRect();
+    for (let i = 0; i < result.snapshotLength; ++i) {
+        const c = result.snapshotItem(i);
+        const cb = c.getBoundingClientRect();
+
+        if (bounds.top >= cb.bottom
+            || bounds.right <= cb.left
+            || bounds.bottom <= cb.top
+            || bounds.left >= cb.right)
+            continue;
+
+        text += c.dataset.content || "" + c.innerText;
+    }
+
+    return text || elem.textContent;
 }

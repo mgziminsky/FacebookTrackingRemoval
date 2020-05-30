@@ -261,8 +261,7 @@ app.init().then(async () => {
     function removeArticlesDyn(node, rules) {
         for (const [sel, texts] of Object.entries(rules)) {
             for (const e of selectAllWithBase(node, sel)) {
-                const elementText = e.innerText
-                    || [...e.querySelectorAll("span[data-content]")].filter(x => x.offsetParent != null).map(x => x.dataset.content).join("");
+                const elementText = visibleText(e);
 
                 if (texts.includes(normalizeString(elementText)) && hide(e, elementText)) {
                     app.log(() => {
