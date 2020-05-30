@@ -145,7 +145,7 @@ app.init().then(() => {
 
     browser.webRequest.onBeforeRequest.addListener(
         blockRequest,
-        {urls: [...genBlockUrls(["ajax/bz", "xti.php?*"]), ...app.host_patterns.map(h => h.replace("*.", "pixel."))]},
+        {urls: [...genBlockUrls(["ajax/bz*", "xti.php?*"]), ...app.host_patterns.map(h => h.replace("*.", "pixel."))]},
         ["blocking"]
     );
 }).catch(console.warn);

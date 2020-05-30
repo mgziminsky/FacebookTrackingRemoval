@@ -29,11 +29,15 @@ section.touchable > a {
 details.fbtrCollapsible {
     padding: 0 10px;
 }
+details.fbtrCollapsible[open] {
+    padding-bottom: 10px;
+}
 
 summary.fbtrLabel {
-    margin: 10px 0;
+    padding: 0.5rem 0;
     cursor: pointer;
     font-size: 0.8rem;
+    color: var(--secondary-text);
 }
 
 .fbtrHide {
