@@ -1,3 +1,9 @@
+v1.8.1
+- Update to work with new FB design
+- Smarter sponsored post detection
+- Big performance improvement
+- Update default style to not break layout
+
 v1.8.0.2
 - Force refresh rules on upgrade
 - Improved performance, hopefully by a noticeable amount
