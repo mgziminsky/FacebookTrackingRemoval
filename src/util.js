@@ -139,8 +139,14 @@ function cleanLinkParams(link) {
 }
 
 function selectAllWithBase(node, selector) {
-    const childResults = node.querySelectorAll(selector);
     const nodeMatches = node.matches(selector);
+
+    const childResults = [];
+    for (let c of node.querySelectorAll(selector)) {
+        if (!c.classList.contains(PROCESSED_CLASS))
+            childResults.push(c);
+    }
+
     const results = (function*() {
         if (nodeMatches) yield node;
         yield* childResults;
