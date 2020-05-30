@@ -173,23 +173,34 @@ function normalizeString(str) {
 }
 
 function visibleText(elem) {
-    // Using XPath adds about 30ms
-    const result = document.evaluate(".//*[text()|data-content]", elem, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE);
-    let text = "";
-
+    let text = elem.dataset.content || "";
     const bounds = elem.getBoundingClientRect();
-    for (let i = 0; i < result.snapshotLength; ++i) {
-        const c = result.snapshotItem(i);
-        const cb = c.getBoundingClientRect();
+    const children = [...elem.childNodes].reverse();
 
-        if (bounds.top >= cb.bottom
-            || bounds.right <= cb.left
-            || bounds.bottom <= cb.top
-            || bounds.left >= cb.right)
-            continue;
-
-        text += c.dataset.content || "" + c.innerText;
+    while (children.length > 0) {
+        const child = children.pop();
+        switch (child.nodeType) {
+            case Node.TEXT_NODE:
+                text += child.nodeValue;
+                break;
+            case Node.ELEMENT_NODE: {
+                if (!rectsIntersect(bounds, child.getBoundingClientRect()))
+                    continue;
+                text += child.dataset.content || "";
+                for (let c = child.lastChild; c !== null; c = c.previousSibling)
+                    children.push(c);
+                break;
+            }
+        }
     }
 
-    return text || elem.textContent;
+    return text;
+}
+
+function rectsIntersect(a, b) {
+    return a.top < b.bottom
+        && a.right > b.left
+        && a.bottom > b.top
+        && a.left < b.right
+    ;
 }
