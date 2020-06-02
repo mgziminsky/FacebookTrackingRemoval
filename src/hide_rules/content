@@ -1,2 +1,2 @@
 /* Syntax: css-selector[||innerText,..] */
-a>span:only-of-type,._3nlk,div>a:first-child,div>a[onmousedown],a[role=link],div[role=button]||Sponsored||Sponsorisé||Patrocinado||Publicidad||Gesponsert
+a>span:only-of-type,._3nlk,div>a:first-child,div>a[onmousedown],a[role=link],div[role=button],h3>div||Sponsored||Sponsorisé||Patrocinado||Publicidad||Gesponsert
