@@ -1,0 +1,2 @@
+/* Syntax: css-selector[||innerText,..] */
+span[dir]||People You May Know||Suggested Post

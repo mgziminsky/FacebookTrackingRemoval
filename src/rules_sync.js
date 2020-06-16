@@ -19,7 +19,7 @@
 'use strict';
 
 const STATIC_RULE_FILES = ["suggestions", "sponsored", "pending", "article_wrapper"];
-const DYN_RULE_FILES = ["content", "content_pending"];
+const DYN_RULE_FILES = ["content", "content_pending", "suggestions_smart"];
 const PARAM_CLEANING_FILES = ["params", "prefix_patterns", "values"];
 const CLICK_WHITELIST_FILES = ["elements", "roles", "selectors"];
 
@@ -93,7 +93,7 @@ async function loadHideRules(fetchRule) {
             continue;
 
         for (let k in rules)
-            rules[k] = Array.from(rules[k]); // Convert Set to Arrray. Sets not supported by storage api
+            rules[k] = Array.from(rules[k]); // Convert Set to Array. Sets not supported by storage api
 
         newRules[file] = {
             value: rules,

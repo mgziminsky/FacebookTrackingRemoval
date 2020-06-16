@@ -107,6 +107,7 @@ const app = {};
             value: Object.seal({
                 article_wrapper: "",
                 suggestions: "",
+                suggestions_smart: {},
                 sponsored: "",
                 pending: "",
                 content: {},
@@ -197,6 +198,9 @@ const app = {};
             [RULES_KEY]: {
                 suggestions: {
                     value: hr.suggestions = hr.suggestions
+                } = {},
+                suggestions_smart: {
+                    value: hr.suggestions_smart = hr.suggestions_smart
                 } = {},
                 sponsored: {
                     value: hr.sponsored = hr.sponsored

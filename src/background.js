@@ -28,7 +28,7 @@ browser.runtime.onInstalled.addListener(details => {
     // Always force refresh rules after an update for simplicity
     // 1.8.0 changed the dynamic rules format
     browser.storage.local.remove(["lastRuleRefresh", "hide_rules"])
-        .then(refreshRules.bind({ force: true }));
+        .finally(refreshRules.bind({ force: true }));
 
     if (details.previousVersion <= "1.6.3")
         app.init().then(async () => {

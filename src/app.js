@@ -297,9 +297,10 @@ app.init().then(async () => {
                 if (mutation.addedNodes.length && !SKIP.includes(mutation.target.nodeName)) {
                     const target = mutation.target;
 
-                    if (app.options.delSuggest)
+                    if (app.options.delSuggest) {
                         removeArticles(target, app.hide_rules.suggestions);
-
+                        removeArticlesDyn(target, app.hide_rules.suggestions_smart);
+                    }
                     if (app.options.delPixeled) {
                         removeArticles(target, app.hide_rules.sponsored);
 
@@ -348,12 +349,18 @@ app.init().then(async () => {
         _running = true;
 
         (async () => {
-            if (app.options.delSuggest)
+            if (app.options.delSuggest) {
                 removeArticles(body, app.hide_rules.suggestions);
-            if (app.options.delPixeled)
+                removeArticlesDyn(target, app.hide_rules.suggestions_smart);
+            }
+            if (app.options.delPixeled) {
                 removeArticles(body, app.hide_rules.sponsored);
-            if (app.options.pendingRules)
+                removeArticlesDyn(target, app.hide_rules.content);
+            }
+            if (app.options.pendingRules) {
                 removeArticles(body, app.hide_rules.pending);
+                removeArticlesDyn(target, app.hide_rules.content_pending);
+            }
             if (_userSelector)
                 removeArticles(body, _userSelector);
             if (app.options.internalRefs)
