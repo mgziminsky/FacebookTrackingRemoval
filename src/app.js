@@ -58,6 +58,8 @@ app.init().then(async () => {
     const supportedProtos = ["http:", "https:", "ftp:"];
     function cleanLink(a, href) {
         cleanAttrs(a);
+        a.target = "_blank";
+        a.rel = "noreferrer noopener";
         try {
             if (supportedProtos.includes(new URL(href, origin).protocol))
                 a.href = href;
@@ -66,8 +68,6 @@ app.init().then(async () => {
         } catch (_) {
             app.log("Link cleaning encountered an invalid url: " + href);
         }
-        a.target = "_blank";
-        a.rel = "noreferrer noopener";
         applyStyle(a);
     }
 
@@ -140,14 +140,24 @@ app.init().then(async () => {
         return trackedLinks.length;
     }
 
+    const fbclidFallback = /((?:[?&]|%3F|%26)fbclid=.*?)($|[?&]|%3F|%26)/ig;
     function stripFBCLID(node) {
         const trackedLinks = selectAllWithBase(node, `a[href*='fbclid='i]`);
         for (const a of trackedLinks) {
             const link = new URL(a.href);
+
             link.searchParams.delete("fbclid");
-            a.href = link.href;
-            applyStyle(a);
-            app.log("Removed fbclid from link: " + a);
+            if (a.href === link.href) {
+                link.href = link.href.replace(fbclidFallback, "$2");
+            }
+
+            if (a.href === link.href) {
+                app.log("Failed to remove fbclid from link:\n -> " + a);
+            } else {
+                a.href = link.href;
+                applyStyle(a);
+                app.log("Removed fbclid from link: " + a);
+            }
         }
         return trackedLinks.length;
     }

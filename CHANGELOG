@@ -1,3 +1,6 @@
+v1.8.4
+- Fix infinite event recursion caused by links with a nested fbclid
+
 v1.8.3
 - Use smart detection for Suggested Posts
 
