@@ -93,13 +93,13 @@ function buildCollapsible(label) {
     return collapsible;
 }
 
-function cleanLinkParams(link) {
+function cleanLinkParams(link, base = (location.origin + location.pathname)) {
     try {
         // Don't mess with anchor links
         if (link.startsWith("#"))
             return link;
 
-        const url = new URL(link, location.href);
+        const url = new URL(link, base);
 
         // Nothing to do
         if (url.search.length <= 1)
@@ -132,7 +132,8 @@ function cleanLinkParams(link) {
         url.search = cleanParams;
         return (origLength === url.search.length)
             ? link // No changes, avoid unintended modification
-            : url.href.substr(location.origin.length);
+            // If link is the same host, use absolute pathname, otherwise use full URL
+            : url.href.substr(url.host === location.host ? location.origin.length : 0);
     } catch (e) {
         return link;
     }

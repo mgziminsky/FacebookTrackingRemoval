@@ -162,16 +162,20 @@ app.init().then(async () => {
         return trackedLinks.length;
     }
 
-    const _internalLinkSelector = `a[href^='/'],a[href^='#'],a[ajaxify],a[data-hovercard],a[href^='${location.origin}']`;
     function stripRefs(node) {
-        const intLinks = selectAllWithBase(node, _internalLinkSelector);
-        for (const a of intLinks) {
+        let intLinks = 0;
+        for (const a of node.getElementsByTagName('a')) {
+            if (!app.domains.some(d => a.hostname.endsWith(d)))
+                continue;
+
+            ++intLinks;
             applyEventBlockers(a.parentNode);
             delete a.dataset.ft;
 
+            const linkBase = a.origin + a.pathname;
             if (a.hasAttribute("href")) {
-                let orig = a.getAttribute("href"); // get unexpanded value
-                a.href = cleanLinkParams(orig);
+                const orig = a.getAttribute("href"); // get unexpanded value
+                a.href = cleanLinkParams(orig, linkBase);
 
                 if (a.getAttribute("href") != orig) {
                     applyStyle(a);
@@ -180,8 +184,8 @@ app.init().then(async () => {
             }
 
             if (a.hasAttribute("ajaxify")) {
-                let orig = a.getAttribute("ajaxify");
-                a.setAttribute("ajaxify", cleanLinkParams(orig));
+                const orig = a.getAttribute("ajaxify");
+                a.setAttribute("ajaxify", cleanLinkParams(orig, linkBase));
                 if (orig != a.getAttribute("ajaxify")) {
                     applyStyle(a);
                     app.log("Cleaned internal ajaxify link:\n\t" + orig + "\n\t" + a.getAttribute("ajaxify"));
@@ -189,16 +193,16 @@ app.init().then(async () => {
             }
 
             if (a.dataset.hovercard) {
-                let orig = a.dataset.hovercard;
-                a.dataset.hovercard = cleanLinkParams(orig);
                 delete a.dataset.hovercardReferrer;
+                const orig = a.dataset.hovercard;
+                a.dataset.hovercard = cleanLinkParams(orig, linkBase);
                 if (orig != a.dataset.hovercard) {
                     applyStyle(a);
                     app.log("Cleaned internal hovercard link:\n\t" + orig + "\n\t" + a.dataset.hovercard);
                 }
             }
         }
-        return intLinks.length;
+        return intLinks;
     }
 
     function fixGifs(node) {
@@ -361,15 +365,15 @@ app.init().then(async () => {
         (async () => {
             if (app.options.delSuggest) {
                 removeArticles(body, app.hide_rules.suggestions);
-                removeArticlesDyn(target, app.hide_rules.suggestions_smart);
+                removeArticlesDyn(body, app.hide_rules.suggestions_smart);
             }
             if (app.options.delPixeled) {
                 removeArticles(body, app.hide_rules.sponsored);
-                removeArticlesDyn(target, app.hide_rules.content);
+                removeArticlesDyn(body, app.hide_rules.content);
             }
             if (app.options.pendingRules) {
                 removeArticles(body, app.hide_rules.pending);
-                removeArticlesDyn(target, app.hide_rules.content_pending);
+                removeArticlesDyn(body, app.hide_rules.content_pending);
             }
             if (_userSelector)
                 removeArticles(body, _userSelector);
