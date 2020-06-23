@@ -103,6 +103,10 @@ const app = {};
             value: 'fbtrStyled',
             enumerable: true
         },
+        isChrome: {
+            value: Object.getPrototypeOf(browser) !== Object.prototype,
+            enumerable: true
+        },
         [RULES_KEY]: {
             value: Object.seal({
                 article_wrapper: "",

@@ -18,8 +18,11 @@
 
 'use strict';
 
-// Don't run in IFrames
-if (window.self === window.top) {
+// NOTE: Needs to run in IFrames as well because some options pages are loaded as IFrames
+
+// Activates page action since show_matches isn't supported...
+if (app.isChrome)
+    browser.runtime.sendMessage({});
 
 app.init().then(async () => {
     if (!app.options.enabled)
@@ -296,17 +299,16 @@ app.init().then(async () => {
         if (_running)
             return;
 
-        new MutationObserver(async mutations => {
-            const SKIP = ["SCRIPT", "STYLE"];
-
-            const forEachAdded = (mutation, cb) => {
-                for (const node of mutation.addedNodes) {
-                    if (node.nodeType == Node.ELEMENT_NODE && !SKIP.includes(node.nodeName) && !node.classList.contains(PROCESSED_CLASS)) {
-                        cb(node);
-                    }
+        const SKIP = ["SCRIPT", "STYLE", "LINK"];
+        const forEachAdded = (mutation, cb) => {
+            for (const node of mutation.addedNodes) {
+                if (node.nodeType == Node.ELEMENT_NODE && !SKIP.includes(node.nodeName) && !node.classList.contains(PROCESSED_CLASS)) {
+                    cb(node);
                 }
-            };
+            }
+        };
 
+        new MutationObserver(async mutations => {
             for (const mutation of mutations) {
                 if (mutation.addedNodes.length && !SKIP.includes(mutation.target.nodeName)) {
                     const target = mutation.target;
@@ -422,5 +424,3 @@ app.init().then(async () => {
     browser.runtime.sendMessage(app.options);
 
 }).catch(console.warn);
-
-}

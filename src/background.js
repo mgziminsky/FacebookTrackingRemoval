@@ -52,20 +52,15 @@ app.init().then(() => {
     const optionsWindows = new Set();
     const fbTabs = new Map();
 
-    browser.tabs.onUpdated.addListener(id => {
-        if (fbTabs.has(id))
-            browser.pageAction.show(id);
-        else
-            browser.pageAction.hide(id);
-    });
-
-    function updateCSS(tabId, opts) {
-        const prev = fbTabs.get(tabId);
+    function updateCSS(id, opts) {
+        const prev = fbTabs.get(id);
+        const [tabId, frameId] = id.split("#").map(x => parseInt(x));
         const details = {
+            frameId,
             cssOrigin: "user",
             code: opts.useStyle ? `.${app.styleClass} { ${opts.modStyle}; }` : "",
         }
-        fbTabs.set(tabId, details);
+        fbTabs.set(id, details);
 
         // F***ing Chrome: https://bugs.chromium.org/p/chromium/issues/detail?id=608854
         if (browser.tabs.removeCSS) {
@@ -74,7 +69,7 @@ app.init().then(() => {
             if (details.code)
                 browser.tabs.insertCSS(tabId, details).catch(app.warn);
         } else {
-            browser.tabs.sendMessage(tabId, details.code)
+            browser.tabs.sendMessage(tabId, details.code).catch(app.warn);
         }
     }
 
@@ -96,10 +91,10 @@ app.init().then(() => {
             }
         }
 
-        if (reload)
-            fbTabs.forEach((_, tabId) => browser.tabs.reload(tabId));
-        else if (restyle)
+        if (restyle)
             fbTabs.forEach((_, tabId) => updateCSS(tabId, mew));
+        if (reload)
+            [...fbTabs.keys()].filter(id => id.endsWith("#0")).forEach((_, tabId) => browser.tabs.reload(parseInt(tabId)));
 
         return reload || restyle ? Promise.resolve() : Promise.reject("No Changes");
     }
@@ -122,8 +117,9 @@ app.init().then(() => {
                     w.addEventListener("unload", () => onUnload(w));
                 });
         } else {
-            updateCSS(sender.tab.id, msg);
-            browser.pageAction.show(sender.tab.id);
+            updateCSS(`${sender.tab.id}#${sender.frameId || 0}`, msg);
+            if (app.isChrome)
+                browser.pageAction.show(sender.tab.id);
         }
     });
 
