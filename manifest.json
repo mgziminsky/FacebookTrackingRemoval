@@ -1,6 +1,6 @@
 {
   "name": "Tracking & Ad Removal for Facebook™",
-  "version": "1.8.4",
+  "version": "1.8.5",
   "description": "Removes Ads and the user interaction tracking from content on Facebook™",
   "icons": { "128": "src/icon.png" },
 

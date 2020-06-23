@@ -1,3 +1,9 @@
+v1.8.5
+- Internal link cleaning fixes and improvements
+- Run properly on pages that are loaded in IFrames
+- Fix processing that should happen at initial page load
+- Bump min required version to FF 59
+
 v1.8.4
 - Fix infinite event recursion caused by links with a nested fbclid
 
