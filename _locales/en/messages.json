@@ -1,0 +1,85 @@
+{
+    "extensionName": {
+        "message": "Tracking & Ad Removal for Facebook™",
+        "description": "Name of the extension."
+    },
+    "extensionDescription": {
+        "message": "Removes Ads and the user interaction tracking from content on Facebook™",
+        "description": "Description of the extension."
+    },
+    "optsTitle": {
+        "message": "Tracking & Ad Removal for Facebook™ Options",
+        "description": "Options page title"
+    },
+    "optsLegend": {
+        "message": "Options"
+    },
+    "optsReloadNotice": {
+        "message": "Changes will cause all Facebook tabs to be automatically reloaded after this page is closed",
+        "description": "Options page notice about page reload after making changes"
+    },
+    "optsEnabled": {
+        "message": "Enabled"
+    },
+    "optsFixLinks": {
+        "message": "Remove tracking from external links"
+    },
+    "optsInternal": {
+        "message": "Remove tracking values from internal links <em>(If something breaks, try disabling this first)</em>"
+    },
+    "optsInlineVids": {
+        "message": "Inline videos on mobile <em>(Only affects mobile; May increase data usage)</em>"
+    },
+    "optsPixeled": {
+        "message": "Hide Sponsored articles <em>(Includes most \"Suggested Posts\")</em>"
+    },
+    "optsSuggest": {
+        "message": "Hide inline suggestions <em>(eg: Suggested Posts, People You May Know)</em>"
+    },
+    "optsHideMethod": {
+        "message": "Hide method:"
+    },
+    "optsCollapse": {
+        "message": "Collapse"
+    },
+    "optsRemove": {
+        "message": "Remove"
+    },
+    "optsUseStyle": {
+        "message": "Add styling to modified elements"
+    },
+    "optsAdvanced": {
+        "message": "Advanced Options"
+    },
+    "optsStyleLabel": {
+        "message": "Custom CSS style to be added to modified elements:"
+    },
+    "optsStylePreview": {
+        "message": "STYLE PREVIEW"
+    },
+    "optsUserRules": {
+        "message": "Custom CSS selectors to hide, one per-line. <em>FOR TESTING PURPOSES ONLY</em>"
+    },
+    "optsUserRulesHover": {
+        "message": "If you identify a new selector, please submit it in a PR"
+    },
+    "optsPending": {
+        "message": "Enable pending/unconfirmed hiding rules"
+    },
+    "optsPendingLink": {
+        "message": "View list here"
+    },
+    "optsLogging": {
+        "message": "Display log messages in the console"
+    },
+    "optsRefresh": {
+        "message": "Refresh Rules"
+    },
+    "optsRefreshHover": {
+        "message": "Only once per $1 minutes",
+        "description": "Rule refresh cooldown message"
+    },
+    "optsDefaults": {
+        "message": "Restore Defaults"
+    }
+}

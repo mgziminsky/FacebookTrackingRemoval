@@ -115,7 +115,7 @@ app.init().then(() => {
     // Refresh button
     {
         const btnRefresh = document.getElementById("btnRefresh");
-        btnRefresh.title = `Only once per ${RATE_LIMIT / 1000 / 60} min`;
+        btnRefresh.title = browser.i18n.getMessage("optsRefreshHover", RATE_LIMIT / 1000 / 60);
 
         let timer;
         function btnRefreshTimer() {

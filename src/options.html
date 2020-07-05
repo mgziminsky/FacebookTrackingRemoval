@@ -1,39 +1,21 @@
 <!DOCTYPE html>
-<!-- This file is part of FacebookTrackingRemoval.
-
-    FacebookTrackingRemoval is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    FacebookTrackingRemoval is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with FacebookTrackingRemoval.  If not, see <http://www.gnu.org/licenses/>.
-
-    Copyright (C) 2016-2020 Michael Ziminsky
- -->
 <html>
 <head>
-    <title>Facebook Tracking &amp; Ad Removal Options</title>
+    <title>__MSG_optsTitle__</title>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="options.css">
 </head>
 <body>
     <fieldset>
-        <legend id="legend">Options</legend>
-        <p><strong>
-            **Changes will cause all Facebook tabs to be automatically reloaded after this page is closed**
-        </strong></p>
+        <legend id="legend">__MSG_optsLegend__</legend>
+        <p><strong>**__MSG_optsReloadNotice__**</strong></p>
 
         <ul>
             <li>
                 <label>
                     <input type="checkbox" id="enabled" data-toggle="options">
-                    Enabled
+                    __MSG_optsEnabled__
                 </label>
             </li>
         </ul>
@@ -43,57 +25,57 @@
                 <btn-reset></btn-reset>
                 <label>
                     <input type="checkbox" id="fixLinks">
-                    Remove tracking from external links
+                    __MSG_optsFixLinks__
                 </label>
             </li>
             <li>
                 <btn-reset></btn-reset>
                 <label>
                     <input type="checkbox" id="internalRefs">
-                    <span>Remove tracking values from internal links <em>(If something breaks, try disabling this first)</em></span>
+                    <span>__MSG_optsInternal__</span>
                 </label>
             </li>
             <li>
                 <btn-reset></btn-reset>
                 <label>
                     <input type="checkbox" id="inlineVids" data-depends="fixLinks">
-                    <span>Inline videos on mobile <em>(Only affects mobile; May increase data usage)</em></span>
+                    <span>__MSG_optsInlineVids__</span>
                 </label>
             </li>
             <li>
                 <btn-reset></btn-reset>
                 <label>
                     <input type="checkbox" id="delPixeled">
-                    <span>Hide Sponsored articles <em>(Includes most "Suggested Posts")</em></span>
+                    <span>__MSG_optsPixeled__</span>
                 </label>
             </li>
             <li>
                 <btn-reset></btn-reset>
                 <label>
                     <input type="checkbox" id="delSuggest">
-                    <span>Hide inline suggestions <em>(eg: Suggested Posts, People You May Know)</em></span>
+                    <span>__MSG_optsSuggest__</span>
                 </label>
             </li>
             <li id="_hideMethod">
                 <btn-reset></btn-reset>
-                Hide method:
-                <label><input type="radio" name="hideMethod" value="collapse"> Collapse</label>
-                <label><input type="radio" name="hideMethod" value="remove"> Remove</label>
+                __MSG_optsHideMethod__
+                <label><input type="radio" name="hideMethod" value="collapse"> __MSG_optsCollapse__</label>
+                <label><input type="radio" name="hideMethod" value="remove"> __MSG_optsRemove__</label>
             </li>
             <li>
                 <btn-reset></btn-reset>
                 <label>
                     <input type="checkbox" id="useStyle">
-                    Add styling to modified elements
+                    __MSG_optsUseStyle__
                 </label>
             </li>
             <li>
                 <details>
-                    <summary>Advanced Options</summary>
+                    <summary>__MSG_optsAdvanced__</summary>
                     <ul>
                         <li>
                             <label class="flex-col">
-                                <span>Custom CSS style to be added to modified elements: <span id="preview">STYLE PREVIEW</span></span>
+                                <span>__MSG_optsStyleLabel__ <span id="preview">__MSG_optsStylePreview__</span></span>
                                 <div style="position: relative;">
                                     <textarea id="modStyle" cols="50" rows="1" data-depends="useStyle"></textarea>
                                     <btn-reset></btn-reset>
@@ -102,42 +84,44 @@
                         </li>
                         <li>
                             <label class="flex-col">
-                                <span>Custom CSS selectors to hide, one per-line. <em>FOR TESTING PURPOSES ONLY</em></span>
-                                <textarea id="userRules" cols="50" title="If you identify a new selector, please submit it in a PR"></textarea>
+                                <span>__MSG_optsUserRules__</span>
+                                <textarea id="userRules" cols="50" title="__MSG_optsUserRulesHover__"></textarea>
                             </label>
                         </li>
                         <li>
                             <label>
                                 <input type="checkbox" id="pendingRules">
-                                Enable pending/unconfirmed hiding rules
+                                __MSG_optsPending__
                             </label>
-                            - <em><a rel="noreferrer noopener" href="https://github.com/mgziminsky/FacebookTrackingRemoval/blob/master/src/hide_rules/pending" target="_blank">View list here</a></em>
+                            - <em><a rel="noreferrer noopener" href="https://github.com/mgziminsky/FacebookTrackingRemoval/blob/master/src/hide_rules/pending" target="_blank">__MSG_optsPendingLink__</a></em>
                         </li>
                         <li>
                             <label title="For debugging only. Will impact performance when enabled">
                                 <input type="checkbox" id="logging">
-                                Display log messages in the console
+                                __MSG_optsLogging__
                             </label>
                         </li>
                         <li>
                             <label>
-                                <button type="button" id="btnRefresh">Refresh Rules</button>
+                                <button type="button" id="btnRefresh">__MSG_optsRefresh__</button>
                             </label>
                         </li>
                     </ul>
                 </details>
             </li>
         </ul>
-        <button type="button" id="reset" class="addon-control">Restore Defaults</button>
+        <button type="button" id="reset" class="addon-control">__MSG_optsDefaults__</button>
     </fieldset>
 
+    <template id="btnReset">
+        <img src="reset.svg" alt="Reset" class="reset" title="Default">
+    </template>
+
     <script type="text/javascript" src="/browser-polyfill.min.js"></script>
+    <script type="text/javascript" async="false" src="i18n.js"></script>
     <script type="text/javascript" src="common.js"></script>
     <script type="text/javascript" src="util.js"></script>
     <script type="text/javascript" src="rules_sync.js"></script>
     <script type="text/javascript" src="options.js"></script>
 </body>
-<template id="btnReset">
-    <img src="reset.svg" alt="Reset" class="reset" title="Default">
-</template>
 </html>

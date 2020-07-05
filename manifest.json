@@ -1,7 +1,8 @@
 {
-  "name": "Tracking & Ad Removal for Facebook™",
+  "name": "__MSG_extensionName__",
   "version": "1.8.5",
-  "description": "Removes Ads and the user interaction tracking from content on Facebook™",
+  "description": "__MSG_extensionDescription__",
+  "default_locale": "en",
   "icons": { "128": "src/icon.png" },
 
   "author": "Michael Ziminsky",
