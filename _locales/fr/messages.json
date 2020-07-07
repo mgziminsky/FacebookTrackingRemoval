@@ -1,0 +1,85 @@
+{
+    "extensionName": {
+        "message": "Suppression des publicités et de la surveillance pour Facebook™",
+        "description": "Nom du module complémentaire."
+    },
+    "extensionDescription": {
+        "message": "Supprime les publicités et la surveillance des interactions des utilisateurs du site web Facebook™",
+        "description": "Description du module complémentaire."
+    },
+    "optsTitle": {
+        "message": "Options du module complémentaire Suppression des publicités et de la surveillance pour Facebook™",
+        "description": "Titre de la page des options"
+    },
+    "optsLegend": {
+        "message": "Options"
+    },
+    "optsReloadNotice": {
+        "message": "Les modifications entraîneront le rechargement automatique de tous les onglets Facebook après la fermeture de cette page",
+        "description": "Remarque sur la page des options concernant le rechargement de la page après avoir apporté des modifications"
+    },
+    "optsEnabled": {
+        "message": "Activé"
+    },
+    "optsFixLinks": {
+        "message": "Supprimer la surveillance des liens vers l'extérieur du site"
+    },
+    "optsInternal": {
+        "message": "Supprimez les valeurs pour contrer la surveillance des liens internes au site<em>(si quelque chose se casse, essayez de le désactiver d'abord)</em>"
+    },
+    "optsInlineVids": {
+        "message": "Vidéos en ligne sur mobile <em>(n'affecte que les mobiles; peut augmenter l'utilisation des données)</em>"
+    },
+    "optsPixeled": {
+        "message": "Masquer les articles sponsorisés <em>(comprend la plupart des \"publications suggérées\")</em>"
+    },
+    "optsSuggest": {
+        "message": "Masquer les suggestions en ligne <em>(par exemple: messages suggérés, personnes que vous connaissez peut-être)</em>"
+    },
+    "optsHideMethod": {
+        "message": "Méthode de dissimulation:"
+    },
+    "optsCollapse": {
+        "message": "Effondrement"
+    },
+    "optsRemove": {
+        "message": "Suppression"
+    },
+    "optsUseStyle": {
+        "message": "Ajouter la mise en page aux éléments modifiés"
+    },
+    "optsAdvanced": {
+        "message": "Options Avançées"
+    },
+    "optsStyleLabel": {
+        "message": "Feuille de Style CSS personnalisée à ajouter aux éléments modifiés:"
+    },
+    "optsStylePreview": {
+        "message": "Aperçu de la mise en page"
+    },
+    "optsUserRules": {
+        "message": "Sélection des feuilles de styles CSS personnalisées à masquer, une par ligne. <em>À DES FINS DE TEST UNIQUEMENT</em>"
+    },
+    "optsUserRulesHover": {
+        "message": "Si vous identifiez une nouvelle feuille de style CSS à sélectionner, veuillez la soumettre dans un message pour les programmeurs"
+    },
+    "optsPending": {
+        "message": "Activer les règles de dissimulation en attente ou non confirmées"
+    },
+    "optsPendingLink": {
+        "message": "Voir la liste ici"
+    },
+    "optsLogging": {
+        "message": "Afficher les messages de journalisation dans la console"
+    },
+    "optsRefresh": {
+        "message": "Actualiser les règles"
+    },
+    "optsRefreshHover": {
+        "message": "Une seule fois par $1 minute(s)",
+        "description": "Message de compte à rebours de la règle de raffraichissemnt"
+    },
+    "optsDefaults": {
+        "message": "Restaurations des paramètres par défaut"
+    }
+}
