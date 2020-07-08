@@ -17,6 +17,9 @@
 */
 
 'use strict';
+
+document.documentElement.innerHTML = document.documentElement.innerHTML.replace(/__MSG_(\w+)__/g, (_, key) => browser.i18n.getMessage(key));
+
 app.init().then(() => {
     // Expert Options
     const modStyle = document.getElementById("modStyle");
