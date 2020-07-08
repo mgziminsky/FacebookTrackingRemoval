@@ -25,7 +25,7 @@
         "message": "Supprimer la surveillance des liens vers l'extérieur du site"
     },
     "optsInternal": {
-        "message": "Supprimez les valeurs pour contrer la surveillance des liens internes au site<em>(si quelque chose se casse, essayez de le désactiver d'abord)</em>"
+        "message": "Supprimez les valeurs pour contrer la surveillance des liens internes au site <em>(si quelque chose se casse, essayez de le désactiver d'abord)</em>"
     },
     "optsInlineVids": {
         "message": "Vidéos en ligne sur mobile <em>(n'affecte que les mobiles; peut augmenter l'utilisation des données)</em>"

@@ -1,3 +1,6 @@
+v1.8.6
+- French translation provided by gatinhonico
+
 v1.8.5
 - Internal link cleaning fixes and improvements
 - Run properly on pages that are loaded in IFrames
