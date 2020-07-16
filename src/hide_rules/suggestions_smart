@@ -1,2 +1,2 @@
 /* Syntax: css-selector[||innerText,..] */
-span[dir]||People You May Know||Suggested Post||Suggested for You
+span[dir]||People You May Know||Suggested Post||Suggested for You||Suggested Groups
