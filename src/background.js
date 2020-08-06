@@ -94,7 +94,7 @@ app.init().then(() => {
         if (restyle)
             fbTabs.forEach((_, tabId) => updateCSS(tabId, mew));
         if (reload)
-            [...fbTabs.keys()].filter(id => id.endsWith("#0")).forEach((_, tabId) => browser.tabs.reload(parseInt(tabId)));
+            [...fbTabs.keys()].filter(id => id.endsWith("#0")).forEach(tabId => browser.tabs.reload(parseInt(tabId)));
 
         return reload || restyle ? Promise.resolve() : Promise.reject("No Changes");
     }

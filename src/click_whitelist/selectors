@@ -6,6 +6,8 @@ form div.pam
 a[rel='theater']
 #stories_tray
 [role=presentation][data-tooltip-content]        /* Chat emoji categories */
+form [contenteditable="true"]
+form [contenteditable="true"]+div:last-child     /* Post comment input */
 
 /* Messenger page */
 a[aria-label='photo']       /* photos */

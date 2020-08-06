@@ -251,6 +251,10 @@ app.init().then(async () => {
             + stripFBCLID(node)
             ;
         fixGifs(node);
+
+        if (cleaned)
+            applyEventBlockers(node);
+
         return cleaned;
     }
 
@@ -335,12 +339,8 @@ app.init().then(async () => {
                     if (_userSelector)
                         removeArticles(target, _userSelector);
 
-                    if (app.options.fixLinks) {
-                        forEachAdded(mutation, node => {
-                            if (removeLinkTracking(node))
-                                applyEventBlockers(node);
-                        });
-                    }
+                    if (app.options.fixLinks)
+                        forEachAdded(mutation, removeLinkTracking);
 
                     if (app.options.internalRefs)
                         forEachAdded(mutation, stripRefs);

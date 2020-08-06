@@ -1,3 +1,7 @@
+v1.8.7
+- Fix automatic page reload on options changes
+- Fix comment input not clickable, and maybe others. Closes #37
+
 v1.8.6
 - French translation provided by gatinhonico
 
