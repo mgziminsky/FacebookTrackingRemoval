@@ -105,7 +105,7 @@ app.init().then(() => {
         app.storage.get(app.defaults)
             .then(opts => handleChanged(app.options, opts))
             .then(app.init)
-            .catch(app.log);
+            .catch(app.warn);
     }
 
     browser.runtime.onMessage.addListener((msg, sender) => {
@@ -126,10 +126,13 @@ app.init().then(() => {
     browser.tabs.onRemoved.addListener(fbTabs.delete.bind(fbTabs));
     browser.tabs.onReplaced.addListener(fbTabs.delete.bind(fbTabs));
 
-    function blockRequest(details) {
-        if (app.options.enabled) {
-          app.log("Blocking tracking request to " + details.url);
-          return {cancel: true};
+    function checkRequest(details, forceBlock) {
+        if (!app.options.enabled)
+            return;
+
+        if (forceBlock || ["beacon", "ping"].includes(details.type)) {
+            app.log(`Blocking ${details.type} request to ${details.url}`);
+            return {cancel: true};
         }
     }
 
@@ -140,8 +143,14 @@ app.init().then(() => {
     }
 
     browser.webRequest.onBeforeRequest.addListener(
-        blockRequest,
-        {urls: [...genBlockUrls(["ajax/bz*", "xti.php?*"]), ...app.host_patterns.map(h => h.replace("*.", "pixel."))]},
+        checkRequest,
+        {urls: app.host_patterns},
+        ["blocking"]
+    );
+
+    browser.webRequest.onBeforeRequest.addListener(
+        details => checkRequest(details, true),
+        {urls: [...genBlockUrls(["ajax/bz*", "ajax/bnzai*", "xti.php?*", "nw/"]), ...app.host_patterns.map(h => h.replace("*.", "pixel."))]},
         ["blocking"]
     );
 }).catch(console.warn);
