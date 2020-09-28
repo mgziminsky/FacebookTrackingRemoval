@@ -59,11 +59,11 @@ function stopPropagation(e) {
 }
 
 function applyEventBlockers(target) {
-    target.addEventListener("mousedown", stopPropagation, true);
+    target.addEventListener("mousedown", restrictEventPropagation, true);
     target.addEventListener("focusin", stopPropagation, true);
     target.addEventListener("focus", stopPropagation, true);
     target.addEventListener("click", restrictEventPropagation, true);
-    target.addEventListener("mouseup", stopPropagation, true);
+    target.addEventListener("mouseup", restrictEventPropagation, true);
     target.addEventListener("focusout", stopPropagation, true);
     target.addEventListener("blur", stopPropagation, true);
 }
