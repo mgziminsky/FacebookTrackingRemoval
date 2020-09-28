@@ -1,3 +1,7 @@
+v1.8.9
+- Block additional background tracking and metrics submission
+- Fix video volume adjustment slider - closes #43
+
 v1.8.8
 - Load at document_end again for hiding sidebar sponsored
 

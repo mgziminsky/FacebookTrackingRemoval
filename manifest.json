@@ -1,6 +1,6 @@
 {
   "name": "__MSG_extensionName__",
-  "version": "1.8.8",
+  "version": "1.8.9",
   "description": "__MSG_extensionDescription__",
   "default_locale": "en",
   "icons": { "128": "src/icon.png" },
