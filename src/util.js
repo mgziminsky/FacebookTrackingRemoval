@@ -27,8 +27,7 @@ function isAllowedTarget(e) {
     // Walk through event target and parents until the currentTarget looking for an element that clicks are allowed on
     while (e.currentTarget.parentNode !== checkTarget) {
         const role = checkTarget.attributes.role;
-        if (checkTarget.tagName === "A" && (!checkTarget.hasAttribute("href") || checkTarget.getAttribute("href") === "#")) {
-            e.preventDefault();
+        if (checkTarget.tagName === "A" && checkTarget.hostname === location.hostname) {
             return true;
         } else if (role && config.roles.includes(role.value.toUpperCase())) {
             return true;

@@ -1,3 +1,6 @@
+v1.8.10
+- Fix some navigation issues with internal link cleaning enabled - closes #44
+
 v1.8.9
 - Block additional background tracking and metrics submission
 - Fix video volume adjustment slider - closes #43
