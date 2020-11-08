@@ -69,7 +69,8 @@ app.init().then(() => {
                 if (item.type === "checkbox") {
                     item.checked = value;
                 } else if (item.type === "text" || item.tagName === "TEXTAREA") {
-                    item.placeholder = app.defaults[key];
+                    if (!item.placeholder)
+                        item.placeholder = app.defaults[key];
                     item.value = value;
                 } else {
                     item.value = value;

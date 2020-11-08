@@ -167,9 +167,28 @@ function joinSelectors(text) {
     return stripComments(text).replace(/\s*$\s/gm, ",").replace(/\s+/g, " ");
 }
 
+function parseHideRules(text) {
+    const rules = {};
+
+    for (let line of splitLines(stripComments(text))) {
+        const [sel, ...filters] = line.split("||");
+
+        const cleanSel = sel.trim().replace(/\s+/, " ");
+        if (!rules.hasOwnProperty(cleanSel))
+            rules[cleanSel] = new Set();
+
+        filters.map(normalizeString).forEach(rules[cleanSel].add.bind(rules[cleanSel]));
+    }
+
+    for (let k in rules)
+        rules[k] = Array.from(rules[k]); // Convert Set to Array. Sets not supported by storage api
+
+    return rules;
+}
+
 function normalizeString(str) {
     const prefix = str.split('\xb7', 2)[0]; // Some sponsored have the buyer appended after a · (0xb7). Just take what's in front.
-    return Array.from(new Set(prefix.replace(/\s+/g, "").toLowerCase())).sort().join("");
+    return Array.from(new Set(prefix.trim().toLowerCase())).sort().join("");
 }
 
 function visibleText(elem) {

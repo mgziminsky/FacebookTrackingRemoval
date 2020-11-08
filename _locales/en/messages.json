@@ -63,6 +63,9 @@
     "optsUserRulesHover": {
         "message": "If you identify a new selector, please submit it in a PR"
     },
+    "optsUserRulesPlaceholder": {
+        "message": "/* Syntax: css-selector[||innerText,..] */\na>span:only-of-type,.someClass||Sponsored\n.alwaysHideThis"
+    },
     "optsPending": {
         "message": "Enable pending/unconfirmed hiding rules"
     },

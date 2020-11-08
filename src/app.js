@@ -28,7 +28,7 @@ app.init().then(async () => {
     if (!app.options.enabled)
         return;
 
-    const _userSelector = joinSelectors(app.options.userRules);
+    const _userRules = parseHideRules(app.options.userRules);
 
     function applyStyle(elem) {
         elem.classList.add(app.styleClass);
@@ -260,35 +260,16 @@ app.init().then(async () => {
 
     /**** END LINK TRACKING ****/
 
-    function removeArticles(node, selector) {
-        if (!selector.trim())
-            return;
-
-        const elements = selectAllWithBase(node, selector);
-        for (const e of elements) {
-            if (!e.closest("._3j6k")) { // Skip Emergency Broadcasts. eg: Amber Alert
-                if (hide(e, e.innerText || getComputedStyle(e, ":after").content))
-                    app.log(() => {
-                        for (const s of selector.split(",")) {
-                            if (e.matches(s)) {
-                                return `>>> Static Rule matched for ${e.innerText}: ${s}`;
-                            }
-                        }
-                    });
-            }
-        }
-    }
-
-    function removeArticlesDyn(node, rules) {
+    function removeArticles(node, rules) {
         for (const [sel, texts] of Object.entries(rules)) {
             for (const e of selectAllWithBase(node, sel)) {
                 const elementText = visibleText(e);
 
-                if (texts.includes(normalizeString(elementText)) && hide(e, elementText)) {
+                if ((texts.length === 0 || texts.includes(normalizeString(elementText))) && hide(e, elementText)) {
                     app.log(() => {
                         for (const s of sel.split(",")) {
                             if (e.matches(s)) {
-                                return `>>> Dynamic Rule matched for ${elementText}: ${sel} = ${s}`;
+                                return `>>> Rule matched for ${elementText}: ${sel} = ${s}`;
                             }
                         }
                     });
@@ -317,27 +298,14 @@ app.init().then(async () => {
                 if (mutation.addedNodes.length && !SKIP.includes(mutation.target.nodeName)) {
                     const target = mutation.target;
 
-                    if (app.options.delSuggest) {
-                        removeArticles(target, app.hide_rules.suggestions);
-                        removeArticlesDyn(target, app.hide_rules.suggestions_smart);
-                    }
-                    if (app.options.delPixeled) {
-                        removeArticles(target, app.hide_rules.sponsored);
+                    removeArticles(target, _userRules);
 
-                        // Putting this here for now. If it works out, it can get its own
-                        // option and may replace the old static rules
-                        removeArticlesDyn(target, app.hide_rules.content);
-                    }
-
-                    if (app.options.pendingRules) {
-                        removeArticles(target, app.hide_rules.pending);
-
-                        // Same as above...
-                        removeArticlesDyn(target, app.hide_rules.content_pending);
-                    }
-
-                    if (_userSelector)
-                        removeArticles(target, _userSelector);
+                    if (app.options.delSuggest)
+                        removeArticles(target, app.hide_rules.suggestions_smart);
+                    if (app.options.delPixeled)
+                        removeArticles(target, app.hide_rules.content);
+                    if (app.options.pendingRules)
+                        removeArticles(target, app.hide_rules.content_pending);
 
                     if (app.options.fixLinks)
                         forEachAdded(mutation, removeLinkTracking);
@@ -365,20 +333,15 @@ app.init().then(async () => {
         _running = true;
 
         (async () => {
-            if (app.options.delSuggest) {
-                removeArticles(body, app.hide_rules.suggestions);
-                removeArticlesDyn(body, app.hide_rules.suggestions_smart);
-            }
-            if (app.options.delPixeled) {
-                removeArticles(body, app.hide_rules.sponsored);
-                removeArticlesDyn(body, app.hide_rules.content);
-            }
-            if (app.options.pendingRules) {
-                removeArticles(body, app.hide_rules.pending);
-                removeArticlesDyn(body, app.hide_rules.content_pending);
-            }
-            if (_userSelector)
-                removeArticles(body, _userSelector);
+            removeArticles(body, _userRules);
+
+            if (app.options.delSuggest)
+                removeArticles(body, app.hide_rules.suggestions_smart);
+            if (app.options.delPixeled)
+                removeArticles(body, app.hide_rules.content);
+            if (app.options.pendingRules)
+                removeArticles(body, app.hide_rules.content_pending);
+
             if (app.options.internalRefs)
                 stripRefs(body);
 
