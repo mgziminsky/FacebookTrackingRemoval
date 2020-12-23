@@ -24,7 +24,7 @@ const PARAM_CLEANING_FILES = ["params", "prefix_patterns", "values"];
 const CLICK_WHITELIST_FILES = ["elements", "roles", "selectors"];
 
 const DATE_HEADER = "last-modified";
-const RATE_LIMIT = (1000 * 60 * 5); // 5 min
+const RATE_LIMIT = (1000 * 60 * 15); // 15 min
 
 function shouldSkip(newDateString, oldDateString) {
     const newDate = Date.parse(newDateString);
@@ -109,11 +109,11 @@ async function refreshRules({ force = false, check = false } = {}) {
     const devMode = (await browser.management.getSelf()).installType === "development";
     const { lastRuleRefresh: lastRefresh } = await browser.storage.local.get("lastRuleRefresh");
 
-    // Prevent abuse, max refresh once per 5 min
-    const timeout = devMode ? 0 : RATE_LIMIT - (Date.now() - Date.parse(lastRefresh));
+    // Prevent abuse, max refresh once per 15 min
+    const timeout = force ? 0 : RATE_LIMIT - (Date.now() - Date.parse(lastRefresh));
 
     if (check)
-        return Promise.resolve(timeout > 0 ? timeout : 0);
+        return Promise.resolve(Math.max(0, timeout));
 
     if (timeout > 0)
         return Promise.reject(timeout);
@@ -127,7 +127,7 @@ async function refreshRules({ force = false, check = false } = {}) {
             )
             .catch(err => new Response(err, { status: 500 })); // Final fallback in case of any other error
 
-        if (!resp.ok || !force && shouldSkip(resp.headers.get(DATE_HEADER), (current || {})[DATE_HEADER]))
+        if (!resp.ok)// || !force && shouldSkip(resp.headers.get(DATE_HEADER), (current || {})[DATE_HEADER]))
             return null; // No updates, or no file
 
         return resp;

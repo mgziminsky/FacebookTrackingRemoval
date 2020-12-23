@@ -23,7 +23,7 @@ document.documentElement.innerHTML = document.documentElement.innerHTML.replace(
 app.init().then(() => {
     // Expert Options
     const modStyle = document.getElementById("modStyle");
-    const preview  = document.getElementById("preview");
+    const preview = document.getElementById("preview");
 
     // Set version text
     document.title += ` - v${browser.runtime.getManifest().version}`;
@@ -118,47 +118,56 @@ app.init().then(() => {
 
     // Refresh button
     {
+        const reloadTabs = () => browser.runtime.sendMessage("RELOAD");
         const btnRefresh = document.getElementById("btnRefresh");
-        btnRefresh.title = browser.i18n.getMessage("optsRefreshHover", RATE_LIMIT / 1000 / 60);
+        const btnText = btnRefresh.textContent;
+        btnRefresh.title = browser.i18n.getMessage("optsRefreshHover", [RATE_LIMIT / 1000 / 60]);
 
         let timer;
-        function btnRefreshTimer() {
-            if (timer)
-                return;
+        let disabled = false;
 
-            refreshRules({check: true}).then(timeout => {
+        function resetBtn() {
+            clearInterval(timer);
+            timer = null;
+            btnRefresh.textContent = btnText;
+            btnRefresh.disabled = disabled = false;
+        }
+
+        function btnRefreshTimer() {
+            resetBtn();
+            refreshRules({ check: true }).then(timeout => {
                 if (timeout <= 0)
                     return;
 
                 let remaining = Math.ceil(timeout / 1000);
-                const text = btnRefresh.textContent;
 
-                btnRefresh.disabled = true;
-                btnRefresh.textContent = `${text} - ${remaining--} seconds`;
+                btnRefresh.disabled = disabled = true;
+                btnRefresh.textContent = `${btnText} - ${remaining--} seconds`;
 
                 timer = setInterval(() => {
                     if (remaining <= 0) {
-                        clearInterval(timer);
-                        timer = null;
-                        btnRefresh.textContent = text;
-                        btnRefresh.disabled = false;
+                        resetBtn();
                     } else {
-                        btnRefresh.textContent = `${text} - ${remaining--} seconds`;
+                        btnRefresh.textContent = `${btnText} - ${remaining--} seconds`;
                     }
                 }, 1000);
             });
         }
 
         btnRefreshTimer();
-        btnRefresh.addEventListener("click", e => refreshRules({force: e.ctrlKey}).then(app.reloadTabs).then(btnRefreshTimer, btnRefreshTimer));
+        btnRefresh.addEventListener("click", e => refreshRules({ force: e.ctrlKey }).then(reloadTabs).then(btnRefreshTimer));
 
         window.addEventListener("keydown", e => {
-            if (!e.repeat && e.key === "Control")
+            if (!e.repeat && e.key === "Control") {
                 btnRefresh.classList.add("ctrl");
+                btnRefresh.disabled = false;
+            }
         });
         window.addEventListener("keyup", e => {
-            if (e.key === "Control")
+            if (e.key === "Control") {
                 btnRefresh.classList.remove("ctrl");
+                btnRefresh.disabled = disabled;
+            }
         });
 
     }

@@ -28,7 +28,7 @@ browser.runtime.onInstalled.addListener(details => {
     // Always force refresh rules after an update for simplicity
     // 1.8.0 changed the dynamic rules format
     browser.storage.local.remove(["lastRuleRefresh", "hide_rules"])
-        .finally(refreshRules.bind({ force: true }));
+        .finally(refreshRules.bind(undefined, { force: true }));
 
     if (details.previousVersion <= "1.6.3")
         app.init().then(async () => {
@@ -59,7 +59,7 @@ app.init().then(() => {
             frameId,
             cssOrigin: "user",
             code: opts.useStyle ? `.${app.styleClass} { ${opts.modStyle}; }` : "",
-        }
+        };
         fbTabs.set(id, details);
 
         // F***ing Chrome: https://bugs.chromium.org/p/chromium/issues/detail?id=608854
@@ -71,6 +71,10 @@ app.init().then(() => {
         } else {
             browser.tabs.sendMessage(tabId, details.code).catch(app.warn);
         }
+    }
+
+    function reloadTabs() {
+        [...fbTabs.keys()].filter(id => id.endsWith("#0")).forEach(tabId => browser.tabs.reload(parseInt(tabId)));
     }
 
     const STYLE_OPTS = ["useStyle", "modStyle"];
@@ -91,10 +95,10 @@ app.init().then(() => {
             }
         }
 
-        if (restyle)
-            fbTabs.forEach((_, tabId) => updateCSS(tabId, mew));
         if (reload)
-            [...fbTabs.keys()].filter(id => id.endsWith("#0")).forEach(tabId => browser.tabs.reload(parseInt(tabId)));
+            reloadTabs();
+        else if (restyle)
+            fbTabs.forEach((_, tabId) => updateCSS(tabId, mew));
 
         return reload || restyle ? Promise.resolve() : Promise.reject("No Changes");
     }
@@ -116,6 +120,9 @@ app.init().then(() => {
                     optionsWindows.add(w);
                     w.addEventListener("unload", () => onUnload(w));
                 });
+        }
+        else if (msg === "RELOAD") {
+            reloadTabs();
         } else {
             updateCSS(`${sender.tab.id}#${sender.frameId || 0}`, msg);
             if (app.isChrome)
@@ -132,7 +139,7 @@ app.init().then(() => {
 
         if (forceBlock || ["beacon", "ping"].includes(details.type)) {
             app.log(`Blocking ${details.type} request to ${details.url}`);
-            return {cancel: true};
+            return { cancel: true };
         }
     }
 
@@ -144,13 +151,13 @@ app.init().then(() => {
 
     browser.webRequest.onBeforeRequest.addListener(
         checkRequest,
-        {urls: app.host_patterns},
+        { urls: app.host_patterns },
         ["blocking"]
     );
 
     browser.webRequest.onBeforeRequest.addListener(
         details => checkRequest(details, true),
-        {urls: [...genBlockUrls(["ajax/bz*", "ajax/bnzai*", "xti.php?*", "nw/"]), ...app.host_patterns.map(h => h.replace("*.", "pixel."))]},
+        { urls: [...genBlockUrls(["ajax/bz*", "ajax/bnzai*", "xti.php?*", "nw/"]), ...app.host_patterns.map(h => h.replace("*.", "pixel."))] },
         ["blocking"]
     );
 }).catch(console.warn);
