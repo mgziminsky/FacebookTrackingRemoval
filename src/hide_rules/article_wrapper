@@ -2,5 +2,5 @@ article
 div._55wo
 div.mbm
 div.pagelet
-div[data-pagelet='RightRail']>div>div
+div[data-pagelet='RightRail']>*>*
 div[role=article]
