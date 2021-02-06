@@ -1,3 +1,6 @@
+v1.9.2
+- Fix some internal links not being cleaned
+
 v1.9.1
 - Fix rules not updating
 

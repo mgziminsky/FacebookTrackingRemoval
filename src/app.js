@@ -167,9 +167,10 @@ app.init().then(async () => {
 
     function stripRefs(node) {
         let intLinks = 0;
-        for (const a of node.getElementsByTagName('a')) {
-            if (!app.domains.some(d => a.hostname.endsWith(d)))
-                continue;
+
+        function _strip(a) {
+            if (a.nodeName !== "A" || !app.domains.some(d => a.hostname.endsWith(d)))
+                return;
 
             ++intLinks;
             applyEventBlockers(a.parentNode);
@@ -178,9 +179,10 @@ app.init().then(async () => {
             const linkBase = a.origin + a.pathname;
             if (a.hasAttribute("href")) {
                 const orig = a.getAttribute("href"); // get unexpanded value
-                a.href = cleanLinkParams(orig, linkBase);
+                const href = cleanLinkParams(orig, linkBase); // Don't assign here to avoid infinite mutation recursion
 
-                if (a.getAttribute("href") != orig) {
+                if (href != orig) {
+                    a.href = href;
                     applyStyle(a);
                     app.log("Cleaned internal href:\n\t" + orig + "\n\t" + a.getAttribute("href"));
                 }
@@ -204,6 +206,11 @@ app.init().then(async () => {
                     app.log("Cleaned internal hovercard link:\n\t" + orig + "\n\t" + a.dataset.hovercard);
                 }
             }
+        }
+
+        _strip(node);
+        for (const a of node.getElementsByTagName('a')) {
+            _strip(a);
         }
         return intLinks;
     }
@@ -295,7 +302,7 @@ app.init().then(async () => {
 
         new MutationObserver(async mutations => {
             for (const mutation of mutations) {
-                if (mutation.addedNodes.length && !SKIP.includes(mutation.target.nodeName)) {
+                if (mutation.type === "childList" && !SKIP.includes(mutation.target.nodeName)) {
                     const target = mutation.target;
 
                     removeArticles(target, _userRules);
@@ -315,10 +322,10 @@ app.init().then(async () => {
 
                     forEachAdded(mutation, node => node.classList.add(PROCESSED_CLASS));
                 } else if (mutation.target) {
-                    // This is to handle FB resetting links that have already been cleaned,
-                    // but it means any cleaned link will be processed at least twice... :(
-                    // Added 10-20ms to processing time of home page in chrome.
-                    removeLinkTracking(mutation.target);
+                    if (app.options.fixLinks)
+                        removeLinkTracking(mutation.target);
+                    if (app.options.internalRefs)
+                        stripRefs(mutation.target);
                 }
             }
         }).observe(body, (() => {
