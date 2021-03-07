@@ -5,6 +5,9 @@
 
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/ldeofbdmhnnocclkaddcnamhbhanaiaj.svg)](https://chrome.google.com/webstore/detail/facebook-tracking-ad-remo/ldeofbdmhnnocclkaddcnamhbhanaiaj)
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/users/ldeofbdmhnnocclkaddcnamhbhanaiaj.svg)](https://chrome.google.com/webstore/detail/facebook-tracking-ad-remo/ldeofbdmhnnocclkaddcnamhbhanaiaj)
+[![Chrome Web Store](https://img.shields.io/chrome-web-store/rating-count/ldeofbdmhnnocclkaddcnamhbhanaiaj.svg)](https://chrome.google.com/webstore/detail/facebook-tracking-ad-remo/ldeofbdmhnnocclkaddcnamhbhanaiaj)
+[![Chrome Web Store](https://img.shields.io/chrome-web-store/stars/ldeofbdmhnnocclkaddcnamhbhanaiaj.svg)](https://chrome.google.com/webstore/detail/facebook-tracking-ad-remo/ldeofbdmhnnocclkaddcnamhbhanaiaj)
+
 
 # Facebook™ Tracking & Ad Removal
 Removes Ads and the user interaction tracking from content on Facebook™.
