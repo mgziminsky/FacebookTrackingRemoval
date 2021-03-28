@@ -1,3 +1,7 @@
+![GitHub manifest version](https://img.shields.io/github/manifest-json/v/mgziminsky/FacebookTrackingRemoval)
+![GitHub release (latest by date)](https://img.shields.io/github/downloads/mgziminsky/FacebookTrackingRemoval/latest/total)
+![GitHub release (total)](https://img.shields.io/github/downloads/mgziminsky/FacebookTrackingRemoval/total)
+
 [![Mozilla Add-on](https://img.shields.io/amo/v/facebook-tracking-removal.svg)](https://addons.mozilla.org/addon/facebook-tracking-removal?src=external-github)
 [![Mozilla Add-on](https://img.shields.io/amo/d/facebook-tracking-removal.svg)](https://addons.mozilla.org/addon/facebook-tracking-removal?src=external-github)
 [![Mozilla Add-on](https://img.shields.io/amo/users/facebook-tracking-removal.svg)](https://addons.mozilla.org/addon/facebook-tracking-removal?src=external-github)
