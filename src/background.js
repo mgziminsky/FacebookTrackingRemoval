@@ -157,7 +157,7 @@ app.init().then(() => {
 
     browser.webRequest.onBeforeRequest.addListener(
         details => checkRequest(details, true),
-        { urls: [...genBlockUrls(["ajax/bz*", "ajax/bnzai*", "xti.php?*", "nw/"]), ...app.host_patterns.map(h => h.replace("*.", "pixel."))] },
+        { urls: [...genBlockUrls(["ajax/bz*", "ajax/bnzai*", "xti.php?*"]), ...app.host_patterns.map(h => h.replace("*.", "pixel."))] },
         ["blocking"]
     );
 }).catch(console.warn);
