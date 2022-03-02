@@ -102,8 +102,8 @@ app.init().then(async () => {
         const videoLinks = selectAllWithBase(node, "div[data-sigil=inlineVideo],a[href^='/video_redirect/']");
         for (const vid of videoLinks) {
             const vidSrc = vid.tagName === 'DIV'
-                           ? JSON.parse(vid.getAttribute("data-store")).src // Phone
-                           : new URL(vid.href).searchParams.get('src'); // m.facebook
+                ? JSON.parse(vid.getAttribute("data-store")).src // Phone
+                : new URL(vid.href).searchParams.get('src'); // m.facebook
 
             const replaceVideo = target => {
                 const img = target.querySelector(".img,img"); // phone,m.facebook
@@ -119,14 +119,14 @@ app.init().then(async () => {
                 cleanAttrs(vid);
                 const target = vid.cloneNode(true);
                 applyStyle(target);
-                target.classList.add("FBTR-SAFE")
+                target.classList.add("FBTR-SAFE");
                 target.addEventListener("click", e => {
                     e.stopImmediatePropagation();
                     e.stopPropagation();
                     replaceVideo(target).play();
                 }, true);
                 vid.parentNode.replaceChild(target, vid);
-                app.log("Cleaned deferred inline video: " + vidSrc)
+                app.log("Cleaned deferred inline video: " + vidSrc);
             }
         }
         return videoLinks.length;
@@ -373,21 +373,30 @@ app.init().then(async () => {
         }).observe(document.documentElement, { childList: true });
     }
 
-    // Fallback for chrome based browsers that don't support tabs.removeCSS
-    browser.runtime.onMessage.addListener(msg => {
-        let styleElement = document.getElementById('fbtr-style');
-        if (!styleElement) {
-            styleElement = document.createElement('style');
-            styleElement.id = 'fbtr-style';
-            document.head.append(styleElement);
-        }
+    browser.runtime.onMessage.addListener(({ type, data }) => {
+        switch (type) {
+            // Fallback for old chrome based browsers that don't support tabs.removeCSS
+            case "STYLE":
+                let styleElement = document.getElementById('fbtr-style');
+                if (!styleElement) {
+                    styleElement = document.createElement('style');
+                    styleElement.id = 'fbtr-style';
+                    document.head.append(styleElement);
+                }
 
-        if (styleElement.sheet.cssRules.length)
-            styleElement.sheet.deleteRule(0);
+                if (styleElement.sheet.cssRules.length)
+                    styleElement.sheet.deleteRule(0);
 
-        if (msg) {
-            // Timeout required for page to reparse
-            setTimeout(() => styleElement.sheet.insertRule(msg), 50);
+                if (data) {
+                    // Timeout required for page to reparse
+                    setTimeout(() => styleElement.sheet.insertRule(data), 50);
+                }
+                break;
+
+            case "HISTORY":
+                history.replaceState(history.state, "", data.clean);
+                app.log(`Cleaned link navigation done via history.pushState:\n\t${data.orig}\n\t${data.clean}`);
+                break;
         }
     });
 

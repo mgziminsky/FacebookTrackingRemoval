@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "target": "esnext",
+        "baseUrl": "./",
+        "paths": {
+            "/*": ["./*"]
+        }
+    },
+    "include": [
+        "src/**/*"
+    ],
+    "typeAcquisition": {
+        "include": [
+            "firefox-webext-browser"
+        ]
+    }
+}

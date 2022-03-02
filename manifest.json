@@ -20,6 +20,7 @@
     "*://*.facebook.com/*",
     "*://*.messenger.com/*",
     "*://*.facebookcorewwwi.onion/*",
+    "webNavigation",
     "webRequest",
     "webRequestBlocking",
     "https://mgziminsky.gitlab.io/FacebookTrackingRemoval/*"

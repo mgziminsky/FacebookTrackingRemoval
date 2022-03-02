@@ -62,14 +62,14 @@ app.init().then(() => {
         };
         fbTabs.set(id, details);
 
-        // F***ing Chrome: https://bugs.chromium.org/p/chromium/issues/detail?id=608854
+        // F***ing Chrome: https://bugs.chromium.org/p/chromium/issues/detail?id=608854 (Fixed 2020-11)
         if (browser.tabs.removeCSS) {
             if (prev && prev.code)
                 browser.tabs.removeCSS(tabId, prev).catch(app.warn);
             if (details.code)
                 browser.tabs.insertCSS(tabId, details).catch(app.warn);
         } else {
-            browser.tabs.sendMessage(tabId, details.code).catch(app.warn);
+            browser.tabs.sendMessage(tabId, { type: "STYLE", data: details.code }).catch(app.warn);
         }
     }
 
@@ -133,6 +133,11 @@ app.init().then(() => {
     browser.tabs.onRemoved.addListener(fbTabs.delete.bind(fbTabs));
     browser.tabs.onReplaced.addListener(fbTabs.delete.bind(fbTabs));
 
+    /**
+     * @param {browser.webRequest._OnBeforeRequestDetails} details
+     * @param {boolean} forceBlock
+     * @return {browser.webRequest.BlockingResponse}
+     */
     function checkRequest(details, forceBlock) {
         if (!app.options.enabled)
             return;
@@ -150,14 +155,26 @@ app.init().then(() => {
     }
 
     browser.webRequest.onBeforeRequest.addListener(
+        details => checkRequest(details, true),
+        { urls: [...genBlockUrls(["ajax/bz*", "ajax/bnzai*", "xti.php?*"]), ...app.host_patterns.map(h => h.replace("*.", "pixel."))] },
+        ["blocking"]
+    );
+
+    browser.webRequest.onBeforeRequest.addListener(
         checkRequest,
         { urls: app.host_patterns },
         ["blocking"]
     );
 
-    browser.webRequest.onBeforeRequest.addListener(
-        details => checkRequest(details, true),
-        { urls: [...genBlockUrls(["ajax/bz*", "ajax/bnzai*", "xti.php?*"]), ...app.host_patterns.map(h => h.replace("*.", "pixel."))] },
-        ["blocking"]
-    );
-}).catch(console.warn);
+    browser.webNavigation.onHistoryStateUpdated.addListener(details => {
+        const orig = details.url;
+        const clean = cleanLinkParams(details.url);
+        if (orig != clean) {
+            browser.tabs.sendMessage(details.tabId, { type: "HISTORY", data: { orig, clean } });
+        }
+    }, {
+        url: app.host_patterns
+            .map(h => h.replaceAll(/[^.\w]/g, ""))
+            .map(hostContains => ({ hostContains }))
+    });
+}).catch(x => console.warn("background init failed:", x));
