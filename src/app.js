@@ -34,12 +34,12 @@ app.init().then(async () => {
         elem.classList.add(app.styleClass);
     }
 
-    function hide(elem, label) {
+    function hide(elem, label, method) {
         let target;
         if (!elem || !(target = elem.closest(app.hide_rules.article_wrapper)))
             return false;
 
-        if (app.options.hideMethod === "collapse") {
+        if (method === "collapse") {
             if (target.closest(".fbtrCollapsible"))
                 return false;
 
@@ -267,12 +267,12 @@ app.init().then(async () => {
 
     /**** END LINK TRACKING ****/
 
-    function removeArticles(node, rules) {
+    function removeArticles(node, rules, method = app.options.hideMethod) {
         for (const [sel, texts] of Object.entries(rules)) {
             for (const e of selectAllWithBase(node, sel)) {
                 const elementText = visibleText(e);
 
-                if ((texts.length === 0 || texts.includes(normalizeString(elementText))) && hide(e, elementText)) {
+                if ((texts.length === 0 || texts.includes(normalizeString(elementText))) && hide(e, elementText, method)) {
                     app.log(() => {
                         for (const s of sel.split(",")) {
                             if (e.matches(s)) {
@@ -285,6 +285,20 @@ app.init().then(async () => {
         }
     }
 
+    const market = document.location.pathname.startsWith("/marketplace");
+    function removeAll(target) {
+        removeArticles(target, _userRules);
+
+        if (app.options.delSuggest)
+            removeArticles(target, app.hide_rules.suggestions_smart);
+        if (app.options.delPixeled)
+            removeArticles(target, app.hide_rules.content, market ? "remove" : app.options.hideMethod);
+        if (app.options.pendingRules)
+            removeArticles(target, app.hide_rules.content_pending);
+
+        if (app.options.internalRefs)
+            stripRefs(target);
+    }
 
     let _running = false;
     function run(body) {
@@ -305,20 +319,10 @@ app.init().then(async () => {
                 if (mutation.type === "childList" && !SKIP.includes(mutation.target.nodeName)) {
                     const target = mutation.target;
 
-                    removeArticles(target, _userRules);
-
-                    if (app.options.delSuggest)
-                        removeArticles(target, app.hide_rules.suggestions_smart);
-                    if (app.options.delPixeled)
-                        removeArticles(target, app.hide_rules.content);
-                    if (app.options.pendingRules)
-                        removeArticles(target, app.hide_rules.content_pending);
+                    removeAll(target);
 
                     if (app.options.fixLinks)
                         forEachAdded(mutation, removeLinkTracking);
-
-                    if (app.options.internalRefs)
-                        forEachAdded(mutation, stripRefs);
 
                     forEachAdded(mutation, node => node.classList.add(PROCESSED_CLASS));
                 } else if (mutation.target) {
@@ -340,17 +344,7 @@ app.init().then(async () => {
         _running = true;
 
         (async () => {
-            removeArticles(body, _userRules);
-
-            if (app.options.delSuggest)
-                removeArticles(body, app.hide_rules.suggestions_smart);
-            if (app.options.delPixeled)
-                removeArticles(body, app.hide_rules.content);
-            if (app.options.pendingRules)
-                removeArticles(body, app.hide_rules.content_pending);
-
-            if (app.options.internalRefs)
-                stripRefs(body);
+            removeAll(body);
 
             if (app.options.fixLinks && removeLinkTracking(body) && document.getElementById("newsFeedHeading")) {
                 const feed = document.getElementById("newsFeedHeading").parentNode;
@@ -394,8 +388,10 @@ app.init().then(async () => {
                 break;
 
             case "HISTORY":
-                history.replaceState(history.state, "", data.clean);
-                app.log(`Cleaned link navigation done via history.pushState:\n\t${data.orig}\n\t${data.clean}`);
+                if (!history.state.fbtr_clean) {
+                    history.replaceState(Object.assign({ fbtr_clean: true }, history.state), "", data.clean);
+                    app.log(`Cleaned link navigation done via history.pushState:\n\t${data.orig}\n\t${data.clean}`);
+                }
                 break;
         }
     });
