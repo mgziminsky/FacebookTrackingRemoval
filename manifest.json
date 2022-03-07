@@ -19,7 +19,7 @@
     "storage",
     "*://*.facebook.com/*",
     "*://*.messenger.com/*",
-    "*://*.facebookcorewwwi.onion/*",
+    "*://*.facebookwkhpilnemxj7asaniu7vnjjbiltxjqhye3mhbshg7kx5tfyd.onion/*",
     "webNavigation",
     "webRequest",
     "webRequestBlocking",
@@ -42,7 +42,7 @@
     "show_matches": [
       "*://*.facebook.com/*",
       "*://*.messenger.com/*",
-      "*://*.facebookcorewwwi.onion/*"
+      "*://*.facebookwkhpilnemxj7asaniu7vnjjbiltxjqhye3mhbshg7kx5tfyd.onion/*"
     ]
   },
 
@@ -52,7 +52,7 @@
       "matches": [
         "*://*.facebook.com/*",
         "*://*.messenger.com/*",
-        "*://*.facebookcorewwwi.onion/*"
+        "*://*.facebookwkhpilnemxj7asaniu7vnjjbiltxjqhye3mhbshg7kx5tfyd.onion/*"
       ],
       "css": ["src/app.css"],
       "js": ["browser-polyfill.min.js", "src/common.js", "src/util.js", "src/app.js"],

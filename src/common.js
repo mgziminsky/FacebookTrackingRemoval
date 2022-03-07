@@ -15,6 +15,7 @@
 
     Copyright (C) 2016-2021 Michael Ziminsky
 */
+/* global joinSelectors */
 
 'use strict';
 
@@ -40,7 +41,7 @@ const app = {};
             // Return the new promise
             this._locks.push(rv);
             return rv;
-        };
+        }
 
         release() {
             this._locks.shift()();

@@ -15,6 +15,7 @@
 
     Copyright (C) 2016-2021 Michael Ziminsky
 */
+/* global app */
 
 'use strict';
 

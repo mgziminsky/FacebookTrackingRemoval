@@ -15,6 +15,7 @@
 
     Copyright (C) 2016-2021 Michael Ziminsky
 */
+/* global joinSelectors, parseHideRules, stripComments, splitLines */
 
 'use strict';
 
@@ -26,27 +27,7 @@ const CLICK_WHITELIST_FILES = ["elements", "roles", "selectors"];
 const DATE_HEADER = "last-modified";
 const RATE_LIMIT = (1000 * 60 * 15); // 15 min
 
-function shouldSkip(newDateString, oldDateString) {
-    const newDate = Date.parse(newDateString);
-    const oldDate = Date.parse(oldDateString);
-
-    // New value failed lookup, don't replace cached value
-    if (isNaN(newDate) && !isNaN(oldDate))
-        return true;
-
-    // Failed to get new value, but nothing cached, use fallback
-    if (isNaN(newDate) && isNaN(oldDate))
-        return false;
-
-    // Lookup succeeded, no cache, use new.
-    if (!isNaN(newDate) && isNaN(oldDate))
-        return false;
-
-    // Skip unless new value is more recent than old
-    return newDate <= oldDate;
-}
-
-async function loadHideRules(fetchRule) {
+async function loadHideRules() {
     const { hide_rules: currentRules = {} } = await browser.storage.local.get("hide_rules");
 
     const newRules = {};
@@ -86,12 +67,12 @@ async function loadHideRules(fetchRule) {
     return Object.assign(currentRules, newRules);
 }
 
-async function loadArrayData(fetchFunc, key, files) {
+async function loadArrayData(key, files) {
     const { [key]: currentRules = {} } = await browser.storage.local.get(key);
 
     const newRules = {};
     for (let file of files) {
-        const resp = await fetchFunc(`${key}/${file}`, currentRules[file]);
+        const resp = await fetchRule(`${key}/${file}`, currentRules[file]);
 
         if (resp === null)
             continue;
@@ -105,8 +86,25 @@ async function loadArrayData(fetchFunc, key, files) {
     return Object.assign(currentRules, newRules);
 }
 
-async function refreshRules({ force = false, check = false } = {}) {
+async function fetchRule(path, current) {
     const devMode = (await browser.management.getSelf()).installType === "development";
+
+    const resp = await fetch(`https://${devMode ? "localhost" : "mgziminsky.gitlab.io"}/FacebookTrackingRemoval/${path}`, { mode: 'cors' })
+        .then(resp => resp.ok ? resp : Promise.reject())
+        .catch(_ => current
+            ? new Response(current, { status: 418 }) // keep saved value if present
+            : fetch(browser.runtime.getURL(`src/${path}`)) // Fallback to bundled copy as last resort, should never fail if file is present
+        )
+        .catch(err => new Response(err, { status: 500 })); // Final fallback in case of any other error
+
+    if (!resp.ok)
+        return null; // No updates, or no file
+
+    return resp;
+}
+
+/* exported refreshRules */
+async function refreshRules({ force = false, check = false } = {}) {
     const { lastRuleRefresh: lastRefresh } = await browser.storage.local.get("lastRuleRefresh");
 
     // Prevent abuse, max refresh once per 15 min
@@ -118,25 +116,10 @@ async function refreshRules({ force = false, check = false } = {}) {
     if (timeout > 0)
         return Promise.reject(timeout);
 
-    const fetchRule = async (path, current) => {
-        const resp = await fetch(`https://${devMode ? "localhost" : "mgziminsky.gitlab.io"}/FacebookTrackingRemoval/${path}`, { mode: 'cors' })
-            .then(resp => resp.ok ? resp : Promise.reject())
-            .catch(_ => current
-                ? new Response(current, { status: 418 }) // keep saved value if present
-                : fetch(browser.runtime.getURL(`src/${path}`)) // Fallback to bundled copy as last resort, should never fail if file is present
-            )
-            .catch(err => new Response(err, { status: 500 })); // Final fallback in case of any other error
-
-        if (!resp.ok)// || !force && shouldSkip(resp.headers.get(DATE_HEADER), (current || {})[DATE_HEADER]))
-            return null; // No updates, or no file
-
-        return resp;
-    };
-
     browser.storage.local.set({
-        hide_rules: await loadHideRules(fetchRule),
-        param_cleaning: await loadArrayData(fetchRule, "param_cleaning", PARAM_CLEANING_FILES),
-        click_whitelist: await loadArrayData(fetchRule, "click_whitelist", CLICK_WHITELIST_FILES),
+        hide_rules: await loadHideRules(),
+        param_cleaning: await loadArrayData("param_cleaning", PARAM_CLEANING_FILES),
+        click_whitelist: await loadArrayData("click_whitelist", CLICK_WHITELIST_FILES),
         lastRuleRefresh: new Date().toUTCString(),
     }).then(() => RATE_LIMIT);
 }

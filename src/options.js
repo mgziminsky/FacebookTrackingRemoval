@@ -15,6 +15,7 @@
 
     Copyright (C) 2016-2021 Michael Ziminsky
 */
+/* global app, RATE_LIMIT, refreshRules */
 
 'use strict';
 
@@ -29,38 +30,42 @@ app.init().then(() => {
     document.title += ` - v${browser.runtime.getManifest().version}`;
     document.getElementById("legend").textContent += ` - v${browser.runtime.getManifest().version}`;
 
-    function handleCheckbox() { app.options[this.id] = this.checked; }
+    /** @param {Event} e */
+    const handleCheckbox = e => { app.options[e.target.id] = e.target.checked; };
     for (let checkbox of document.querySelectorAll("input[type=checkbox]")) {
         checkbox.addEventListener("change", handleCheckbox);
     }
 
-    function handleRadio() { app.options[this.name] = this.value; }
+    /** @param {Event} e */
+    const handleRadio = e => { app.options[e.target.name] = e.target.value; };
     for (let checkbox of document.querySelectorAll("input[type=radio]")) {
         checkbox.addEventListener("change", handleRadio);
     }
 
-    function handleText() {
-        this.value = this.value.trim();
-        if (!this.value) {
-            app.options.reset(this.id);
+    /** @param {Event} e */
+    const handleText = e => {
+        e.target.value = e.target.value.trim();
+        if (!e.target.value) {
+            app.options.reset(e.target.id);
         } else {
-            app.options[this.id] = this.value;
+            app.options[e.target.id] = e.target.value;
         }
-    }
+    };
     for (let text of document.querySelectorAll("input[type=text],textarea")) {
         text.addEventListener("change", handleText);
     }
 
     document.getElementById("reset").addEventListener("click", _ => app.options.reset().then(() => document.body.classList.add("resetDone")));
 
-    modStyle.addEventListener("change", e => preview.style.cssText = this.value);
+    modStyle.addEventListener("input", e => preview.style.cssText = e.target.value);
 
-    function handleToggle() { document.getElementById(this.dataset.toggle).classList.toggle("hidden", !this.checked); }
+    /** @param {Event} e */
+    const handleToggle = e => { document.getElementById(e.target.dataset.toggle).classList.toggle("hidden", !e.target.checked); };
 
     // Avoid duplicated event listeners
     const dependFuncs = new Map();
 
-    function init() {
+    const init = () => {
         const opts = app.options;
         for (let key in opts) {
             const value = opts[key];
@@ -96,17 +101,18 @@ app.init().then(() => {
 
         for (let checkbox of document.querySelectorAll("input[data-toggle]")) {
             checkbox.addEventListener("change", handleToggle);
-            handleToggle.apply(checkbox);
+            handleToggle.call(undefined, { target: checkbox });
         }
-    }
+    };
     init();
 
     // Per-option reset functionality
-    function resetField(e) {
+    /** @param {MouseEvent} e */
+    const resetField = e => {
         e.preventDefault();
-        const option = this.parentNode.querySelector("input[id],textarea[id],input[name]");
+        const option = e.target.parentNode.querySelector("input[id],textarea[id],input[name]");
         app.options.reset(option.id || option.name)
-            .then(() => this.parentNode.classList.add("resetDone"));
+            .then(() => e.target.parentNode.classList.add("resetDone"));
     };
     for (let reset of document.querySelectorAll("btn-reset")) {
         const content = document.importNode(document.getElementById("btnReset").content, true);
@@ -126,14 +132,14 @@ app.init().then(() => {
         let timer;
         let disabled = false;
 
-        function resetBtn() {
+        const resetBtn = () => {
             clearInterval(timer);
             timer = null;
             btnRefresh.textContent = btnText;
             btnRefresh.disabled = disabled = false;
-        }
+        };
 
-        function btnRefreshTimer() {
+        const btnRefreshTimer = () => {
             resetBtn();
             refreshRules({ check: true }).then(timeout => {
                 if (timeout <= 0)
@@ -152,7 +158,7 @@ app.init().then(() => {
                     }
                 }, 1000);
             });
-        }
+        };
 
         btnRefreshTimer();
         btnRefresh.addEventListener("click", e => refreshRules({ force: e.ctrlKey }).then(reloadTabs).then(btnRefreshTimer));
@@ -178,4 +184,4 @@ app.init().then(() => {
 
     // Tell the background script a new options window was opened
     browser.runtime.sendMessage("OPTIONS");
-}, console.log);
+}, console.warn);

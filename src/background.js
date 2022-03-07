@@ -15,6 +15,7 @@
 
     Copyright (C) 2016-2021 Michael Ziminsky
 */
+/* global app, refreshRules, cleanLinkParams */
 
 'use strict';
 
@@ -40,8 +41,9 @@ browser.runtime.onInstalled.addListener(details => {
         });
 });
 
-refreshRules();
-setInterval(refreshRules, 1000 * 60 * 60 * 12); // refresh every 12 hours
+const refresh = () => refreshRules().catch(() => {/* Ignore timeout */});
+refresh();
+setInterval(refresh, 1000 * 60 * 60 * 12); // refresh every 12 hours
 
 /*
     Keep track of open options and FB windows and the currently
@@ -177,4 +179,4 @@ app.init().then(() => {
             .map(h => h.replaceAll(/[^.\w]/g, ""))
             .map(hostContains => ({ hostContains }))
     });
-}).catch(x => console.warn("background init failed:", x));
+}).catch(e => console.warn("background init failed: ", e));

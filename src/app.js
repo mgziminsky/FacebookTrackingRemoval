@@ -15,6 +15,7 @@
 
     Copyright (C) 2016-2021 Michael Ziminsky
 */
+/* eslint no-undef: off */
 
 'use strict';
 
@@ -370,7 +371,7 @@ app.init().then(async () => {
     browser.runtime.onMessage.addListener(({ type, data }) => {
         switch (type) {
             // Fallback for old chrome based browsers that don't support tabs.removeCSS
-            case "STYLE":
+            case "STYLE": {
                 let styleElement = document.getElementById('fbtr-style');
                 if (!styleElement) {
                     styleElement = document.createElement('style');
@@ -386,7 +387,7 @@ app.init().then(async () => {
                     setTimeout(() => styleElement.sheet.insertRule(data), 50);
                 }
                 break;
-
+            }
             case "HISTORY":
                 if (!history.state.fbtr_clean) {
                     history.replaceState(Object.assign({ fbtr_clean: true }, history.state), "", data.clean);
