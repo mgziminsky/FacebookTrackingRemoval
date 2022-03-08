@@ -112,18 +112,26 @@ app.init().then(() => {
     init();
 
     // Per-option reset functionality
-    /** @param {MouseEvent} e */
-    const resetField = e => {
-        e.preventDefault();
-        const option = e.target.parentNode.querySelector("input[id],textarea[id],input[name]");
-        app.options.reset(option.id || option.name)
-            .then(() => e.target.parentNode.classList.add("resetDone"));
-    };
-    for (let reset of document.querySelectorAll("btn-reset")) {
-        const content = document.importNode(document.getElementById("btnReset").content, true);
-        content.firstElementChild.addEventListener("click", resetField);
-        reset.parentNode.replaceChild(content, reset);
-    }
+    window.customElements.define('btn-reset', class extends HTMLElement {
+        constructor() {
+            super();
+            const img = this.attachShadow({ mode: "open" }).appendChild(document.createElement("img"));
+            img.src = "reset.svg";
+            img.alt = getMessageSafe("optsResetAlt");
+            img.title = getMessageSafe("optsResetTitle");
+            this.addEventListener("click", this.reset.bind(this));
+        }
+
+        /** @param {MouseEvent} e */
+        reset(e) {
+            e?.preventDefault();
+            const option = this.parentNode.querySelector("input[id],textarea[id],input[name]");
+            app.options
+                .reset(option.id || option.name)
+                .then(() => this.parentNode.classList.add("resetDone"));
+        }
+    });
+
     document.body.addEventListener("animationend", e => e.target.classList.remove("resetDone"));
 
 

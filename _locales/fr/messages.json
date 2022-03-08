@@ -81,5 +81,14 @@
     },
     "optsDefaults": {
         "message": "Restaurations des paramètres par défaut"
+    },
+    "—": {
+        "message": "From https://libretranslate.com/?source=en&target=fr&q=Default%250AReset"
+    },
+    "optsResetTitle": {
+        "message": "Par défaut"
+    },
+    "optsResetAlt": {
+        "message": "Réinitialiser"
     }
 }

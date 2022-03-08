@@ -84,5 +84,11 @@
     },
     "optsDefaults": {
         "message": "Restore Defaults"
+    },
+    "optsResetTitle": {
+        "message": "Default"
+    },
+    "optsResetAlt": {
+        "message": "Reset"
     }
 }

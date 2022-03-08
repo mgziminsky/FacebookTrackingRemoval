@@ -75,17 +75,17 @@ details>summary {
 }
 
 /* Per-options buttons */
-img.reset {
+btn-reset {
     position: absolute;
     cursor: pointer;
     height: var(--reset-btn-size);
 }
 
-img.reset:first-child {
+btn-reset:first-child {
     left: calc(-1.5 * var(--reset-btn-size));
 }
 
-img.reset:last-child {
+btn-reset:last-child {
     top: calc(.25 * var(--reset-btn-size));
     right: calc(.25 * var(--reset-btn-size));
 }
@@ -97,7 +97,7 @@ img.reset:last-child {
 
 @keyframes blank {}
 
-.resetDone img.reset {
+.resetDone btn-reset {
     animation: spin .5s linear infinite;
 }
 
