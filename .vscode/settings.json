@@ -1,0 +1,10 @@
+{
+    "firefox.args": [
+        "about:debugging#/runtime/this-firefox",
+        "about:addons",
+        "https://www.facebook.com/",
+    ],
+    "html.customData": [
+        ".vscode/html.html-data.json",
+    ],
+}

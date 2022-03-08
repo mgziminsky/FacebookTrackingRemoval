@@ -1,21 +1,24 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>__MSG_optsTitle__</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="options.css">
 </head>
+
 <body>
     <fieldset>
-        <legend id="legend">__MSG_optsLegend__</legend>
-        <p><strong>**__MSG_optsReloadNotice__**</strong></p>
+        <legend id="legend">
+            <fbtr-i18n key="optsLegend"></fbtr-i18n>
+        </legend>
+        <p><strong>**<fbtr-i18n key="optsReloadNotice"></fbtr-i18n>**</strong></p>
 
         <ul>
             <li>
                 <label>
                     <input type="checkbox" id="enabled" data-toggle="options">
-                    __MSG_optsEnabled__
+                    <fbtr-i18n key="optsEnabled"></fbtr-i18n>
                 </label>
             </li>
         </ul>
@@ -25,57 +28,68 @@
                 <btn-reset></btn-reset>
                 <label>
                     <input type="checkbox" id="fixLinks">
-                    __MSG_optsFixLinks__
+                    <fbtr-i18n key="optsFixLinks"></fbtr-i18n>
                 </label>
             </li>
             <li>
                 <btn-reset></btn-reset>
                 <label>
                     <input type="checkbox" id="internalRefs">
-                    <span>__MSG_optsInternal__</span>
+                    <fbtr-i18n key="optsInternal"></fbtr-i18n>
                 </label>
             </li>
             <li>
                 <btn-reset></btn-reset>
                 <label>
                     <input type="checkbox" id="inlineVids" data-depends="fixLinks">
-                    <span>__MSG_optsInlineVids__</span>
+                    <fbtr-i18n key="optsInlineVids"></fbtr-i18n>
                 </label>
             </li>
             <li>
                 <btn-reset></btn-reset>
                 <label>
                     <input type="checkbox" id="delPixeled">
-                    <span>__MSG_optsPixeled__</span>
+                    <fbtr-i18n key="optsPixeled"></fbtr-i18n>
                 </label>
             </li>
             <li>
                 <btn-reset></btn-reset>
                 <label>
                     <input type="checkbox" id="delSuggest">
-                    <span>__MSG_optsSuggest__</span>
+                    <fbtr-i18n key="optsSuggest"></fbtr-i18n>
                 </label>
             </li>
             <li id="_hideMethod">
                 <btn-reset></btn-reset>
-                __MSG_optsHideMethod__
-                <label><input type="radio" name="hideMethod" value="collapse"> __MSG_optsCollapse__</label>
-                <label><input type="radio" name="hideMethod" value="remove"> __MSG_optsRemove__</label>
+                <fbtr-i18n key="optsHideMethod"></fbtr-i18n>
+                <label>
+                    <input type="radio" name="hideMethod" value="collapse">
+                    <fbtr-i18n key="optsCollapse"></fbtr-i18n>
+                </label>
+                <label>
+                    <input type="radio" name="hideMethod" value="remove">
+                    <fbtr-i18n key="optsRemove"></fbtr-i18n>
+                </label>
             </li>
             <li>
                 <btn-reset></btn-reset>
                 <label>
                     <input type="checkbox" id="useStyle">
-                    __MSG_optsUseStyle__
+                    <fbtr-i18n key="optsUseStyle"></fbtr-i18n>
                 </label>
             </li>
             <li>
                 <details>
-                    <summary>__MSG_optsAdvanced__</summary>
+                    <summary>
+                        <fbtr-i18n key="optsAdvanced"></fbtr-i18n>
+                    </summary>
                     <ul>
                         <li>
                             <label class="flex-col">
-                                <span>__MSG_optsStyleLabel__ <span id="preview">__MSG_optsStylePreview__</span></span>
+                                <span>
+                                    <fbtr-i18n key="optsStyleLabel"></fbtr-i18n>
+                                    <fbtr-i18n id="preview" key="optsStylePreview"></fbtr-i18n>
+                                </span>
                                 <div style="position: relative;">
                                     <textarea id="modStyle" cols="50" rows="1" data-depends="useStyle"></textarea>
                                     <btn-reset></btn-reset>
@@ -84,33 +98,43 @@
                         </li>
                         <li>
                             <label class="flex-col">
-                                <span>__MSG_optsUserRules__</span>
-                                <textarea id="userRules" cols="50" placeholder="__MSG_optsUserRulesPlaceholder__" title="__MSG_optsUserRulesHover__"></textarea>
+                                <fbtr-i18n key="optsUserRules"></fbtr-i18n>
+                                <textarea id="userRules" cols="50"></textarea>
                             </label>
                         </li>
                         <li>
                             <label>
                                 <input type="checkbox" id="pendingRules">
-                                __MSG_optsPending__
+                                <fbtr-i18n key="optsPending"></fbtr-i18n>
                             </label>
-                            - <em><a rel="noreferrer noopener" href="https://github.com/mgziminsky/FacebookTrackingRemoval/blob/master/src/hide_rules/pending" target="_blank">__MSG_optsPendingLink__</a></em>
+                            -
+                            <em>
+                                <a rel="noreferrer noopener" target="_blank"
+                                    href="https://github.com/mgziminsky/FacebookTrackingRemoval/blob/master/src/hide_rules/pending">
+                                    <fbtr-i18n key="optsPendingLink"></fbtr-i18n>
+                                </a>
+                            </em>
                         </li>
                         <li>
                             <label title="For debugging only. Will impact performance when enabled">
                                 <input type="checkbox" id="logging">
-                                __MSG_optsLogging__
+                                <fbtr-i18n key="optsLogging"></fbtr-i18n>
                             </label>
                         </li>
                         <li>
                             <label>
-                                <button type="button" id="btnRefresh">__MSG_optsRefresh__</button>
+                                <button type="button" id="btnRefresh">
+                                    <fbtr-i18n key="optsRefresh"></fbtr-i18n>
+                                </button>
                             </label>
                         </li>
                     </ul>
                 </details>
             </li>
         </ul>
-        <button type="button" id="reset" class="addon-control">__MSG_optsDefaults__</button>
+        <button type="button" id="reset" class="addon-control">
+            <fbtr-i18n key="optsDefaults"></fbtr-i18n>
+        </button>
     </fieldset>
 
     <template id="btnReset">
@@ -121,6 +145,8 @@
     <script type="text/javascript" src="common.js"></script>
     <script type="text/javascript" src="util.js"></script>
     <script type="text/javascript" src="rules_sync.js"></script>
+    <script type="text/javascript" src="i18n.js"></script>
     <script type="text/javascript" src="options.js"></script>
 </body>
+
 </html>

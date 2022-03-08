@@ -31,7 +31,7 @@
         "message": "Inline videos on mobile <em>(Only affects mobile; May increase data usage)</em>"
     },
     "optsPixeled": {
-        "message": "Hide Sponsored articles <em>(Includes most \"Suggested Posts\")</em>"
+        "message": "Hide Sponsored articles"
     },
     "optsSuggest": {
         "message": "Hide inline suggestions <em>(eg: Suggested Posts, People You May Know)</em>"

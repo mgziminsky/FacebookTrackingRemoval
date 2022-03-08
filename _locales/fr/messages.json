@@ -31,7 +31,7 @@
         "message": "Vidéos en ligne sur mobile <em>(n'affecte que les mobiles; peut augmenter l'utilisation des données)</em>"
     },
     "optsPixeled": {
-        "message": "Masquer les articles sponsorisés <em>(comprend la plupart des \"publications suggérées\")</em>"
+        "message": "Masquer les articles sponsorisés"
     },
     "optsSuggest": {
         "message": "Masquer les suggestions en ligne <em>(par exemple: messages suggérés, personnes que vous connaissez peut-être)</em>"

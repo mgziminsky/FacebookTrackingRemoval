@@ -15,11 +15,10 @@
 
     Copyright (C) 2016-2021 Michael Ziminsky
 */
-/* global app, RATE_LIMIT, refreshRules */
+/* global app, RATE_LIMIT, refreshRules, getMessageSafe */
 
 'use strict';
 
-document.documentElement.innerHTML = document.documentElement.innerHTML.replace(/__MSG_(\w+)__/g, (_, key) => browser.i18n.getMessage(key));
 
 app.init().then(() => {
     // Expert Options
@@ -27,8 +26,14 @@ app.init().then(() => {
     const preview = document.getElementById("preview");
 
     // Set version text
-    document.title += ` - v${browser.runtime.getManifest().version}`;
-    document.getElementById("legend").textContent += ` - v${browser.runtime.getManifest().version}`;
+    document.title = `${getMessageSafe("optsTitle")} - v${browser.runtime.getManifest().version}`;
+    document.getElementById("legend").append(` - v${browser.runtime.getManifest().version}`);
+
+    {
+        const userRules = document.getElementById("userRules");
+        userRules.title = getMessageSafe("optsUserRulesHover");
+        userRules.placeholder = getMessageSafe("optsUserRulesPlaceholder");
+    }
 
     /** @param {Event} e */
     const handleCheckbox = e => { app.options[e.target.id] = e.target.checked; };

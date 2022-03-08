@@ -1,0 +1,28 @@
+{
+    "version": 1.1,
+    "tags": [
+        {
+            "name": "fbtr-i18n",
+            "description": "Renders translation string specified by `key` as html",
+            "attributes": [
+                {
+                    "name": "key"
+                }
+            ]
+        }
+    ],
+    "globalAttributes": [
+        {
+            "name": "data-i18n",
+            "description": "Translation key of which the value will be assigned to the attribute specified by [data-i18n-attr], or [title] if not specified"
+        },
+        {
+            "name": "data-i18n-attr",
+            "description": "Name of attribute that will be assigned the value of the translation specified in [data-i18n]"
+        },
+        {
+            "name": "data-i18n-vars",
+            "description": "Values of any variables needed by translation specified by [data-i18n]; Multiple values are separated by ||"
+        }
+    ]
+}
