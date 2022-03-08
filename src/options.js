@@ -161,7 +161,10 @@ app.init().then(() => {
         };
 
         btnRefreshTimer();
-        btnRefresh.addEventListener("click", e => refreshRules({ force: e.ctrlKey }).then(reloadTabs).then(btnRefreshTimer));
+        btnRefresh.addEventListener("click", e => {
+            btnRefresh.disabled = disabled = true;
+            refreshRules({ force: e.ctrlKey }).then(reloadTabs).then(btnRefreshTimer).catch(() => { });
+        });
 
         window.addEventListener("keydown", e => {
             if (!e.repeat && e.key === "Control") {
@@ -175,7 +178,6 @@ app.init().then(() => {
                 btnRefresh.disabled = disabled;
             }
         });
-
     }
 
 

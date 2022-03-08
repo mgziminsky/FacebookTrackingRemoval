@@ -108,7 +108,7 @@ async function refreshRules({ force = false, check = false } = {}) {
     const { lastRuleRefresh: lastRefresh } = await browser.storage.local.get("lastRuleRefresh");
 
     // Prevent abuse, max refresh once per 15 min
-    const timeout = force ? 0 : RATE_LIMIT - (Date.now() - Date.parse(lastRefresh));
+    const timeout = force || !lastRefresh ? 0 : RATE_LIMIT - (Date.now() - Date.parse(lastRefresh));
 
     if (check)
         return Promise.resolve(Math.max(0, timeout));
