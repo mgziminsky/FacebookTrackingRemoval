@@ -23,7 +23,7 @@
 // to get rid of old storage data that is no longer used
 browser.runtime.onInstalled.addListener(details => {
     // Not an update
-    if (!details.previousVersion)
+    if (!details.previousVersion || details.previousVersion === browser.runtime.getManifest().version)
         return;
 
     // Always force refresh rules after an update for simplicity
@@ -31,7 +31,9 @@ browser.runtime.onInstalled.addListener(details => {
     browser.storage.local.remove(["lastRuleRefresh", "hide_rules"])
         .finally(refreshRules.bind(undefined, { force: true }));
 
-    if (details.previousVersion <= "1.6.3")
+    const old = [1, 6, 3];
+    const prev = details.previousVersion.split(".").map(Number);
+    if (!details.temporary && prev.every((v, i) => v <= (old[i] ?? 0)))
         app.init().then(async () => {
             const currentOpts = await app.storage.get(Object.keys(app.defaults));
             app.storage.clear();
