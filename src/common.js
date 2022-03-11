@@ -113,9 +113,9 @@ const app = {};
         [RULES_KEY]: {
             value: Object.seal({
                 article_wrapper: "",
-                suggestions_smart: {},
-                content: {},
-                content_pending: {},
+                sponsored: {},
+                suggested: {},
+                pending: {},
             }),
             enumerable: true
         },
@@ -200,20 +200,18 @@ const app = {};
         const hr = app[RULES_KEY];
         ({
             [RULES_KEY]: {
-                suggestions_smart: {
-                    value: hr.suggestions_smart = hr.suggestions_smart
-                } = {},
-                content: {
-                    value: hr.content = hr.content
-                } = {},
-                content_pending: {
-                    value: hr.content_pending = hr.content_pending
-                } = {},
-                article_wrapper: {
-                    value: hr.article_wrapper = hr.article_wrapper
-                } = {},
+                article_wrapper: hr.article_wrapper = hr.article_wrapper,
+                sponsored: hr.sponsored = hr.sponsored,
+                suggested: hr.suggested = hr.suggested,
+                pending: hr.pending = hr.pending,
             } = {},
         } = await browser.storage.local.get(RULES_KEY));
+        for (const rule of Object.values(hr)) {
+            if (rule.patterns instanceof Array && rule.patterns.length)
+                rule.patterns = new RegExp(rule.patterns.join("|"), "iu");
+            else
+                delete rule.patterns;
+        }
         Object.freeze(hr);
     }
 
@@ -222,15 +220,9 @@ const app = {};
         let _patterns;
         ({
             [PARAMS_KEY]: {
-                params: {
-                    value: pc.params = pc.params
-                } = {},
-                prefix_patterns: {
-                    value: _patterns = ['$']
-                } = {},
-                values: {
-                    value: pc.values = pc.values
-                } = {},
+                params: pc.params = pc.params,
+                prefix_patterns: _patterns = ['$'],
+                values: pc.values = pc.values,
             } = {},
         } = await browser.storage.local.get(PARAMS_KEY));
         pc.pattern = new RegExp(`^(${_patterns.join('|')})`);
@@ -242,15 +234,9 @@ const app = {};
         let _selectors;
         ({
             [WHITELIST_KEY]: {
-                elements: {
-                    value: cw.elements = cw.elements
-                } = {},
-                roles: {
-                    value: cw.roles = cw.roles
-                } = {},
-                selectors: {
-                    value: _selectors = []
-                } = {},
+                elements: cw.elements = cw.elements,
+                roles: cw.roles = cw.roles,
+                selectors: _selectors = [],
             } = {},
         } = await browser.storage.local.get(WHITELIST_KEY));
         cw.selector = joinSelectors(_selectors.join("\n"));

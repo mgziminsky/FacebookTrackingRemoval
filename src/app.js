@@ -30,6 +30,9 @@ app.init().then(async () => {
         return;
 
     const _userRules = parseHideRules(app.options.userRules);
+    (_userRules.patterns.length
+        ? _userRules.patterns = new RegExp(_userRules.patterns.join("|"), "iu")
+        : delete _userRules.patterns);
 
     function applyStyle(elem) {
         elem.classList.add(app.styleClass);
@@ -56,6 +59,16 @@ app.init().then(async () => {
             target.remove();
             app.log("Removed " + label);
         }
+
+        app.log(() => {
+            const selector = app.hide_rules.article_wrapper;
+            for (const s of selector.split(",")) {
+                if (target.matches(s)) {
+                    return `>>> Hide matched for ${target.tagName}: ${selector} = ${s}`;
+                }
+            }
+        });
+
         return true;
     }
 
@@ -86,7 +99,7 @@ app.init().then(async () => {
         return video;
     }
 
-    /**** LINK TRACKING ****/
+    /* LINK TRACKING */
 
     // Desktop only
     function cleanShimLinks(node) {
@@ -266,36 +279,46 @@ app.init().then(async () => {
         return cleaned;
     }
 
-    /**** END LINK TRACKING ****/
+    /* END LINK TRACKING */
 
-    function removeArticles(node, rules, method = app.options.hideMethod) {
-        for (const [sel, texts] of Object.entries(rules)) {
-            for (const e of selectAllWithBase(node, sel)) {
-                const elementText = visibleText(e);
+    /**
+     * @param {Element} node
+     * @param {Object} rule
+     * @param {string} rule.selector
+     * @param {string[]} rule.texts
+     * @param {RegExp?} rule.patterns
+     * @param {string} [method=app.options.hideMethod]
+     */
+    function removeArticles(node, { selector, texts, patterns }, method = app.options.hideMethod) {
+        if (!selector)
+            return;
 
-                if ((texts.length === 0 || texts.includes(normalizeString(elementText))) && hide(e, elementText, method)) {
-                    app.log(() => {
-                        for (const s of sel.split(",")) {
-                            if (e.matches(s)) {
-                                return `>>> Rule matched for ${elementText}: ${sel} = ${s}`;
-                            }
+        for (const e of selectAllWithBase(node, selector)) {
+            const elementText = visibleText(e);
+            // Some sponsored have other details appended after a · (0xb7). Try matching both parts separately
+            const parts = elementText.split("\xb7").map(s => s.trim().toLowerCase());
+
+            if ((!(texts.length || patterns) || parts.some(p => texts.includes(p)) || parts.some(p => patterns?.test(p))) && hide(e, elementText, method)) {
+                app.log(() => {
+                    for (const s of selector.split(",")) {
+                        if (e.matches(s)) {
+                            return `>>> Rule matched for ${elementText}: ${selector} = ${s}`;
                         }
-                    });
-                }
+                    }
+                });
             }
         }
     }
 
-    const market = document.location.pathname.startsWith("/marketplace");
     function removeAll(target) {
         removeArticles(target, _userRules);
 
         if (app.options.delSuggest)
-            removeArticles(target, app.hide_rules.suggestions_smart);
+            removeArticles(target, app.hide_rules.suggested);
         if (app.options.delPixeled)
-            removeArticles(target, app.hide_rules.content, market ? "remove" : app.options.hideMethod);
+            removeArticles(target, app.hide_rules.sponsored, document.location.pathname.startsWith("/marketplace") ? "remove" : app.options.hideMethod);
         if (app.options.pendingRules)
-            removeArticles(target, app.hide_rules.content_pending);
+            removeArticles(target, app.hide_rules.pending);
 
         if (app.options.internalRefs)
             stripRefs(target);

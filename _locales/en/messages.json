@@ -64,7 +64,7 @@
         "message": "If you identify a new selector, please submit it in a PR"
     },
     "optsUserRulesPlaceholder": {
-        "message": "/* Syntax: css-selector[||innerText,..] */\na>span:only-of-type,.someClass||Sponsored\n.alwaysHideThis"
+        "message": "/* Syntax: css-selector[||innerText|/regex/,..] */\na>span:only-of-type,.someClass||Sponsored||/suggest(ed)?/\n.alwaysHideThis"
     },
     "optsPending": {
         "message": "Enable pending/unconfirmed hiding rules"

@@ -19,48 +19,34 @@
 
 'use strict';
 
-const STATIC_RULE_FILES = ["article_wrapper"];
-const DYN_RULE_FILES = ["content", "content_pending", "suggestions_smart"];
+const SELECTOR_RULE_FILES = ["article_wrapper"];
+const DYN_RULE_FILES = ["pending"];
+const SPLIT_RULE_DIRS = ["sponsored", "suggested"];
 const PARAM_CLEANING_FILES = ["params", "prefix_patterns", "values"];
 const CLICK_WHITELIST_FILES = ["elements", "roles", "selectors"];
 
-const DATE_HEADER = "last-modified";
-
 async function loadHideRules() {
     const { hide_rules: currentRules = {} } = await browser.storage.local.get("hide_rules");
-
     const newRules = {};
-    for (let file of STATIC_RULE_FILES) {
-        const resp = await fetchRule(`hide_rules/${file}`, currentRules[file]);
 
-        if (resp === null)
-            continue;
-
-        const value = await resp.text().then(joinSelectors);
-        if (!value)
-            continue;
-
-        newRules[file] = {
-            value,
-            [DATE_HEADER]: resp.headers.get(DATE_HEADER),
-        };
+    for (const file of SELECTOR_RULE_FILES) {
+        await fetchRule(`hide_rules/${file}`)
+            .then(joinSelectors)
+            .then(sel => newRules[file] = sel)
+            .catch(e => console.warn(`Failed to selectors file "${file}"`, e));
     }
 
-    for (let file of DYN_RULE_FILES) {
-        const resp = await fetchRule(`hide_rules/${file}`, currentRules[file]);
+    for (const file of DYN_RULE_FILES) {
+        await fetchRule(`hide_rules/${file}`)
+            .then(parseHideRules)
+            .then(rule => Object.assign(newRules[file] ??= {}, rule))
+            .catch(e => console.warn(`Failed to load legacy rules from "${file}"`, e));
+    }
 
-        if (resp === null)
-            continue;
-
-        const rules = parseHideRules(await resp.text());
-
-        if (Object.keys(rules).length == 0)
-            continue;
-
-        newRules[file] = {
-            value: rules,
-            [DATE_HEADER]: resp.headers.get(DATE_HEADER),
-        };
+    for (const dir of SPLIT_RULE_DIRS) {
+        await loadSplitRule(dir)
+            .then(rule => Object.assign(newRules[dir] ??= {}, rule))
+            .catch(e => console.warn(`Split rule "${dir}" failed to load`, e));
     }
 
     return Object.assign(currentRules, newRules);
@@ -71,35 +57,59 @@ async function loadArrayData(key, files) {
 
     const newRules = {};
     for (let file of files) {
-        const resp = await fetchRule(`${key}/${file}`, currentRules[file]);
-
-        if (resp === null)
-            continue;
-
-        newRules[file] = {
-            value: await resp.text().then(stripComments).then(splitLines),
-            [DATE_HEADER]: resp.headers.get(DATE_HEADER),
-        };
+        await fetchRule(`${key}/${file}`)
+            .then(stripComments)
+            .then(splitLines)
+            .then(data => newRules[file] = data)
+            .catch(e => console.warn(`Failed to load array data from "${key}/${file}"`, e));
     }
 
     return Object.assign(currentRules, newRules);
 }
 
-async function fetchRule(path, current) {
+async function loadSplitRule(dir) {
+    const rule = {};
+
+    rule.selector = await fetchRule(`hide_rules/${dir}/selectors`)
+        .then(joinSelectors)
+        .catch(e => console.warn(`Failed to load selectors for "${dir}"`, e));
+
+    // Selector required, fail if missing or empty
+    if (!rule.selector)
+        return Promise.reject("Selector missing or empty");
+
+    await fetchRule(`hide_rules/${dir}/texts`)
+        .then(stripComments)
+        .then(splitLines)
+        .then(a => a.map(s => s.toLowerCase()).sort())
+        .then(texts => rule.texts = texts)
+        .catch(e => console.warn(`Failed to load texts for "${dir}"`, e));
+
+    await fetchRule(`hide_rules/${dir}/patterns`)
+        .then(stripComments)
+        .then(splitLines)
+        .then(a => a.sort())
+        .then(patterns => rule.patterns = patterns)
+        .catch(e => console.warn(`Failed to load patterns for "${dir}"`, e));
+
+    return rule;
+}
+
+async function fetchRule(path) {
     const devMode = (await browser.management.getSelf()).installType === "development";
-
-    const resp = await fetch(`https://${devMode ? "localhost" : "mgziminsky.gitlab.io"}/FacebookTrackingRemoval/${path}`, { mode: 'cors' })
+    return fetch(`https://${devMode ? "localhost" : "mgziminsky.gitlab.io"}/FacebookTrackingRemoval/${path}`, { mode: 'cors' })
         .then(resp => resp.ok ? resp : Promise.reject())
-        .catch(_ => current
-            ? new Response(current, { status: 418 }) // keep saved value if present
-            : fetch(browser.runtime.getURL(`src/${path}`)) // Fallback to bundled copy as last resort, should never fail if file is present
-        )
-        .catch(err => new Response(err, { status: 500 })); // Final fallback in case of any other error
+        .catch(_ => fetch(browser.runtime.getURL(`src/${path}`))) // Fallback to bundled copy
+        .then(resp => resp.ok ? resp.text() : Promise.reject());
+}
 
-    if (!resp.ok)
-        return null; // No updates, or no file
-
-    return resp;
+/** @param {Function} func */
+async function _try(func, ...args) {
+    try {
+        return await func(...args);
+    } catch (error) {
+        console.warn(error);
+    }
 }
 
 /* exported refreshRules */
@@ -116,9 +126,9 @@ async function refreshRules({ force = false, check = false } = {}) {
         return Promise.reject(timeout);
 
     browser.storage.local.set({
-        hide_rules: await loadHideRules(),
-        param_cleaning: await loadArrayData("param_cleaning", PARAM_CLEANING_FILES),
-        click_whitelist: await loadArrayData("click_whitelist", CLICK_WHITELIST_FILES),
+        hide_rules: await _try(loadHideRules),
+        param_cleaning: await _try(loadArrayData, "param_cleaning", PARAM_CLEANING_FILES),
+        click_whitelist: await _try(loadArrayData, "click_whitelist", CLICK_WHITELIST_FILES),
         lastRuleRefresh: new Date().toUTCString(),
     }).then(() => RATE_LIMIT);
 }

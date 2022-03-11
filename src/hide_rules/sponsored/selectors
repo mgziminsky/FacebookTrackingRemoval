@@ -1,0 +1,7 @@
+._3nlk
+a[role=link]
+a>span:only-of-type
+div[role=button]
+div>a:first-child
+div>a[onmousedown]
+h3>*
