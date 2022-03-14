@@ -15,7 +15,7 @@
 
     Copyright (C) 2016-2021 Michael Ziminsky
 */
-/* global joinSelectors, parseHideRules, stripComments, splitLines */
+/* global joinSelectors, parseHideRules, stripComments, splitLines, RATE_LIMIT */
 
 'use strict';
 
@@ -25,7 +25,6 @@ const PARAM_CLEANING_FILES = ["params", "prefix_patterns", "values"];
 const CLICK_WHITELIST_FILES = ["elements", "roles", "selectors"];
 
 const DATE_HEADER = "last-modified";
-const RATE_LIMIT = (1000 * 60 * 15); // 15 min
 
 async function loadHideRules() {
     const { hide_rules: currentRules = {} } = await browser.storage.local.get("hide_rules");

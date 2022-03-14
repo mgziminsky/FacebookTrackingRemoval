@@ -23,7 +23,7 @@
 
 // Activates page action since show_matches isn't supported...
 if (app.isChrome)
-    browser.runtime.sendMessage({});
+    browser.runtime.sendMessage({ msg: "CSS", args: {} });
 
 app.init().then(async () => {
     if (!app.options.enabled)
@@ -397,6 +397,6 @@ app.init().then(async () => {
         }
     });
 
-    browser.runtime.sendMessage(app.options);
+    browser.runtime.sendMessage({ msg: "CSS", args: app.options });
 
 }).catch(console.warn);

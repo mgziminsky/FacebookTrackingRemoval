@@ -43,7 +43,7 @@ browser.runtime.onInstalled.addListener(details => {
         });
 });
 
-const refresh = () => refreshRules().catch(() => {/* Ignore timeout */});
+const refresh = () => refreshRules().catch(() => {/* Ignore timeout */ });
 refresh();
 setInterval(refresh, 1000 * 60 * 60 * 12); // refresh every 12 hours
 
@@ -116,7 +116,7 @@ app.init().then(() => {
             .catch(app.warn);
     }
 
-    browser.runtime.onMessage.addListener((msg, sender) => {
+    browser.runtime.onMessage.addListener(({ msg, args }, sender, sendResponse) => {
         if (msg === "OPTIONS") {
             browser.extension.getViews()
                 .filter(w => !optionsWindows.has(w) && (w.location.pathname === "/src/options.html"))
@@ -125,12 +125,16 @@ app.init().then(() => {
                     w.addEventListener("unload", () => onUnload(w));
                 });
         }
-        else if (msg === "RELOAD") {
-            reloadTabs();
-        } else {
-            updateCSS(`${sender.tab.id}#${sender.frameId || 0}`, msg);
+        else if (msg === "CSS") {
+            updateCSS(`${sender.tab.id}#${sender.frameId || 0}`, args);
             if (app.isChrome)
                 browser.pageAction.show(sender.tab.id);
+        }
+        else if (msg === "REFRESH") {
+            refreshRules(args)
+                .then(t => args.check ? t : (reloadTabs(), t)) // Reload tabs if this isn't just a check
+                .then(sendResponse, e => sendResponse(Promise.reject(e)));
+            return true; // Allow async response
         }
     });
 

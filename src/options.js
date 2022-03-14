@@ -137,9 +137,8 @@ app.init().then(() => {
 
     // Refresh button
     {
-        const reloadTabs = () => browser.runtime.sendMessage("RELOAD");
         const btnRefresh = document.getElementById("btnRefresh");
-        const btnText = btnRefresh.textContent;
+        const btnText = getMessageSafe("optsRefresh");
         btnRefresh.title = browser.i18n.getMessage("optsRefreshHover", [RATE_LIMIT / 1000 / 60]);
 
         let timer;
@@ -154,29 +153,33 @@ app.init().then(() => {
 
         const btnRefreshTimer = () => {
             resetBtn();
-            refreshRules({ check: true }).then(timeout => {
-                if (timeout <= 0)
-                    return;
+            browser.runtime.sendMessage({ msg: "REFRESH", args: { check: true } })
+                .then((timeout = 0) => {
+                    if (timeout <= 0)
+                        return;
 
-                let remaining = Math.ceil(timeout / 1000);
+                    let remaining = Math.ceil(timeout / 1000);
 
-                btnRefresh.disabled = disabled = true;
-                btnRefresh.textContent = `${btnText} - ${remaining--} seconds`;
+                    btnRefresh.disabled = disabled = true;
+                    btnRefresh.textContent = `${btnText} - ${remaining--} seconds`;
 
-                timer = setInterval(() => {
-                    if (remaining <= 0) {
-                        resetBtn();
-                    } else {
-                        btnRefresh.textContent = `${btnText} - ${remaining--} seconds`;
-                    }
-                }, 1000);
-            });
+                    timer = setInterval(() => {
+                        if (remaining <= 0) {
+                            resetBtn();
+                        } else {
+                            btnRefresh.textContent = `${btnText} - ${remaining--} seconds`;
+                        }
+                    }, 1000);
+                });
         };
 
         btnRefreshTimer();
         btnRefresh.addEventListener("click", e => {
             btnRefresh.disabled = disabled = true;
-            refreshRules({ force: e.ctrlKey }).then(reloadTabs).then(btnRefreshTimer).catch(() => { });
+            btnRefresh.classList.remove("ctrl");
+            browser.runtime.sendMessage({ msg: "REFRESH", args: { force: e.ctrlKey } })
+                .then(btnRefreshTimer)
+                .catch(() => { });
         });
 
         window.addEventListener("keydown", e => {
@@ -198,5 +201,5 @@ app.init().then(() => {
     browser.storage.onChanged.addListener(() => app.init().then(init));
 
     // Tell the background script a new options window was opened
-    browser.runtime.sendMessage("OPTIONS");
+    browser.runtime.sendMessage({ msg: "OPTIONS" });
 }, console.warn);

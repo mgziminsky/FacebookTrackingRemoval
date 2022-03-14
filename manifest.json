@@ -27,7 +27,8 @@
   ],
 
   "options_ui": {
-    "page": "src/options.html"
+    "page": "src/options.html",
+    "browser_style": false
   },
 
   "background": {
@@ -36,7 +37,7 @@
   },
 
   "page_action": {
-    "browser_style": true,
+    "browser_style": false,
     "default_icon": "src/icon.png",
     "default_popup": "src/options.html",
     "show_matches": [

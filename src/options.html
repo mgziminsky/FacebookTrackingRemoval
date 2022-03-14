@@ -62,14 +62,16 @@
             <li id="_hideMethod">
                 <btn-reset></btn-reset>
                 <fbtr-i18n key="optsHideMethod"></fbtr-i18n>
-                <label>
-                    <input type="radio" name="hideMethod" value="collapse">
-                    <fbtr-i18n key="optsCollapse"></fbtr-i18n>
-                </label>
-                <label>
-                    <input type="radio" name="hideMethod" value="remove">
-                    <fbtr-i18n key="optsRemove"></fbtr-i18n>
-                </label>
+                <span>
+                    <label>
+                        <input type="radio" name="hideMethod" value="collapse">
+                        <fbtr-i18n key="optsCollapse"></fbtr-i18n>
+                    </label>
+                    <label>
+                        <input type="radio" name="hideMethod" value="remove">
+                        <fbtr-i18n key="optsRemove"></fbtr-i18n>
+                    </label>
+                </span>
             </li>
             <li>
                 <btn-reset></btn-reset>
@@ -90,8 +92,8 @@
                                     <fbtr-i18n key="optsStyleLabel"></fbtr-i18n>
                                     <fbtr-i18n id="preview" key="optsStylePreview"></fbtr-i18n>
                                 </span>
-                                <div style="position: relative;">
-                                    <textarea id="modStyle" cols="50" rows="1" data-depends="useStyle"></textarea>
+                                <div style="position: relative; display: flex;">
+                                    <textarea id="modStyle" data-depends="useStyle" rows="1"></textarea>
                                     <btn-reset></btn-reset>
                                 </div>
                             </label>
@@ -99,7 +101,7 @@
                         <li>
                             <label class="flex-col">
                                 <fbtr-i18n key="optsUserRules"></fbtr-i18n>
-                                <textarea id="userRules" cols="50"></textarea>
+                                <textarea id="userRules" rows="3"></textarea>
                             </label>
                         </li>
                         <li>
@@ -123,9 +125,7 @@
                         </li>
                         <li>
                             <label>
-                                <button type="button" id="btnRefresh">
-                                    <fbtr-i18n key="optsRefresh"></fbtr-i18n>
-                                </button>
+                                <button type="button" id="btnRefresh"></button>
                             </label>
                         </li>
                     </ul>
@@ -140,7 +140,6 @@
     <script type="text/javascript" src="/browser-polyfill.min.js"></script>
     <script type="text/javascript" src="common.js"></script>
     <script type="text/javascript" src="util.js"></script>
-    <script type="text/javascript" src="rules_sync.js"></script>
     <script type="text/javascript" src="i18n.js"></script>
     <script type="text/javascript" src="options.js"></script>
 </body>

@@ -19,6 +19,8 @@
 
 'use strict';
 
+const RATE_LIMIT = (1000 * 60 * 15); // 15 min
+
 const app = {};
 
 (function() {

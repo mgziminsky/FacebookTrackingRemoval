@@ -1,3 +1,7 @@
+@import url(theme.css); /* Fallback for Chrome */
+@import url(chrome://global/skin/in-content/common.css); /* Actual theme in FF */
+
+
 :root {
     --reset-btn-size: 16px;
 }
@@ -17,6 +21,11 @@
     content: "Force ";
 }
 
+#_hideMethod > span {
+    display: flex;
+    gap: 1.5rem;
+}
+
 .hidden {
     display: none;
 }
@@ -24,6 +33,10 @@
 /* Make checkboxes visible from page action popup */
 input {
     display: initial !important;
+}
+
+input[type="radio"] {
+    margin-inline: initial;
 }
 
 body {
@@ -49,6 +62,7 @@ label {
 
 .flex-col {
     flex-direction: column;
+    flex-grow: 1;
     align-items: initial;
     row-gap: 5px;
 }
@@ -56,9 +70,9 @@ label {
 textarea {
     display: block;
     resize: vertical;
-    padding: .25rem;
     padding-right: calc(1.5 * var(--reset-btn-size));
     min-height: 2rem;
+    flex-grow: 1;
 }
 
 details {
@@ -74,7 +88,6 @@ details>summary {
     cursor: pointer;
 }
 
-/* Per-options buttons */
 btn-reset {
     position: absolute;
     cursor: pointer;
@@ -86,8 +99,14 @@ btn-reset:first-child {
 }
 
 btn-reset:last-child {
-    top: calc(.25 * var(--reset-btn-size));
-    right: calc(.25 * var(--reset-btn-size));
+    top: calc(.5 * var(--reset-btn-size));
+    right: calc(.5 * var(--reset-btn-size));
+}
+
+@media (prefers-color-scheme: dark) {
+    btn-reset {
+        filter: invert();
+    }
 }
 
 /* Timer */
