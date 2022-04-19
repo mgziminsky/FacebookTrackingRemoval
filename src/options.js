@@ -37,13 +37,13 @@ app.init().then(() => {
 
     /** @param {Event} e */
     const handleCheckbox = e => { app.options[e.target.id] = e.target.checked; };
-    for (let checkbox of document.querySelectorAll("input[type=checkbox]")) {
+    for (const checkbox of document.querySelectorAll("input[type=checkbox]")) {
         checkbox.addEventListener("change", handleCheckbox);
     }
 
     /** @param {Event} e */
     const handleRadio = e => { app.options[e.target.name] = e.target.value; };
-    for (let checkbox of document.querySelectorAll("input[type=radio]")) {
+    for (const checkbox of document.querySelectorAll("input[type=radio]")) {
         checkbox.addEventListener("change", handleRadio);
     }
 
@@ -56,7 +56,7 @@ app.init().then(() => {
             app.options[e.target.id] = e.target.value;
         }
     };
-    for (let text of document.querySelectorAll("input[type=text],textarea")) {
+    for (const text of document.querySelectorAll("input[type=text],textarea")) {
         text.addEventListener("change", handleText);
     }
 
@@ -72,7 +72,7 @@ app.init().then(() => {
 
     const init = () => {
         const opts = app.options;
-        for (let key in opts) {
+        for (const key in opts) {
             const value = opts[key];
             const item = document.getElementById(key);
             if (item) {
@@ -94,7 +94,7 @@ app.init().then(() => {
 
         preview.style.cssText = modStyle.value;
 
-        for (let elem of document.querySelectorAll("[data-depends]")) {
+        for (const elem of document.querySelectorAll("[data-depends]")) {
             const source = document.getElementById(elem.dataset.depends);
 
             if (!dependFuncs.has(elem))
@@ -104,7 +104,7 @@ app.init().then(() => {
             elem.disabled = !source.checked;
         }
 
-        for (let checkbox of document.querySelectorAll("input[data-toggle]")) {
+        for (const checkbox of document.querySelectorAll("input[data-toggle]")) {
             checkbox.addEventListener("change", handleToggle);
             handleToggle.call(undefined, { target: checkbox });
         }

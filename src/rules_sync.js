@@ -56,7 +56,7 @@ async function loadArrayData(key, files) {
     const { [key]: currentRules = {} } = await browser.storage.local.get(key);
 
     const newRules = {};
-    for (let file of files) {
+    for (const file of files) {
         await fetchRule(`${key}/${file}`)
             .then(stripComments)
             .then(splitLines)

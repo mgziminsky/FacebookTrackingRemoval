@@ -157,8 +157,8 @@ app.init().then(() => {
     }
 
     function* genBlockUrls(paths) {
-        for (let h of app.host_patterns)
-            for (let p of paths)
+        for (const h of app.host_patterns)
+            for (const p of paths)
                 yield h.replace(/\*$/, p);
     }
 

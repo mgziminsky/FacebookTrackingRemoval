@@ -1,3 +1,4 @@
+
 /*  This file is part of FacebookTrackingRemoval.
 
     FacebookTrackingRemoval is free software: you can redistribute it and/or modify
@@ -157,7 +158,7 @@ function selectAllWithBase(node, selector) {
     const nodeMatches = node.matches(selector);
 
     const childResults = [];
-    for (let c of node.querySelectorAll(selector)) {
+    for (const c of node.querySelectorAll(selector)) {
         if (!c.classList.contains(PROCESSED_CLASS))
             childResults.push(c);
     }
@@ -190,7 +191,7 @@ function parseHideRules(text) {
     const texts = new Set;
     const patterns = new Set;
 
-    for (let line of splitLines(stripComments(text))) {
+    for (const line of splitLines(stripComments(text))) {
         const [sel, ...filters] = line.split("||");
 
         sel.trim().replaceAll(/\s+/g, " ").split(",").forEach(selector.add.bind(selector));

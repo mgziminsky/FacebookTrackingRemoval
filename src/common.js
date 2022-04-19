@@ -151,7 +151,7 @@ const app = {};
 
                     if (inited) return;
 
-                    for (let key in opts) {
+                    for (const key in opts) {
                         Object.defineProperty(app.options, key, {
                             get: () => opts[key],
                             set: val => {
