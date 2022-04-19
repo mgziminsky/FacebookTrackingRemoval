@@ -162,7 +162,7 @@ function selectAllWithBase(node, selector) {
             childResults.push(c);
     }
 
-    const results = (function*() {
+    const results = (function* () {
         if (nodeMatches) yield node;
         yield* childResults;
     })();
@@ -210,6 +210,11 @@ function parseHideRules(text) {
     };
 }
 
+/** @param {string} str */
+function normalizeString(str) {
+    return Array.from(str.trim().toLowerCase()).sort().join("");
+}
+
 /** @param {HTMLElement} elem */
 function visibleText(elem) {
     let text = elem.dataset.content ?? "";
@@ -245,5 +250,5 @@ function rectsIntersect(a, b) {
         && a.right > b.left
         && a.bottom > b.top
         && a.left < b.right
-    ;
+        ;
 }

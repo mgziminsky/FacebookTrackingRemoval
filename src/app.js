@@ -285,7 +285,7 @@ app.init().then(async () => {
      * @param {Element} node
      * @param {Object} rule
      * @param {string} rule.selector
-     * @param {string[]} rule.texts
+     * @param {Map<string,string>} rule.texts
      * @param {RegExp?} rule.patterns
      * @param {string} [method=app.options.hideMethod]
      */
@@ -293,12 +293,27 @@ app.init().then(async () => {
         if (!selector)
             return;
 
+        const getMatch = text => {
+            if (texts.size === 0 && !patterns)
+                return text;
+
+            // Some sponsored have other details appended after a · (0xb7). Try matching both parts separately
+            const parts = text.split("\xb7").map(s => s.trim().toLowerCase());
+
+            if (patterns && parts.some(p => patterns.test(p)))
+                return text;
+
+            for (const p of parts) {
+                const x = texts.get(normalizeString(p));
+                if (x) return x;
+            }
+        };
+
         for (const e of selectAllWithBase(node, selector)) {
             const elementText = visibleText(e);
-            // Some sponsored have other details appended after a · (0xb7). Try matching both parts separately
-            const parts = elementText.split("\xb7").map(s => s.trim().toLowerCase());
 
-            if ((!(texts.length || patterns) || parts.some(p => texts.includes(p)) || parts.some(p => patterns?.test(p))) && hide(e, elementText, method)) {
+            const match = getMatch(elementText);
+            if (match && hide(e, match, method)) {
                 app.log(() => {
                     for (const s of selector.split(",")) {
                         if (e.matches(s)) {

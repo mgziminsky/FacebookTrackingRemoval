@@ -81,7 +81,7 @@ async function loadSplitRule(dir) {
     await fetchRule(`hide_rules/${dir}/texts`)
         .then(stripComments)
         .then(splitLines)
-        .then(a => a.map(s => s.toLowerCase()).sort())
+        .then(a => a.sort())
         .then(texts => rule.texts = texts)
         .catch(e => console.warn(`Failed to load texts for "${dir}"`, e));
 

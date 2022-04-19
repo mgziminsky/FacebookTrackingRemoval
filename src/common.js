@@ -15,7 +15,7 @@
 
     Copyright (C) 2016-2021 Michael Ziminsky
 */
-/* global joinSelectors */
+/* global joinSelectors, normalizeString */
 
 'use strict';
 
@@ -207,6 +207,9 @@ const app = {};
             } = {},
         } = await browser.storage.local.get(RULES_KEY));
         for (const rule of Object.values(hr)) {
+            if (rule.texts)
+                rule.texts = rule.texts.reduce((m, t) => m.set(normalizeString(t), t), new Map());
+
             if (rule.patterns instanceof Array && rule.patterns.length)
                 rule.patterns = new RegExp(rule.patterns.join("|"), "iu");
             else
