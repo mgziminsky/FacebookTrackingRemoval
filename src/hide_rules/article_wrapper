@@ -2,5 +2,6 @@ article
 div._55wo
 div.mbm
 div.pagelet
-div[data-pagelet='RightRail']>*>*
+div[data-pagelet='RightRail']>*>*    /* Sidebar - old */
+#ssrb_rhc_start+div>*>*              /* Sidebar - new */
 div[role=article]
