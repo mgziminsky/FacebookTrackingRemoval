@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with FacebookTrackingRemoval.  If not, see <http://www.gnu.org/licenses/>.
 
-    Copyright (C) 2016-2021 Michael Ziminsky
+    Copyright (C) 2016-2022 Michael Ziminsky
 */
 /* global app */
 

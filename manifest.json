@@ -1,6 +1,6 @@
 {
   "name": "__MSG_extensionName__",
-  "version": "1.9.3",
+  "version": "1.10.0.1",
   "description": "__MSG_extensionDescription__",
   "default_locale": "en",
   "icons": { "128": "src/icon.png" },
@@ -59,12 +59,6 @@
       "js": ["browser-polyfill.min.js", "src/util.js", "src/common.js", "src/app.js"],
       "run_at": "document_end"
     }
-  ],
-
-  "web_accessible_resources": [
-    "src/hide_rules/*",
-    "src/click_whitelist/*",
-    "src/param_cleaning/*"
   ],
 
   "incognito": "spanning",
