@@ -5,7 +5,7 @@ div.pagelet
 div[data-pagelet='RightRail']>*>*    /* Sidebar - old */
 #ssrb_rhc_start+div>*>*              /* Sidebar - new */
 div[role=article]
-div.a6y00v3l      /* Marketplace Sponsored Label */
-div.l9j0dhe7>span /* Marketplace Sidebar */
-div.ph5uu5jm      /* Marketplace Sponsored */
-div.tr9rh885      /* User page top suggestions */
+div.tr9rh885             /* Suggestions at top of user page */
+div.a6y00v3l             /* Marketplace Sponsored Label */
+div.buofh1pr>div+span    /* Marketplace Sidebar */
+div[style].n1dktuyu      /* Marketplace Sponsored */

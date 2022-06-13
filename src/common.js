@@ -143,8 +143,8 @@ const app = {};
                     Object.assign(opts, o);
 
                     if (opts.logging) {
-                        app.log = arg => console.log(typeof(arg) === "function" ? arg() : arg);
-                        app.warn = arg => console.warn(typeof(arg) === "function" ? arg() : arg);
+                        app.log = log_to.bind(console, console.log);
+                        app.warn = log_to.bind(console, console.warn);
                     } else {
                         app.log = app.warn = () => {};
                     }
@@ -194,6 +194,16 @@ const app = {};
         }
     });
     Object.seal(app);
+
+    function log_to(logger, arg) {
+        if (typeof(arg) === "function") {
+            const res = arg();
+            if (res)
+                logger(res);
+        } else {
+            logger(arg);
+        }
+    }
 
     // This weird destructuring in the load* functions is doing assignment into a different variable
     async function loadHideRules() {

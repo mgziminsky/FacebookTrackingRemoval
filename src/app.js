@@ -40,12 +40,25 @@ app.init().then(async () => {
 
     function hide(elem, label, method) {
         let target;
-        if (!elem || !(target = elem.closest(app.hide_rules.article_wrapper)))
-            return false;
+        if (!elem || !(target = elem.closest(app.hide_rules.article_wrapper))) {
+            app.log(`Unable to hide ${label} - ${elem}`);
+            return;
+        }
+
+        app.log(() => {
+            const selector = app.hide_rules.article_wrapper;
+            for (const s of selector.split(",")) {
+                if (target.matches(s)) {
+                    return `>>> Hide matched wrapper for ${target.tagName}: ${selector} = ${s}`;
+                }
+            }
+        });
 
         if (method === "collapse") {
-            if (target.closest(".fbtrCollapsible"))
-                return false;
+            if (target.closest(".fbtrCollapsible")){
+                app.log(`${label} already collapsed`);
+                return;
+            }
 
             const wrapper = buildCollapsible(label);
             applyStyle(wrapper);
@@ -56,20 +69,9 @@ app.init().then(async () => {
             wrapper.appendChild(target);
             app.log("Collapsed " + label);
         } else {
-            target.remove();
+            (target.closest(":not(:only-child)") || target).remove();
             app.log("Removed " + label);
         }
-
-        app.log(() => {
-            const selector = app.hide_rules.article_wrapper;
-            for (const s of selector.split(",")) {
-                if (target.matches(s)) {
-                    return `>>> Hide matched for ${target.tagName}: ${selector} = ${s}`;
-                }
-            }
-        });
-
-        return true;
     }
 
     const supportedProtos = ["http:", "https:", "ftp:"];
@@ -313,7 +315,7 @@ app.init().then(async () => {
             const elementText = visibleText(e);
 
             const match = getMatch(elementText);
-            if (match && hide(e, match, method)) {
+            if (match) {
                 app.log(() => {
                     for (const s of selector.split(",")) {
                         if (e.matches(s)) {
@@ -321,6 +323,7 @@ app.init().then(async () => {
                         }
                     }
                 });
+                hide(e, match, method);
             }
         }
     }
