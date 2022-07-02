@@ -1,3 +1,6 @@
+v1.10.1
+- Fix feed breaking when "Hide method" set to "Remove"
+
 v1.10.0.1
 - Remove marketplace sponsored
 - Themed options

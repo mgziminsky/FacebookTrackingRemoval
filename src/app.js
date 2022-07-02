@@ -69,7 +69,8 @@ app.init().then(async () => {
             wrapper.appendChild(target);
             app.log("Collapsed " + label);
         } else {
-            (target.closest(":not(:only-child)") || target).remove();
+             // Removing breaks things :/ Consider using class instead of inline style?
+            (target.closest(":not(:only-child)") || target).style = "display: none !important";
             app.log("Removed " + label);
         }
     }
