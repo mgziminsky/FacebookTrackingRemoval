@@ -1,3 +1,6 @@
+v1.10.2
+- Fix custom user rules under advanced options
+
 v1.10.1
 - Fix feed breaking when "Hide method" set to "Remove"
 

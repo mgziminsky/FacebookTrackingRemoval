@@ -200,7 +200,7 @@ function parseHideRules(text) {
             if (/^\/.*[^\\](?:\\\\)*\/$/.test(val))
                 patterns.add(val.substring(1, val.length - 1));
             else
-                texts.add(val.toLowerCase());
+                texts.add(val);
         }
     }
 
@@ -209,6 +209,29 @@ function parseHideRules(text) {
         texts: Array.from(texts).sort(),
         patterns: Array.from(patterns).sort(),
     };
+}
+
+/**
+ * Converts the texts and patterns of a rule to final format
+ * @param {Object} rule
+ * @param {string[]?} rule.texts
+ * @param {string[]?} rule.patterns
+ *
+ * @typedef {object} rule
+ * @prop {Map<string, string>?} rule.texts
+ * @prop {RegExp?} rule.patterns
+ * @returns {rule} rule
+ */
+function initHideRule(rule) {
+    if (rule.texts)
+        rule.texts = rule.texts.reduce((m, t) => m.set(normalizeString(t), t), new Map());
+
+    if (rule.patterns instanceof Array && rule.patterns.length)
+        rule.patterns = new RegExp(rule.patterns.join("|"), "iu");
+    else
+        delete rule.patterns;
+
+    return rule;
 }
 
 /** @param {string} str */

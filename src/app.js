@@ -29,10 +29,7 @@ app.init().then(async () => {
     if (!app.options.enabled)
         return;
 
-    const _userRules = parseHideRules(app.options.userRules);
-    (_userRules.patterns.length
-        ? _userRules.patterns = new RegExp(_userRules.patterns.join("|"), "iu")
-        : delete _userRules.patterns);
+    const _userRules = initHideRule(parseHideRules(app.options.userRules));
 
     function applyStyle(elem) {
         elem.classList.add(app.styleClass);
