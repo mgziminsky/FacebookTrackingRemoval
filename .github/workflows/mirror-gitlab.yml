@@ -9,7 +9,7 @@
 # the `language` matrix defined below to confirm you have the correct set of
 # supported CodeQL languages.
 #
-name: "Mirror to Gitlab"
+name: Mirror to Gitlab
 
 on:
   workflow_dispatch:
@@ -30,8 +30,10 @@ jobs:
           fetch-depth: 0
 
       - name: Setup SSH
+        env:
+          GITLAB_PUSH_KEY: ${{ secrets.GITLAB_PUSH_KEY }}
         run: |
-          mkdir ~/.ssh/
+          mkdir -p ~/.ssh/
           chmod 700 ~/.ssh/
           echo "$GITLAB_PUSH_KEY" > ~/.ssh/push_key
           chmod 400 ~/.ssh/push_key
@@ -39,4 +41,4 @@ jobs:
       - name: Push to Gitlab
         env:
           GIT_SSH_COMMAND: ssh -v -i ~/.ssh/push_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=no
-        run: git push --force --tags --prune git@gitlab.com:mgziminsky/FacebookTrackingRemoval.git
+        run: git push --force --all --prune git@gitlab.com:mgziminsky/FacebookTrackingRemoval.git
