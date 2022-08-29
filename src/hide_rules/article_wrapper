@@ -6,8 +6,8 @@ div[data-pagelet='RightRail']>*>*    /* Sidebar - old */
 #ssrb_rhc_start+div>*>*              /* Sidebar - new */
 div[role=article]
 div.tr9rh885             /* Suggestions at top of user page */
-div.a6y00v3l             /* Marketplace Sponsored Label */
-div.buofh1pr>div+span    /* Marketplace Sidebar */
-div[style].n1dktuyu      /* Marketplace Sponsored */
+div.m1vx35lq             /* Marketplace Sponsored Label */
+div.cqf1kptm>div+span    /* Marketplace Sidebar */
+div[style].r0bj8g6i      /* Marketplace Sponsored */
 div._6x84                /* Watch Sponsored */
 div.dzwucfd1             /* Page banner suggestions */
