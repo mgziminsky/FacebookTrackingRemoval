@@ -1,3 +1,6 @@
+v1.10.3
+- Fix mention completion popup - closes #62
+
 v1.10.2
 - Fix custom user rules under advanced options
 

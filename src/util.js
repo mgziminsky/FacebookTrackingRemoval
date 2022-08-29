@@ -48,12 +48,10 @@ function isAllowedTarget(e) {
  * @param {Event} e
 */
 function restrictEventPropagation(e) {
-    if (!isAllowedTarget(e)) {
-        e.stopImmediatePropagation();
-        e.stopPropagation();
-        app.log(`Stopped propagation of ${e.type} from ${e.target}`);
-    } else {
+    if (isAllowedTarget(e)) {
         app.log(`Allowed propagation of ${e.type} from ${e.target} to ${e.currentTarget}`);
+    } else {
+        stopPropagation(e);
     }
 }
 
@@ -68,7 +66,7 @@ function stopPropagation(e) {
 function applyEventBlockers(target) {
     target.addEventListener("mousedown", restrictEventPropagation, true);
     target.addEventListener("focusin", stopPropagation, true);
-    target.addEventListener("focus", stopPropagation, true);
+    target.addEventListener("focus", restrictEventPropagation, true);
     target.addEventListener("click", restrictEventPropagation, true);
     target.addEventListener("mouseup", restrictEventPropagation, true);
     target.addEventListener("focusout", stopPropagation, true);
