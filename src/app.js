@@ -310,7 +310,7 @@ app.init().then(async () => {
         };
 
         for (const e of selectAllWithBase(node, selector)) {
-            const elementText = visibleText(e);
+            const elementText = ariaText(e) || useText(e) || visibleText(e);
 
             const match = getMatch(elementText);
             if (match) {

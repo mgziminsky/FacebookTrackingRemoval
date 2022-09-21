@@ -1,3 +1,6 @@
+v1.10.4
+- Fix ad detection. Handle svg/aria trickery.
+
 v1.10.3
 - Fix mention completion popup - closes #62
 

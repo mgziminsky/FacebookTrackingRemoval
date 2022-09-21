@@ -238,6 +238,24 @@ function normalizeString(str) {
 }
 
 /** @param {HTMLElement} elem */
+function ariaText(elem) {
+    const labels = elem.getAttribute('aria-labelledby')?.split(' ')
+        .map(id => document.getElementById(id))
+        .filter(e => e);
+
+    const text = [...new Set(labels || [])].map(e => e.textContent).join(' ');
+    return text ? text : elem.getAttribute('aria-label');
+}
+
+/** @param {SVGUseElement} elem */
+function useText(elem) {
+    if (elem.tagName.toUpperCase() != 'USE')
+        return;
+
+    return document.querySelector(elem.href.baseVal)?.textContent;
+}
+
+/** @param {HTMLElement} elem */
 function visibleText(elem) {
     let text = elem.dataset.content ?? "";
     const bounds = elem.getBoundingClientRect();
