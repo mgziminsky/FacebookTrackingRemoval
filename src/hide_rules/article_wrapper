@@ -4,6 +4,7 @@ div.mbm
 div.pagelet
 div[data-pagelet='RightRail']>*>*    /* Sidebar - old */
 #ssrb_rhc_start+div>*>*              /* Sidebar - new */
+div[role="complementary"] div>span:only-child>div:only-child>div:only-child     /* Sidebar - newer */
 div[role=article]
 div[aria-posinset]       /* Feed article */
 div.tr9rh885             /* Suggestions at top of user page */
