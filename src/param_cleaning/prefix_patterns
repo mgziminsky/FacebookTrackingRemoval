@@ -1,4 +1,7 @@
+__
 ((\w*_)?source|hc)(\b|_)
 ft\[
-__
+pn_
+ref_
 referral
+zero_
