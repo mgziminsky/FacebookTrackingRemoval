@@ -24,6 +24,10 @@ For videos on mobile, all Facebook™ event-listeners and custom controls are re
 ## Explanation of permissions:
 - Access to facebook.com, messenger.com, and facebookcorewwwi.onion is needed for main functionality, in order to work on those pages.
 - Access to mgziminsky.gitlab.io, more specifically https://mgziminsky.gitlab.io/FacebookTrackingRemoval/*, is used to download blocking rules only
+- `webNavigation`: Needed to handle cleaning FB interactions that use the browser history API instead of doing a normal page navigation
+  - Firefox: "Access browser activity during navigation"
+  - Chrome: "Read your browsing history"
+    - This is misleading. See [here](https://github.com/mgziminsky/FacebookTrackingRemoval/issues/67#issuecomment-1346953059)
 
 ## Privacy Policy
 I don't, and never will, collect or send any data to myself or any third parties
