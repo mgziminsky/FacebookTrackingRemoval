@@ -22,7 +22,7 @@ For links, the event listeners on the link and its parents are removed and/or di
 For videos on mobile, all Facebook™ event-listeners and custom controls are removed, and the video is simplified into just the bare HTML5 video tag.
 
 ## Explanation of permissions:
-- Access to facebook.com, messenger.com, and facebookcorewwwi.onion is needed for main functionality, in order to work on those pages.
+- Access to facebook.com, messenger.com, and facebookwkhpilnemxj7asaniu7vnjjbiltxjqhye3mhbshg7kx5tfyd.onion is needed for main functionality, in order to work on those pages.
 - Access to mgziminsky.gitlab.io, more specifically https://mgziminsky.gitlab.io/FacebookTrackingRemoval/*, is used to download blocking rules only
 - `webNavigation`: Needed to handle cleaning FB interactions that use the browser history API instead of doing a normal page navigation
   - Firefox: "Access browser activity during navigation"
