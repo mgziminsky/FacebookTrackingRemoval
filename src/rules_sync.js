@@ -99,7 +99,7 @@ async function fetchRule(path) {
     const devMode = (await browser.management.getSelf()).installType === "development";
     return fetch(`https://${devMode ? "localhost" : "mgziminsky.gitlab.io"}/FacebookTrackingRemoval/${path}`, { mode: 'cors' })
         .then(resp => resp.ok ? resp : Promise.reject())
-        .catch(_ => fetch(browser.runtime.getURL(`src/${path}`))) // Fallback to bundled copy
+        .catch(_ => fetch(browser.runtime.getURL(`data/${path}`))) // Fallback to bundled copy
         .then(resp => resp.ok ? resp.text() : Promise.reject());
 }
 

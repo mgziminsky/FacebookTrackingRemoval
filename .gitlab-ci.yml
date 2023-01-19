@@ -4,7 +4,7 @@ pages:
   stage: deploy
   script:
   - mkdir .public
-  - cp -a src/hide_rules src/param_cleaning src/click_whitelist .public/
+  - cp -a data/* .public/
   - mv .public public
   artifacts:
     paths:
