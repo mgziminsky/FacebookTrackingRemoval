@@ -16,8 +16,8 @@
     Copyright (C) 2016-2022 Michael Ziminsky
 */
 
-import { RATE_LIMIT } from "./consts.js";
-import { joinSelectors, parseHideRules, splitLines, stripComments } from "./util.js";
+import { RATE_LIMIT } from "../consts.js";
+import { joinSelectors, parseHideRules, splitLines, stripComments } from "../util.js";
 
 
 const SELECTOR_RULE_FILES = ["article_wrapper"];

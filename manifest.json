@@ -28,7 +28,7 @@
   ],
 
   "options_ui": {
-    "page": "src/options.html",
+    "page": "src/options/options.html",
     "browser_style": false
   },
 
@@ -40,7 +40,7 @@
   "page_action": {
     "browser_style": false,
     "default_icon": "src/icon.png",
-    "default_popup": "src/options.html",
+    "default_popup": "src/options/options.html",
     "show_matches": [
       "*://*.facebook.com/*",
       "*://*.messenger.com/*",
@@ -56,7 +56,7 @@
         "*://*.messenger.com/*",
         "*://*.facebookwkhpilnemxj7asaniu7vnjjbiltxjqhye3mhbshg7kx5tfyd.onion/*"
       ],
-      "css": ["src/app.css"],
+      "css": ["src/content_script/app.css"],
       "js": ["browser-polyfill.min.js", "src/content_script/content_script.js"],
       "run_at": "document_end"
     }
