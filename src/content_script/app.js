@@ -16,10 +16,10 @@
     Copyright (C) 2016-2022 Michael Ziminsky
 */
 
-import { log } from "./common.js";
-import { domains, hide_rules, initHideRule, options } from "./config.js";
-import { PROCESSED_CLASS, STYLE_CLASS } from "./consts.js";
-import * as util from "./util.js";
+import { log } from "../common.js";
+import { domains, hide_rules, initHideRule, options } from "../config.js";
+import { PROCESSED_CLASS, STYLE_CLASS } from "../consts.js";
+import * as util from "../util.js";
 
 
 const _userRules = initHideRule(util.parseHideRules(options.userRules));

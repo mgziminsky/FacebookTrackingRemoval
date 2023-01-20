@@ -16,11 +16,11 @@
     Copyright (C) 2016-2022 Michael Ziminsky
 */
 
-import { isChrome, log, warn } from "./common.js";
-import * as config from "./config.js";
-import { STYLE_CLASS } from "./consts.js";
+import { isChrome, log, warn } from "../common.js";
+import * as config from "../config.js";
+import { STYLE_CLASS } from "../consts.js";
 import refreshRules from "./rules_sync.js";
-import { cleanLinkParams } from "./util.js";
+import { cleanLinkParams } from "../util.js";
 
 
 // Do some cleanup after updating to 1.6.4+ for the first time

@@ -16,9 +16,9 @@
     Copyright (C) 2016-2022 Michael Ziminsky
 */
 
-import * as config from "./config.js";
-import { NOOP, RATE_LIMIT } from "./consts.js";
-import getMessageSafe from "./i18n.js";
+import * as config from "../config.js";
+import { NOOP, RATE_LIMIT } from "../consts.js";
+import getMessageSafe from "../i18n.js";
 
 
 /** @type {Options} */
@@ -198,7 +198,6 @@ function init() {
 
     const opts = config.options;
     for (const key in opts) {
-
         const value = opts[key];
         const item = document.getElementById(key);
         if (item) {
