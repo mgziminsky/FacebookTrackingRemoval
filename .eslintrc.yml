@@ -5,7 +5,7 @@ env:
   webextensions: true
 parserOptions:
   ecmaVersion: latest
-  sourceType: script
+  sourceType: module
 rules:
   no-prototype-builtins: off
   no-unused-vars:

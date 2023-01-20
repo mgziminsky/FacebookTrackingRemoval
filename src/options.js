@@ -15,191 +15,224 @@
 
     Copyright (C) 2016-2022 Michael Ziminsky
 */
-/* global app, RATE_LIMIT, refreshRules, getMessageSafe */
 
-'use strict';
+import * as config from "./config.js";
+import { NOOP, RATE_LIMIT } from "./consts.js";
+import getMessageSafe from "./i18n.js";
 
 
-app.init().then(() => {
-    // Expert Options
-    const modStyle = document.getElementById("modStyle");
-    const preview = document.getElementById("preview");
-
-    // Set version text
-    document.title = `${getMessageSafe("optsTitle")} - v${browser.runtime.getManifest().version}`;
-    document.getElementById("legend").append(` - v${browser.runtime.getManifest().version}`);
-
-    {
-        const userRules = document.getElementById("userRules");
-        userRules.title = getMessageSafe("optsUserRulesHover");
-        userRules.placeholder = getMessageSafe("optsUserRulesPlaceholder");
-    }
-
-    /** @param {Event} e */
-    const handleCheckbox = e => { app.options[e.target.id] = e.target.checked; };
-    for (const checkbox of document.querySelectorAll("input[type=checkbox]")) {
-        checkbox.addEventListener("change", handleCheckbox);
-    }
-
-    /** @param {Event} e */
-    const handleRadio = e => { app.options[e.target.name] = e.target.value; };
-    for (const checkbox of document.querySelectorAll("input[type=radio]")) {
-        checkbox.addEventListener("change", handleRadio);
-    }
-
-    /** @param {Event} e */
-    const handleText = e => {
-        e.target.value = e.target.value.trim();
-        if (!e.target.value) {
-            app.options.reset(e.target.id);
+/** @type {Options} */
+const changes = new Proxy({}, {
+    set(obj, key, val) {
+        if (config.options[key] == val) {
+            delete obj[key];
         } else {
-            app.options[e.target.id] = e.target.value;
+            obj[key] = val;
         }
-    };
-    for (const text of document.querySelectorAll("input[type=text],textarea")) {
-        text.addEventListener("change", handleText);
+        return true;
+    }
+});
+window.addEventListener("unload", () => {
+    if (Object.keys(changes).length)
+        Object.assign(config.options, changes);
+});
+
+
+// Expert Options
+const modStyle = document.getElementById("modStyle");
+const preview = document.getElementById("preview");
+
+// Set version text
+document.title = `${getMessageSafe("optsTitle")} - v${browser.runtime.getManifest().version}`;
+document.getElementById("legend").append(` - v${browser.runtime.getManifest().version}`);
+
+{
+    const userRules = document.getElementById("userRules");
+    userRules.title = getMessageSafe("optsUserRulesHover");
+    userRules.placeholder = getMessageSafe("optsUserRulesPlaceholder");
+}
+
+/** @param {Event} e */
+function handleCheckbox(e) { changes[e.target.id] = e.target.checked; }
+for (const checkbox of document.querySelectorAll("input[type=checkbox]")) {
+    checkbox.addEventListener("change", handleCheckbox);
+}
+
+/** @param {Event} e */
+function handleRadio(e) { changes[e.target.name] = e.target.value; }
+for (const checkbox of document.querySelectorAll("input[type=radio]")) {
+    checkbox.addEventListener("change", handleRadio);
+}
+
+/** @param {Event} e */
+function handleText(e) {
+    e.target.value = e.target.value.trim();
+    if (!e.target.value) {
+        delete changes[e.target.id];
+    } else {
+        changes[e.target.id] = e.target.value;
+    }
+}
+for (const text of document.querySelectorAll("input[type=text],textarea")) {
+    text.addEventListener("change", handleText);
+}
+
+document.getElementById("reset").addEventListener("click", _ => config.reset().then(() => document.body.classList.add("resetDone")));
+
+modStyle.addEventListener("input", e => preview.style.cssText = e.target.value);
+
+/** @param {Event} e */
+function handleToggle(e) { document.getElementById(e.target.dataset.toggle).classList.toggle("hidden", !e.target.checked); }
+
+/**
+ * @param {Element} elem
+ * @param {string} name
+ * @param {*} value
+ */
+function findRadio(elem, name, value) { return elem.querySelector("input[name=" + name + "][value=" + value + "]"); }
+
+// Per-option reset functionality
+window.customElements.define('btn-reset', class extends HTMLElement {
+    constructor() {
+        super();
+        const img = this.attachShadow({ mode: "open" }).appendChild(document.createElement("img"));
+        img.src = "reset.svg";
+        img.alt = getMessageSafe("optsResetAlt");
+        img.title = getMessageSafe("optsResetTitle");
+        this.addEventListener("click", this.reset.bind(this));
     }
 
-    document.getElementById("reset").addEventListener("click", _ => app.options.reset().then(() => document.body.classList.add("resetDone")));
-
-    modStyle.addEventListener("input", e => preview.style.cssText = e.target.value);
-
-    /** @param {Event} e */
-    const handleToggle = e => { document.getElementById(e.target.dataset.toggle).classList.toggle("hidden", !e.target.checked); };
-
-    // Avoid duplicated event listeners
-    const dependFuncs = new Map();
-
-    const init = () => {
-        const opts = app.options;
-        for (const key in opts) {
-            const value = opts[key];
-            const item = document.getElementById(key);
-            if (item) {
-                if (item.type === "checkbox") {
-                    item.checked = value;
-                } else if (item.type === "text" || item.tagName === "TEXTAREA") {
-                    if (!item.placeholder)
-                        item.placeholder = app.defaults[key];
-                    item.value = value;
-                } else {
-                    item.value = value;
-                }
-            } else {
-                const radio = document.querySelector("input[name=" + key + "][value=" + value + "]");
-                if (radio)
-                    radio.checked = true;
-            }
+    /** @param {MouseEvent} e */
+    reset(e) {
+        e?.preventDefault();
+        const option = this.parentNode.querySelector("input[id],textarea[id],input[name]");
+        const key = option.id || option.name;
+        changes[key] = null;
+        switch (option.type) {
+            case "radio":
+                findRadio(this.parentNode, key, config.defaults[key]).checked = true;
+                break;
+            case "checkbox":
+                option.checked = config.defaults[key];
+                break;
+            default:
+                option.value = config.defaults[key];
+                break;
         }
+        this.parentNode.classList.add("resetDone");
+    }
+});
+document.body.addEventListener("animationend", e => e.target.classList.remove("resetDone"));
 
-        preview.style.cssText = modStyle.value;
 
-        for (const elem of document.querySelectorAll("[data-depends]")) {
-            const source = document.getElementById(elem.dataset.depends);
+// Refresh button
+{
+    const btnRefresh = document.getElementById("btnRefresh");
+    const btnText = getMessageSafe("optsRefresh");
+    btnRefresh.title = browser.i18n.getMessage("optsRefreshHover", [RATE_LIMIT / 1000 / 60]);
 
-            if (!dependFuncs.has(elem))
-                dependFuncs.set(elem, () => elem.disabled = !source.checked);
+    let timer;
+    let disabled = false;
 
-            source.addEventListener("change", dependFuncs.get(elem));
-            elem.disabled = !source.checked;
-        }
-
-        for (const checkbox of document.querySelectorAll("input[data-toggle]")) {
-            checkbox.addEventListener("change", handleToggle);
-            handleToggle.call(undefined, { target: checkbox });
-        }
+    const resetBtn = () => {
+        clearInterval(timer);
+        timer = null;
+        btnRefresh.textContent = btnText;
+        btnRefresh.disabled = disabled = false;
     };
-    init();
 
-    // Per-option reset functionality
-    window.customElements.define('btn-reset', class extends HTMLElement {
-        constructor() {
-            super();
-            const img = this.attachShadow({ mode: "open" }).appendChild(document.createElement("img"));
-            img.src = "reset.svg";
-            img.alt = getMessageSafe("optsResetAlt");
-            img.title = getMessageSafe("optsResetTitle");
-            this.addEventListener("click", this.reset.bind(this));
-        }
+    const btnRefreshTimer = () => {
+        resetBtn();
+        browser.runtime.sendMessage({ msg: "REFRESH", args: { check: true } })
+            .then((timeout = 0) => {
+                if (timeout <= 0)
+                    return;
 
-        /** @param {MouseEvent} e */
-        reset(e) {
-            e?.preventDefault();
-            const option = this.parentNode.querySelector("input[id],textarea[id],input[name]");
-            app.options
-                .reset(option.id || option.name)
-                .then(() => this.parentNode.classList.add("resetDone"));
-        }
+                let remaining = Math.ceil(timeout / 1000);
+
+                btnRefresh.disabled = disabled = true;
+                btnRefresh.textContent = `${btnText} - ${remaining--} seconds`;
+
+                timer = setInterval(() => {
+                    if (remaining <= 0) {
+                        resetBtn();
+                    } else {
+                        btnRefresh.textContent = `${btnText} - ${remaining--} seconds`;
+                    }
+                }, 1000);
+            });
+    };
+
+    btnRefreshTimer();
+    btnRefresh.addEventListener("click", e => {
+        btnRefresh.disabled = disabled = true;
+        btnRefresh.classList.remove("ctrl");
+        browser.runtime.sendMessage({ msg: "REFRESH", args: { force: e.ctrlKey } })
+            .then(btnRefreshTimer)
+            .catch(NOOP);
     });
 
-    document.body.addEventListener("animationend", e => e.target.classList.remove("resetDone"));
-
-
-    // Refresh button
-    {
-        const btnRefresh = document.getElementById("btnRefresh");
-        const btnText = getMessageSafe("optsRefresh");
-        btnRefresh.title = browser.i18n.getMessage("optsRefreshHover", [RATE_LIMIT / 1000 / 60]);
-
-        let timer;
-        let disabled = false;
-
-        const resetBtn = () => {
-            clearInterval(timer);
-            timer = null;
-            btnRefresh.textContent = btnText;
-            btnRefresh.disabled = disabled = false;
-        };
-
-        const btnRefreshTimer = () => {
-            resetBtn();
-            browser.runtime.sendMessage({ msg: "REFRESH", args: { check: true } })
-                .then((timeout = 0) => {
-                    if (timeout <= 0)
-                        return;
-
-                    let remaining = Math.ceil(timeout / 1000);
-
-                    btnRefresh.disabled = disabled = true;
-                    btnRefresh.textContent = `${btnText} - ${remaining--} seconds`;
-
-                    timer = setInterval(() => {
-                        if (remaining <= 0) {
-                            resetBtn();
-                        } else {
-                            btnRefresh.textContent = `${btnText} - ${remaining--} seconds`;
-                        }
-                    }, 1000);
-                });
-        };
-
-        btnRefreshTimer();
-        btnRefresh.addEventListener("click", e => {
-            btnRefresh.disabled = disabled = true;
+    window.addEventListener("keydown", e => {
+        if (!e.repeat && e.key === "Control") {
+            btnRefresh.classList.add("ctrl");
+            btnRefresh.disabled = false;
+        }
+    });
+    window.addEventListener("keyup", e => {
+        if (e.key === "Control") {
             btnRefresh.classList.remove("ctrl");
-            browser.runtime.sendMessage({ msg: "REFRESH", args: { force: e.ctrlKey } })
-                .then(btnRefreshTimer)
-                .catch(() => { });
-        });
+            btnRefresh.disabled = disabled;
+        }
+    });
+}
 
-        window.addEventListener("keydown", e => {
-            if (!e.repeat && e.key === "Control") {
-                btnRefresh.classList.add("ctrl");
-                btnRefresh.disabled = false;
+// Keep in sync with other options pages
+browser.storage.onChanged.addListener(() => config.sync().then(init));
+
+
+// Avoid duplicated event listeners
+const dependFuncs = new Map();
+
+function init() {
+    for (const key in changes) { delete changes[key]; }
+
+    const opts = config.options;
+    for (const key in opts) {
+
+        const value = opts[key];
+        const item = document.getElementById(key);
+        if (item) {
+            if (item.type === "checkbox") {
+                item.checked = value;
+            } else if (item.type === "text" || item.tagName === "TEXTAREA") {
+                if (!item.placeholder)
+                    item.placeholder = config.defaults[key];
+                item.value = value;
+            } else {
+                item.value = value;
             }
-        });
-        window.addEventListener("keyup", e => {
-            if (e.key === "Control") {
-                btnRefresh.classList.remove("ctrl");
-                btnRefresh.disabled = disabled;
-            }
-        });
+        } else {
+            const radio = findRadio(document, key, value);
+            if (radio)
+                radio.checked = true;
+        }
     }
 
+    preview.style.cssText = modStyle.value;
 
-    // Keep in sync with other options pages
-    browser.storage.onChanged.addListener(() => app.init().then(init));
+    for (const elem of document.querySelectorAll("[data-depends]")) {
+        const source = document.getElementById(elem.dataset.depends);
 
-    // Tell the background script a new options window was opened
-    browser.runtime.sendMessage({ msg: "OPTIONS" });
-}, console.warn);
+        if (!dependFuncs.has(elem))
+            dependFuncs.set(elem, () => elem.disabled = !source.checked);
+
+        source.addEventListener("change", dependFuncs.get(elem));
+        elem.disabled = !source.checked;
+    }
+
+    for (const checkbox of document.querySelectorAll("input[data-toggle]")) {
+        checkbox.addEventListener("change", handleToggle);
+        handleToggle.call(undefined, { target: checkbox });
+    }
+}
+init();

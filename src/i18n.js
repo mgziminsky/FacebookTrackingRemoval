@@ -104,3 +104,5 @@ new MutationObserver(muts => {
     attributeFilter: ['data-i18n', 'data-i18n-attr', 'data-i18n-vars'],
     subtree: true,
 });
+
+export default getMessageSafe;
