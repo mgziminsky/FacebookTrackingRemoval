@@ -1,4 +1,4 @@
-@import url(theme.css); /* Fallback for Chrome */
+@import url(./theme.css); /* Fallback for Chrome */
 @import url(chrome://global/skin/in-content/common.css); /* Actual theme in FF */
 
 

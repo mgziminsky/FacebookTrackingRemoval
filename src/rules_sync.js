@@ -15,15 +15,17 @@
 
     Copyright (C) 2016-2022 Michael Ziminsky
 */
-/* global joinSelectors, parseHideRules, stripComments, splitLines, RATE_LIMIT */
 
-'use strict';
+import { RATE_LIMIT } from "./consts.js";
+import { joinSelectors, parseHideRules, splitLines, stripComments } from "./util.js";
+
 
 const SELECTOR_RULE_FILES = ["article_wrapper"];
 const DYN_RULE_FILES = ["pending"];
 const SPLIT_RULE_DIRS = ["sponsored", "suggested"];
 const PARAM_CLEANING_FILES = ["params", "prefix_patterns", "values"];
 const CLICK_WHITELIST_FILES = ["elements", "roles", "selectors"];
+
 
 async function loadHideRules() {
     const { hide_rules: currentRules = {} } = await browser.storage.local.get("hide_rules");
@@ -112,7 +114,6 @@ async function _try(func, ...args) {
     }
 }
 
-/* exported refreshRules */
 async function refreshRules({ force = false, check = false } = {}) {
     const { lastRuleRefresh: lastRefresh } = await browser.storage.local.get("lastRuleRefresh");
 
@@ -132,3 +133,5 @@ async function refreshRules({ force = false, check = false } = {}) {
         lastRuleRefresh: new Date().toUTCString(),
     }).then(() => RATE_LIMIT);
 }
+
+export default refreshRules;

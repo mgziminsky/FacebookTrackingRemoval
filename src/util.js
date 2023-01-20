@@ -1,4 +1,3 @@
-
 /*  This file is part of FacebookTrackingRemoval.
 
     FacebookTrackingRemoval is free software: you can redistribute it and/or modify
@@ -16,15 +15,34 @@
 
     Copyright (C) 2016-2022 Michael Ziminsky
 */
-/* global app */
 
-'use strict';
+import { log } from "./common.js";
+import * as config from "./config.js";
+import { PROCESSED_CLASS } from "./consts.js";
 
-const PROCESSED_CLASS = "FBTR-PROCESSED";
+export {
+    applyEventBlockers,
+    ariaText,
+    buildCollapsible,
+    cleanAttrs,
+    cleanLinkParams,
+    extractQuotedString,
+    joinSelectors,
+    normalizeString,
+    parseHideRules,
+    selectAllWithBase,
+    splitLines,
+    stopPropagation,
+    stripComments,
+    useText,
+    visibleText,
+};
+
+
 
 /** @param {Event} e */
 function isAllowedTarget(e) {
-    const config = app.click_whitelist;
+    const whitelist = config.click_whitelist;
     let checkTarget = e.target;
 
     // Walk through event target and parents until the currentTarget looking for an element that clicks are allowed on
@@ -32,9 +50,9 @@ function isAllowedTarget(e) {
         const role = checkTarget.attributes.role;
         if (checkTarget.tagName === "A" && checkTarget.hostname === location.hostname) {
             return true;
-        } else if (role && config.roles.includes(role.value.toUpperCase())) {
+        } else if (role && whitelist.roles.includes(role.value.toUpperCase())) {
             return true;
-        } else if (config.elements.includes(checkTarget.tagName) || checkTarget.classList.contains("FBTR-SAFE") || checkTarget.matches(config.selector)) {
+        } else if (whitelist.elements.includes(checkTarget.tagName) || checkTarget.classList.contains("FBTR-SAFE") || checkTarget.matches(whitelist.selector)) {
             return true;
         }
         checkTarget = checkTarget.parentNode;
@@ -49,7 +67,7 @@ function isAllowedTarget(e) {
 */
 function restrictEventPropagation(e) {
     if (isAllowedTarget(e)) {
-        app.log(`Allowed propagation of ${e.type} from ${e.target} to ${e.currentTarget}`);
+        log(`Allowed propagation of ${e.type} from ${e.target} to ${e.currentTarget}`);
     } else {
         stopPropagation(e);
     }
@@ -59,7 +77,7 @@ function restrictEventPropagation(e) {
 function stopPropagation(e) {
     e.stopImmediatePropagation();
     e.stopPropagation();
-    app.log(`Stopped propagation of ${e.type} from ${e.target}`);
+    log(`Stopped propagation of ${e.type} from ${e.target}`);
 }
 
 /** @param {HTMLElement} target */
@@ -118,20 +136,20 @@ function cleanLinkParams(link, base = (location.origin + location.pathname)) {
 
         const deleteParam = cleanParams.delete.bind(cleanParams);
 
-        const config = app.param_cleaning;
-        config.params.forEach(deleteParam);
+        const pc = config.param_cleaning;
+        pc.params.forEach(deleteParam);
 
         // for..of loop stops early if items are removed
         // .keys() doesn't work in FF... https://bugzilla.mozilla.org/show_bug.cgi?id=1414602
         [...cleanParams].map(([key, _]) => key)
-            .filter(config.pattern.test.bind(config.pattern))
+            .filter(pc.pattern.test.bind(pc.pattern))
             .forEach(deleteParam);
 
-        config.values.filter(cleanParams.has.bind(cleanParams)).forEach(k => {
+        pc.values.filter(cleanParams.has.bind(cleanParams)).forEach(k => {
             const v = JSON.parse(cleanParams.get(k));
-            config.params.forEach(key => delete v[key]);
+            pc.params.forEach(key => delete v[key]);
             for (const key in v) {
-                if (config.pattern.test(key))
+                if (pc.pattern.test(key))
                     delete v[key];
             }
             cleanParams.set(k, JSON.stringify(v));
@@ -207,29 +225,6 @@ function parseHideRules(text) {
         texts: Array.from(texts).sort(),
         patterns: Array.from(patterns).sort(),
     };
-}
-
-/**
- * Converts the texts and patterns of a rule to final format
- * @param {Object} rule
- * @param {string[]?} rule.texts
- * @param {string[]?} rule.patterns
- *
- * @typedef {object} rule
- * @prop {Map<string, string>?} rule.texts
- * @prop {RegExp?} rule.patterns
- * @returns {rule} rule
- */
-function initHideRule(rule) {
-    if (rule.texts)
-        rule.texts = rule.texts.reduce((m, t) => m.set(normalizeString(t), t), new Map());
-
-    if (rule.patterns instanceof Array && rule.patterns.length)
-        rule.patterns = new RegExp(rule.patterns.join("|"), "iu");
-    else
-        delete rule.patterns;
-
-    return rule;
 }
 
 /** @param {string} str */
