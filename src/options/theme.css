@@ -2,6 +2,7 @@
 
 :root {
     font: message-box;
+    appearance: none;
     background-color: var(--in-content-page-background);
     color: var(--in-content-page-color);
 }
@@ -48,7 +49,7 @@ textarea {
     --in-content-text-color: var(--in-content-page-color);
     --in-content-deemphasized-text: rgb(91, 91, 102);
     --in-content-box-background: #fff;
-    --in-content-box-background-odd: rgba(12, 12, 13, 0.05);
+    --in-content-box-background-odd: rgba(12, 12, 13, 0.05); /* grey 90 a05 */
     --in-content-box-border-color: color-mix(in srgb, currentColor 41%, transparent);
     --in-content-box-info-background: #f0f0f4;
     --in-content-item-hover: color-mix(in srgb, var(--in-content-primary-button-background) 20%, transparent);
@@ -56,16 +57,17 @@ textarea {
     --in-content-item-selected: var(--in-content-primary-button-background);
     --in-content-item-selected-text: var(--in-content-primary-button-text-color);
     --in-content-icon-color: rgb(91, 91, 102);
-    --in-content-accent-color: #0a84ff;
-    --in-content-accent-color-active: #0060df;
+    --in-content-accent-color: var(--in-content-primary-button-background);
+    --in-content-accent-color-active: var(--in-content-primary-button-background-hover);
     --in-content-border-hover: var(--grey-90-a50);
     --in-content-border-invalid: var(--red-50);
     --in-content-border-color: #d7d7db;
     --in-content-error-text-color: #c50042;
-    --in-content-link-color: var(--blue-60);
-    --in-content-link-color-hover: var(--blue-70);
-    --in-content-link-color-active: var(--blue-80);
-    --in-content-link-color-visited: var(--blue-60);
+    --in-content-link-color: var(--in-content-primary-button-background);
+    --in-content-link-color-hover: var(--in-content-primary-button-background-hover);
+    --in-content-link-color-active: var(--in-content-primary-button-background-active);
+    --in-content-link-color-visited: var(--in-content-link-color);
+    /* button background states are also used for checkboxes and radiobuttons */
     --in-content-button-text-color: var(--in-content-text-color);
     --in-content-button-text-color-hover: var(--in-content-text-color);
     --in-content-button-text-color-active: var(--in-content-button-text-color-hover);
@@ -77,21 +79,30 @@ textarea {
     --in-content-button-border-color-active: var(--in-content-button-border-color-hover);
     --in-content-primary-button-text-color: rgb(251, 251, 254);
     --in-content-primary-button-text-color-hover: var(--in-content-primary-button-text-color);
+    --in-content-primary-button-text-color-active: var(--in-content-primary-button-text-color);
     --in-content-primary-button-background: #0061e0;
     --in-content-primary-button-background-hover: #0250bb;
     --in-content-primary-button-background-active: #053e94;
     --in-content-primary-button-border-color: transparent;
     --in-content-primary-button-border-hover: transparent;
+    --in-content-primary-button-border-active: transparent;
     --in-content-danger-button-background: #e22850;
     --in-content-danger-button-background-hover: #c50042;
     --in-content-danger-button-background-active: #810220;
     --in-content-focus-outline-color: var(--in-content-primary-button-background);
+    --in-content-focus-outline-width: 2px;
+    --in-content-focus-outline-offset: 2px;
+    --in-content-focus-outline-inset: calc(-1 * var(--in-content-focus-outline-width));
+    --in-content-focus-outline: var(--in-content-focus-outline-width) solid var(--in-content-focus-outline-color);
+
     --in-content-table-background: #f8f8fa;
     --in-content-table-border-color: var(--in-content-box-border-color);
     --in-content-table-header-background: var(--in-content-primary-button-background);
     --in-content-table-header-color: var(--in-content-primary-button-text-color);
     --in-content-sidebar-width: 240px;
+
     --dialog-warning-text-color: var(--red-60);
+
     --checkbox-border-color: var(--in-content-box-border-color);
     --checkbox-unchecked-bgcolor: var(--in-content-button-background);
     --checkbox-unchecked-hover-bgcolor: var(--in-content-button-background-hover);
@@ -101,11 +112,10 @@ textarea {
     --checkbox-checked-border-color: transparent;
     --checkbox-checked-hover-bgcolor: var(--in-content-primary-button-background-hover);
     --checkbox-checked-active-bgcolor: var(--in-content-primary-button-background-active);
+
     --blue-40: #45a1ff;
     --blue-50: #0a84ff;
     --blue-60: #0060df;
-    --blue-70: #003eaa;
-    --blue-80: #002275;
     --grey-30: #d7d7db;
     --grey-60: #4a4a4f;
     --grey-90-a10: rgba(12, 12, 13, 0.1);
@@ -131,12 +141,17 @@ textarea {
     --yellow-70: #a47f00;
     --yellow-80: #715100;
     --yellow-90: #3e2800;
+
     --shadow-10: 0 1px 4px var(--grey-90-a10);
     --shadow-30: 0 4px 16px var(--grey-90-a10);
+
     --card-padding: 16px;
     --card-shadow: var(--shadow-10);
     --card-outline-color: var(--grey-30);
     --card-shadow-hover: var(--card-shadow), 0 0 0 5px var(--card-outline-color);
+
+    accent-color: var(--in-content-accent-color);
+    color-scheme: light dark;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -145,41 +160,46 @@ textarea {
         --in-content-page-background: rgb(28, 27, 34);
         --in-content-page-color: rgb(251, 251, 254);
         --in-content-deemphasized-text: rgb(191, 191, 201);
+
         --in-content-box-background: rgb(35, 34, 43);
         --in-content-box-background-odd: rgba(249, 249, 250, 0.05);
         --in-content-box-info-background: rgba(249, 249, 250, 0.15);
+
         --in-content-border-color: rgba(249, 249, 250, 0.2);
         --in-content-border-hover: rgba(249, 249, 250, 0.3);
         --in-content-border-invalid: rgb(255, 132, 139);
+
         --in-content-error-text-color: #ff9aa2;
+
         --in-content-button-background: rgb(43, 42, 51);
         --in-content-button-background-hover: rgb(82, 82, 94);
         --in-content-button-background-active: rgb(91, 91, 102);
         --in-content-icon-color: rgb(251, 251, 254);
+
         --in-content-primary-button-text-color: rgb(43, 42, 51);
         --in-content-primary-button-background: rgb(0, 221, 255);
         --in-content-primary-button-background-hover: rgb(128, 235, 255);
         --in-content-primary-button-background-active: rgb(170, 242, 255);
+
         --in-content-danger-button-background: #ff848b;
         --in-content-danger-button-background-hover: #ffbdc5;
         --in-content-danger-button-background-active: #ffdfe7;
+
         --in-content-table-background: rgb(35, 34, 43);
-        --in-content-accent-color: var(--in-content-primary-button-background);
-        --in-content-accent-color-active: var(--in-content-primary-button-background-hover);
-        --in-content-link-color: var(--in-content-primary-button-background);
-        --in-content-link-color-hover: var(--in-content-primary-button-background-hover);
-        --in-content-link-color-active: var(--in-content-primary-button-background-active);
-        --in-content-link-color-visited: var(--in-content-link-color);
+
         --card-outline-color: var(--grey-60);
+
         --dialog-warning-text-color: var(--red-40);
+
+        scrollbar-color: rgba(249, 249, 250, 0.4) rgba(20, 20, 25, 0.3);
     }
 }
 
 @media (prefers-contrast) {
     :host,
     :root {
-        --in-content-page-color: WindowText;
-        --in-content-page-background: Window;
+        --in-content-page-color: CanvasText;
+        --in-content-page-background: Canvas;
         --in-content-deemphasized-text: GrayText;
 
         --in-content-box-background: -moz-Dialog;
@@ -193,8 +213,8 @@ textarea {
         --in-content-item-selected-text: SelectedItemText;
         --in-content-icon-color: -moz-DialogText;
 
-        --in-content-accent-color: -moz-DialogText;
-        --in-content-accent-color-active: -moz-DialogText;
+        --in-content-accent-color: SelectedItem;
+        --in-content-accent-color-active: SelectedItem;
 
         --in-content-border-hover: ThreeDShadow;
         /* This is not great, but there is no suitable keyword for this.
@@ -208,23 +228,31 @@ textarea {
         --in-content-link-color-active: -moz-nativehyperlinktext;
         --in-content-link-color-visited: -moz-nativehyperlinktext;
 
-        --in-content-button-text-color-hover: ButtonFace;
-        --in-content-button-background: ButtonFace;
         --in-content-button-text-color: ButtonText;
-        --in-content-button-background-hover: ButtonText;
-        --in-content-button-background-active: ButtonText;
+        --in-content-button-text-color-hover: SelectedItemText;
+        --in-content-button-text-color-active: SelectedItem;
+        --in-content-button-background: ButtonFace;
+        --in-content-button-background-hover: SelectedItem;
+        --in-content-button-background-active: SelectedItemText;
         --in-content-button-border-color: ButtonText;
+        --in-content-button-border-color-hover: SelectedItemText;
+        --in-content-button-border-color-active: SelectedItem;
 
         --in-content-primary-button-text-color: ButtonFace;
-        --in-content-primary-button-text-color-hover: ButtonText;
+        --in-content-primary-button-text-color-hover: SelectedItemText;
+        --in-content-primary-button-text-color-active: SelectedItem;
         --in-content-primary-button-background: ButtonText;
-        --in-content-primary-button-background-hover: ButtonFace;
-        --in-content-primary-button-background-active: ButtonFace;
-        --in-content-primary-button-border-hover: ButtonText;
+        --in-content-primary-button-background-hover: SelectedItem;
+        --in-content-primary-button-background-active: SelectedItemText;
+        --in-content-primary-button-border-color: ButtonFace;
+        --in-content-primary-button-border-hover: SelectedItemText;
+        --in-content-primary-button-border-active: SelectedItem;
 
         --in-content-danger-button-background: var(--in-content-primary-button-background);
         --in-content-danger-button-background-hover: var(--in-content-primary-button-background-hover);
         --in-content-danger-button-background-active: var(--in-content-primary-button-background-active);
+
+        --in-content-focus-outline-color: -moz-DialogText;
 
         --in-content-table-border-color: ThreeDDarkShadow;
         --in-content-table-background: -moz-Dialog;

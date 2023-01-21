@@ -16,11 +16,11 @@
     Copyright (C) 2016-2022 Michael Ziminsky
 */
 
-import { isChrome, log, warn } from "../common.js";
-import * as config from "../config.js";
-import { STYLE_CLASS } from "../consts.js";
-import refreshRules from "./rules_sync.js";
-import { cleanLinkParams } from "../util.js";
+import { warn } from "../common.js";
+import { options, storage, sync } from "../config.js";
+import { MSG, STYLE_CLASS } from "../consts.js";
+import { refreshRules } from "../rules_sync.js";
+import "./webrequest.js";
 
 
 // Do some cleanup after updating to 1.6.4+ for the first time
@@ -33,110 +33,53 @@ browser.runtime.onInstalled.addListener(details => {
     // Always force refresh rules after an update for simplicity
     // 1.8.0 changed the dynamic rules format
     browser.storage.local.remove(["lastRuleRefresh", "hide_rules"])
-        .finally(refreshRules.bind(undefined, { force: true }));
+        .finally(refreshRules.bind(undefined, true));
 
     const old = [1, 6, 3];
     const prev = details.previousVersion.split(".").map(Number);
     if (!details.temporary && prev.every((v, i) => v <= (old[i] ?? 0))) {
-        const currentOpts = config.options;
-        config.storage.clear();
+        const currentOpts = options;
+        storage.clear();
         browser.storage.local.clear();
-        config.storage.set(currentOpts);
+        storage.set(currentOpts);
         browser.runtime.reload();
     }
 });
 
-// refresh rules every 12 hours
-browser.alarms.onAlarm.addListener(() => refreshRules().catch(() => {/* Ignore timeout */ }));
-browser.alarms.create({ delayInMinutes: 1/60, periodInMinutes: 60 * 12 });
-
 /**
- * Keep track of open FB pages for updating the CSS
- *  @type {Map<string, browser.extensionTypes.InjectDetails}
- */
-const fbTabs = new Map();
-
-/**
+ * @param {(tabId: number, details: browser.extensionTypes.InjectDetails) => Promise<void>} action
+ * @param {string?} style
  * @param {number} tabId
  * @param {number} frameId
  */
-function updateCSS(tabId, frameId) {
-    const prev = fbTabs.get(tabId);
-    const details = {
+function updateCSS(action, style, tabId, frameId) {
+    action(tabId, {
         frameId,
         cssOrigin: "user",
-        code: config.options.useStyle ? `.${STYLE_CLASS} { ${config.options.modStyle}; }` : "",
-    };
-    fbTabs.set(`${tabId}#${frameId}`, details);
-
-    if (prev && prev.code)
-        browser.tabs.removeCSS(tabId, prev).catch(warn);
-    if (details.code)
-        browser.tabs.insertCSS(tabId, details).catch(warn);
+        code: style ? `.${STYLE_CLASS} { ${style}; }` : "",
+    }).catch(warn);
 }
-
-function reloadTabs() {
-    [...fbTabs.keys()].filter(id => id.endsWith("#0")).forEach(tabId => browser.tabs.reload(parseInt(tabId)));
-}
-
-browser.runtime.onMessage.addListener(({ msg, args }, sender, sendResponse) => {
-    if (msg === "CSS") {
-        updateCSS(sender.tab.id, sender.frameId ?? 0);
-        if (isChrome)
-            browser.pageAction.show(sender.tab.id);
-    }
-    else if (msg === "REFRESH") {
-        refreshRules(args)
-            .then(t => args.check ? t : (reloadTabs(), t)) // Reload tabs if this isn't just a check
-            .then(sendResponse, e => sendResponse(Promise.reject(e)));
-        return true; // Allow async response
-    }
-});
-
-browser.tabs.onRemoved.addListener(fbTabs.delete.bind(fbTabs));
-browser.tabs.onReplaced.addListener(fbTabs.delete.bind(fbTabs));
 
 /**
- * @param {browser.webRequest._OnBeforeRequestDetails} details
- * @param {boolean} forceBlock
- * @return {browser.webRequest.BlockingResponse}
+ * @param {{msg: string}}
+ * @param {browser.runtime.MessageSender} sender
  */
-function checkRequest(details, forceBlock) {
-    if (!config.options.enabled)
-        return;
-
-    if (forceBlock || ["beacon", "ping"].includes(details.type)) {
-        log(`Blocking ${details.type} request to ${details.url}`);
-        return { cancel: true };
+function onMessage({ msg, ...data }, sender) {
+    switch (msg) {
+        case MSG.chromeShow:
+            browser.pageAction.show(sender.tab.id);
+            break;
+        case MSG.insertCss:
+            updateCSS(browser.tabs.insertCSS, data.style, sender.tab.id, sender.frameId);
+            break;
+        case MSG.removeCss:
+            updateCSS(browser.tabs.removeCSS, data.style, sender.tab.id, sender.frameId);
+            break;
+        case MSG.rulesRefresh:
+            return refreshRules(data.force);
     }
 }
+browser.runtime.onMessage.addListener(onMessage);
 
-function* genBlockUrls(paths) {
-    for (const h of config.host_patterns)
-        for (const p of paths)
-            yield h.replace(/\*$/, p);
-}
-
-browser.webRequest.onBeforeRequest.addListener(
-    details => checkRequest(details, true),
-    { urls: [...genBlockUrls(["ajax/bz*", "ajax/bnzai*", "xti.php?*"]), ...config.host_patterns.map(h => h.replace("*.", "pixel."))] },
-    ["blocking"]
-);
-
-browser.webRequest.onBeforeRequest.addListener(
-    checkRequest,
-    { urls: config.host_patterns },
-    ["blocking"]
-);
-
-browser.webNavigation.onHistoryStateUpdated.addListener(details => {
-    const orig = details.url;
-    const clean = cleanLinkParams(details.url);
-    if (orig != clean) {
-        browser.tabs.sendMessage(details.tabId, { type: "HISTORY", data: { orig, clean } });
-    }
-}, {
-    url: config.host_patterns
-        .map(h => h.replaceAll(/[^.\w]/g, ""))
-        .map(hostContains => ({ hostContains }))
-});
+// Keep config up to date
+storage.onChanged.addListener(changes => sync(Object.keys(changes)));

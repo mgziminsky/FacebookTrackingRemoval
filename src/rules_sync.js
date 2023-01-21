@@ -16,8 +16,13 @@
     Copyright (C) 2016-2022 Michael Ziminsky
 */
 
-import { RATE_LIMIT } from "../consts.js";
-import { joinSelectors, parseHideRules, splitLines, stripComments } from "../util.js";
+import { NOOP, RATE_LIMIT } from "./consts.js";
+import { joinSelectors, parseHideRules, splitLines, stripComments } from "./util.js";
+
+export {
+    refreshRules,
+    timeoutRemaining
+};
 
 
 const SELECTOR_RULE_FILES = ["article_wrapper"];
@@ -114,14 +119,14 @@ async function _try(func, ...args) {
     }
 }
 
-async function refreshRules({ force = false, check = false } = {}) {
-    const { lastRuleRefresh: lastRefresh } = await browser.storage.local.get("lastRuleRefresh");
+async function timeoutRemaining() {
+    const { lastRuleRefresh } = await browser.storage.local.get("lastRuleRefresh");
+    const timeout = !lastRuleRefresh ? 0 : RATE_LIMIT - (Date.now() - Date.parse(lastRuleRefresh));
+    return Math.max(0, timeout);
+}
 
-    // Prevent abuse, max refresh once per 15 min
-    const timeout = force || !lastRefresh ? 0 : RATE_LIMIT - (Date.now() - Date.parse(lastRefresh));
-
-    if (check)
-        return Promise.resolve(Math.max(0, timeout));
+async function refreshRules(force = false) {
+    const timeout = force ? 0 : await timeoutRemaining();
 
     if (timeout > 0)
         return Promise.reject(timeout);
@@ -134,4 +139,6 @@ async function refreshRules({ force = false, check = false } = {}) {
     }).then(() => RATE_LIMIT);
 }
 
-export default refreshRules;
+// refresh rules every 12 hours
+browser.alarms.onAlarm.addListener(() => refreshRules().catch(NOOP));
+browser.alarms.create({ when: Date.now(), periodInMinutes: 60 * 12 });

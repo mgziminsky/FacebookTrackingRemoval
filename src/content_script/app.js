@@ -16,17 +16,19 @@
     Copyright (C) 2016-2022 Michael Ziminsky
 */
 
-import { log } from "../common.js";
-import { domains, hide_rules, initHideRule, options } from "../config.js";
-import { PROCESSED_CLASS, STYLE_CLASS } from "../consts.js";
-import * as util from "../util.js";
+import { isChrome, log, warn } from "../common.js";
+import { hide_rules, initHideRule, options, storage, sync } from "../config.js";
+import { MSG, PROCESSED_CLASS } from "../consts.js";
+import { normalizeString, parseHideRules } from "../util.js";
+import { applyStyle, cleanRedirectLinks, cleanShimLinks, fixGifs, fixVideoLinks, stripFBCLID, stripRefs } from "./cleaning.js";
+import { applyEventBlockers, ariaText, buildCollapsible, selectAllWithBase, useText, visibleText } from "./dom.js";
 
 
-const _userRules = initHideRule(util.parseHideRules(options.userRules));
+if (isChrome)
+    browser.runtime.sendMessage({ msg: MSG.chromeShow });
 
-function applyStyle(elem) {
-    elem.classList.add(STYLE_CLASS);
-}
+const userRules = initHideRule(parseHideRules(options.userRules));
+
 
 function hide(elem, label, method) {
     let target;
@@ -50,7 +52,7 @@ function hide(elem, label, method) {
             return;
         }
 
-        const wrapper = util.buildCollapsible(label);
+        const wrapper = buildCollapsible(label);
         applyStyle(wrapper);
         for (const c of target.classList)
             wrapper.classList.add(c);
@@ -65,199 +67,6 @@ function hide(elem, label, method) {
     }
 }
 
-const supportedProtos = ["http:", "https:", "ftp:"];
-function cleanLink(a, href) {
-    util.cleanAttrs(a);
-    a.target = "_blank";
-    a.rel = "noreferrer noopener";
-    try {
-        if (supportedProtos.includes(new URL(href, origin).protocol))
-            a.href = href;
-        else
-            log("Unsupported link protocol; leaving unchanged: " + href);
-    } catch (_) {
-        log("Link cleaning encountered an invalid url: " + href);
-    }
-    applyStyle(a);
-}
-
-function buildVideo(src, poster) {
-    const video = document.createElement("video");
-    video.preload = "metadata";
-    video.controls = true;
-    video.poster = poster;
-    video.setAttribute("width", "100%");
-    video.src = src;
-    applyStyle(video);
-    return video;
-}
-
-/* LINK TRACKING */
-
-// Desktop only
-function cleanShimLinks(node) {
-    const trackedLinks = util.selectAllWithBase(node, "a[onclick^='LinkshimAsyncLink.referrer_log']");
-    for (const a of trackedLinks) {
-        cleanLink(a, util.extractQuotedString(a.getAttribute("onmouseover")).replace(/\\(.)/g, '$1'));
-        log("Removed tracking from shim link: " + a);
-    }
-    return trackedLinks.length;
-}
-
-// Mobile only
-function fixVideoLinks(node) {
-    const videoLinks = util.selectAllWithBase(node, "div[data-sigil=inlineVideo],a[href^='/video_redirect/']");
-    for (const vid of videoLinks) {
-        const vidSrc = vid.tagName === 'DIV'
-            ? JSON.parse(vid.getAttribute("data-store")).src // Phone
-            : new URL(vid.href).searchParams.get('src'); // m.facebook
-
-        const replaceVideo = target => {
-            const img = target.querySelector(".img,img"); // phone,m.facebook
-            const poster = util.extractQuotedString(img.style.backgroundImage) || img.src;
-            const video = buildVideo(vidSrc, poster);
-            target.parentNode.replaceChild(video, target);
-            return video;
-        };
-
-        if (options.inlineVids) {
-            log("Inlined video: " + replaceVideo(vid).src);
-        } else {
-            util.cleanAttrs(vid);
-            const target = vid.cloneNode(true);
-            applyStyle(target);
-            target.classList.add("FBTR-SAFE");
-            target.addEventListener("click", e => {
-                e.stopImmediatePropagation();
-                e.stopPropagation();
-                replaceVideo(target).play();
-            }, true);
-            vid.parentNode.replaceChild(target, vid);
-            log("Cleaned deferred inline video: " + vidSrc);
-        }
-    }
-    return videoLinks.length;
-}
-
-// Desktop and Mobile
-function cleanRedirectLinks(node) {
-    const trackedLinks = util.selectAllWithBase(node, `a[href*='${document.domain.split(".").slice(-2).join(".")}/l.php?']`);
-    for (const a of trackedLinks) {
-        const newHref = new URL(a.href).searchParams.get('u');
-        cleanLink(a, newHref);
-        log("Removed tracking from redirect link: " + a);
-    }
-    return trackedLinks.length;
-}
-
-const fbclidFallback = /((?:[?&]|%3F|%26)fbclid=.*?)($|[?&]|%3F|%26)/ig;
-function stripFBCLID(node) {
-    const trackedLinks = util.selectAllWithBase(node, `a[href*='fbclid='i]`);
-    for (const a of trackedLinks) {
-        const link = new URL(a.href);
-
-        link.searchParams.delete("fbclid");
-        if (a.href === link.href) {
-            link.href = link.href.replace(fbclidFallback, "$2");
-        }
-
-        if (a.href === link.href) {
-            log("Failed to remove fbclid from link:\n -> " + a);
-        } else {
-            a.href = link.href;
-            applyStyle(a);
-            log("Removed fbclid from link: " + a);
-        }
-    }
-    return trackedLinks.length;
-}
-
-function stripRefs(node) {
-    let intLinks = 0;
-
-    function _strip(a) {
-        if (a.nodeName !== "A" || !domains.some(d => a.hostname.endsWith(d)))
-            return;
-
-        ++intLinks;
-        util.applyEventBlockers(a.parentNode);
-        delete a.dataset.ft;
-
-        const linkBase = a.origin + a.pathname;
-        if (a.hasAttribute("href")) {
-            const orig = a.getAttribute("href"); // get unexpanded value
-            const href = util.cleanLinkParams(orig, linkBase); // Don't assign here to avoid infinite mutation recursion
-
-            if (href != orig) {
-                a.href = href;
-                applyStyle(a);
-                log("Cleaned internal href:\n\t" + orig + "\n\t" + a.getAttribute("href"));
-            }
-        }
-
-        if (a.hasAttribute("ajaxify")) {
-            const orig = a.getAttribute("ajaxify");
-            a.setAttribute("ajaxify", util.cleanLinkParams(orig, linkBase));
-            if (orig != a.getAttribute("ajaxify")) {
-                applyStyle(a);
-                log("Cleaned internal ajaxify link:\n\t" + orig + "\n\t" + a.getAttribute("ajaxify"));
-            }
-        }
-
-        if (a.dataset.hovercard) {
-            delete a.dataset.hovercardReferrer;
-            const orig = a.dataset.hovercard;
-            a.dataset.hovercard = util.cleanLinkParams(orig, linkBase);
-            if (orig != a.dataset.hovercard) {
-                applyStyle(a);
-                log("Cleaned internal hovercard link:\n\t" + orig + "\n\t" + a.dataset.hovercard);
-            }
-        }
-    }
-
-    _strip(node);
-    for (const a of node.getElementsByTagName('a')) {
-        _strip(a);
-    }
-    return intLinks;
-}
-
-function fixGifs(node) {
-    const gifs = util.selectAllWithBase(node, "div._5b-_");
-    for (const g of gifs) {
-        const target = g.closest("div._2lhm");
-        if (!target)
-            continue;
-
-        const gif = target.querySelector("img.img").cloneNode(false);
-        gif.classList.add("FBTR-SAFE");
-        gif.dataset.placeholder = gif.src;
-        gif.dataset.src = g.parentNode.href;
-
-        const controls = target.querySelector("div._393-").parentNode.cloneNode(true);
-        controls.classList.add("FBTR-SAFE");
-
-        const toggle = (e) => {
-            gif.src = controls.classList.toggle("fbtrHide")
-                ? gif.dataset.src
-                : gif.dataset.placeholder;
-            util.stopPropagation(e);
-        };
-        gif.addEventListener("click", toggle, true);
-        controls.addEventListener("click", toggle, true);
-
-        const wrapper = document.createElement("div");
-        wrapper.appendChild(gif);
-        wrapper.appendChild(controls);
-
-        for (const c of target.classList)
-            wrapper.classList.add(c);
-
-        target.parentNode.replaceChild(wrapper, target);
-        log("Fixed GIF: " + gif.dataset.src);
-    }
-}
-
 function removeLinkTracking(node) {
     const cleaned = cleanShimLinks(node)
         + fixVideoLinks(node)
@@ -267,12 +76,10 @@ function removeLinkTracking(node) {
     fixGifs(node);
 
     if (cleaned)
-        util.applyEventBlockers(node);
+        applyEventBlockers(node);
 
     return cleaned;
 }
-
-/* END LINK TRACKING */
 
 /**
  * @param {Element} node
@@ -297,13 +104,13 @@ function removeArticles(node, { selector, texts, patterns }, method = options.hi
             return text;
 
         for (const p of parts) {
-            const x = texts.get(util.normalizeString(p));
+            const x = texts.get(normalizeString(p));
             if (x) return x;
         }
     };
 
-    for (const e of util.selectAllWithBase(node, selector)) {
-        const elementText = util.ariaText(e) || util.useText(e) || util.visibleText(e);
+    for (const e of selectAllWithBase(node, selector)) {
+        const elementText = ariaText(e) || useText(e) || visibleText(e);
 
         const match = getMatch(elementText);
         if (match) {
@@ -320,7 +127,7 @@ function removeArticles(node, { selector, texts, patterns }, method = options.hi
 }
 
 function removeAll(target) {
-    removeArticles(target, _userRules);
+    removeArticles(target, userRules);
 
     if (options.delSuggest)
         removeArticles(target, hide_rules.suggested);
@@ -333,39 +140,45 @@ function removeAll(target) {
         stripRefs(target);
 }
 
-let _running = false;
-function run(body) {
-    if (_running)
-        return;
 
-    const SKIP = ["SCRIPT", "STYLE", "LINK"];
-    const forEachAdded = (mutation, cb) => {
-        for (const node of mutation.addedNodes) {
-            if (node.nodeType == Node.ELEMENT_NODE && !SKIP.includes(node.nodeName) && !node.classList.contains(PROCESSED_CLASS)) {
-                cb(node);
-            }
+/**
+ * @param {MutationRecord} mutation
+ * @param {(n: Node) => void} cb
+ */
+function forEachAdded(mutation, cb) {
+    for (const node of mutation.addedNodes) {
+        if (node.nodeType == Node.ELEMENT_NODE && !SKIP.includes(node.nodeName) && !node.classList.contains(PROCESSED_CLASS)) {
+            cb(node);
         }
-    };
+    }
+}
+const SKIP = ["SCRIPT", "STYLE", "LINK"];
 
-    new MutationObserver(async mutations => {
-        for (const mutation of mutations) {
-            if (mutation.type === "childList" && !SKIP.includes(mutation.target.nodeName)) {
-                const target = mutation.target;
+const observer = new MutationObserver(async mutations => {
+    for (const mutation of mutations) {
+        if (mutation.type === "childList" && !SKIP.includes(mutation.target.nodeName)) {
+            const target = mutation.target;
 
-                removeAll(target);
+            removeAll(target);
 
-                if (options.fixLinks)
-                    forEachAdded(mutation, removeLinkTracking);
+            if (options.fixLinks)
+                forEachAdded(mutation, removeLinkTracking);
 
-                forEachAdded(mutation, node => node.classList.add(PROCESSED_CLASS));
-            } else if (mutation.target) {
-                if (options.fixLinks)
-                    removeLinkTracking(mutation.target);
-                if (options.internalRefs)
-                    stripRefs(mutation.target);
-            }
+            forEachAdded(mutation, node => node.classList.add(PROCESSED_CLASS));
+        } else if (mutation.target) {
+            if (options.fixLinks)
+                removeLinkTracking(mutation.target);
+            if (options.internalRefs)
+                stripRefs(mutation.target);
         }
-    }).observe(body, (() => {
+    }
+});
+
+async function run() {
+    const body = document.body;
+
+    observer.disconnect();
+    observer.observe(body, (() => {
         const opts = { childList: true, subtree: true, characterData: false };
         if (options.fixLinks) {
             opts.attributes = true;
@@ -374,62 +187,52 @@ function run(body) {
         return opts;
     })());
 
-    _running = true;
+    removeAll(body);
 
-    (async () => {
-        removeAll(body);
-
-        if (options.fixLinks && removeLinkTracking(body) && document.getElementById("newsFeedHeading")) {
-            const feed = document.getElementById("newsFeedHeading").parentNode;
-            for (const stream of feed.querySelectorAll("div._4ikz")) {
-                util.applyEventBlockers(stream);
-            }
+    if (options.fixLinks && removeLinkTracking(body) && document.getElementById("newsFeedHeading")) {
+        const feed = document.getElementById("newsFeedHeading").parentNode;
+        for (const stream of feed.querySelectorAll("div._4ikz")) {
+            applyEventBlockers(stream);
         }
-    })();
-}
-
-
-if (options.enabled) {
-    if (document.body) {
-        run(document.body);
-    } else {
-        new MutationObserver((_, self) => {
-            const body = document.body;
-            if (!body)
-                return;
-            self.disconnect();
-            run(body);
-        }).observe(document.documentElement, { childList: true });
     }
-
-    browser.runtime.onMessage.addListener(({ type, data }) => {
-        switch (type) {
-            // Fallback for old chrome based browsers that don't support tabs.removeCSS
-            case "STYLE": {
-                let styleElement = document.getElementById('fbtr-style');
-                if (!styleElement) {
-                    styleElement = document.createElement('style');
-                    styleElement.id = 'fbtr-style';
-                    document.head.append(styleElement);
-                }
-
-                if (styleElement.sheet.cssRules.length)
-                    styleElement.sheet.deleteRule(0);
-
-                if (data) {
-                    // Timeout required for page to reparse
-                    setTimeout(() => styleElement.sheet.insertRule(data), 50);
-                }
-                break;
-            }
-            case "HISTORY":
-                if (!history.state.fbtr_clean) {
-                    history.replaceState(Object.assign({ fbtr_clean: true }, history.state), "", data.clean);
-                    log(`Cleaned link navigation done via history.pushState:\n\t${data.orig}\n\t${data.clean}`);
-                }
-                break;
-        }
-    });
-
-    browser.runtime.sendMessage({ msg: "CSS" });
 }
+
+/** @param {{type: string}} */
+function handleMessage({ type, ...data }) {
+    switch (type) {
+        case MSG.history:
+            if (!history.state.fbtr_clean) {
+                history.replaceState(Object.assign({ fbtr_clean: true }, history.state), "", data.clean);
+                log(`Cleaned link navigation done via history.pushState:\n\t${data.orig}\n\t${data.clean}`);
+            }
+            break;
+    }
+}
+
+let activeStyle;
+function start() {
+    run();
+    browser.runtime.onMessage.addListener(handleMessage);
+
+    if (activeStyle)
+        browser.runtime.sendMessage({ msg: MSG.removeCss, style: activeStyle });
+
+    if (options.useStyle)
+        browser.runtime.sendMessage({ msg: MSG.insertCss, style: activeStyle = options.modStyle });
+}
+
+function stop() {
+    observer.disconnect();
+    browser.runtime.onMessage.removeListener(handleMessage);
+    browser.runtime.sendMessage({ msg: MSG.removeCss, style: activeStyle });
+}
+
+storage.onChanged.addListener(changes => {
+    sync(Object.keys(changes)).then(() => {
+        if (options.enabled) start();
+        else stop();
+    }).catch(warn);
+});
+
+if (options.enabled)
+    start();

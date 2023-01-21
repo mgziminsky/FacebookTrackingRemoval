@@ -102,10 +102,13 @@ function reset(key) {
 /**
  * Update local options with value from storage
  *
- * @param {void | string | string[] | { [key: string]: any}} key
+ * @param {?string | string[]} key
  */
 async function sync(key) {
-    Object.assign(_options, await storage.get(key || defaults));
+    const filtered = key
+        ? Object.fromEntries([...key].filter(k => k in defaults).map(k => [k, defaults[k]]))
+        : defaults;
+    Object.assign(_options, await storage.get(filtered));
 }
 
 const RULES_KEY = "hide_rules";

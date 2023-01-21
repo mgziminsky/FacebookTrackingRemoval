@@ -17,8 +17,9 @@
 */
 
 import * as config from "../config.js";
-import { NOOP, RATE_LIMIT } from "../consts.js";
+import { MSG, NOOP, RATE_LIMIT } from "../consts.js";
 import getMessageSafe from "../i18n.js";
+import { timeoutRemaining } from "../rules_sync.js";
 
 
 /** @type {Options} */
@@ -143,31 +144,30 @@ document.body.addEventListener("animationend", e => e.target.classList.remove("r
 
     const btnRefreshTimer = () => {
         resetBtn();
-        browser.runtime.sendMessage({ msg: "REFRESH", args: { check: true } })
-            .then((timeout = 0) => {
-                if (timeout <= 0)
-                    return;
+        timeoutRemaining().then((timeout = 0) => {
+            if (timeout <= 0)
+                return;
 
-                let remaining = Math.ceil(timeout / 1000);
+            let remaining = Math.ceil(timeout / 1000);
 
-                btnRefresh.disabled = disabled = true;
-                btnRefresh.textContent = `${btnText} - ${remaining--} seconds`;
+            btnRefresh.disabled = disabled = true;
+            btnRefresh.textContent = `${btnText} - ${remaining--} seconds`;
 
-                timer = setInterval(() => {
-                    if (remaining <= 0) {
-                        resetBtn();
-                    } else {
-                        btnRefresh.textContent = `${btnText} - ${remaining--} seconds`;
-                    }
-                }, 1000);
-            });
+            timer = setInterval(() => {
+                if (remaining <= 0) {
+                    resetBtn();
+                } else {
+                    btnRefresh.textContent = `${btnText} - ${remaining--} seconds`;
+                }
+            }, 1000);
+        });
     };
 
     btnRefreshTimer();
     btnRefresh.addEventListener("click", e => {
         btnRefresh.disabled = disabled = true;
         btnRefresh.classList.remove("ctrl");
-        browser.runtime.sendMessage({ msg: "REFRESH", args: { force: e.ctrlKey } })
+        browser.runtime.sendMessage({ msg: MSG.rulesRefresh, force: e.ctrlKey })
             .then(btnRefreshTimer)
             .catch(NOOP);
     });
