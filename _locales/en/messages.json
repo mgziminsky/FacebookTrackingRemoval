@@ -15,8 +15,8 @@
         "message": "Options"
     },
     "optsReloadNotice": {
-        "message": "Changes will cause all Facebook tabs to be automatically reloaded after this page is closed",
-        "description": "Options page notice about page reload after making changes"
+        "message": "Changes will be applied when this options page is closed",
+        "description": "Options page notice about when changes will be applied"
     },
     "optsEnabled": {
         "message": "Enabled"

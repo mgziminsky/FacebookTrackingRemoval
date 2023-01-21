@@ -14,10 +14,6 @@
     "optsLegend": {
         "message": "Options"
     },
-    "optsReloadNotice": {
-        "message": "Les modifications entraîneront le rechargement automatique de tous les onglets Facebook après la fermeture de cette page",
-        "description": "Remarque sur la page des options concernant le rechargement de la page après avoir apporté des modifications"
-    },
     "optsEnabled": {
         "message": "Activé"
     },
@@ -83,12 +79,16 @@
         "message": "Restaurations des paramètres par défaut"
     },
     "___": {
-        "message": "From https://libretranslate.com/?source=en&target=fr&q=Default%250AReset"
+        "message": "From https://libretranslate.com/?source=en&target=fr"
     },
     "optsResetTitle": {
         "message": "Par défaut"
     },
     "optsResetAlt": {
         "message": "Réinitialiser"
+    },
+    "optsReloadNotice": {
+        "message": "Les changements seront appliqués lorsque cette page d'options est fermée",
+        "description": "Remarque sur la page des options sur quand les changements seront appliqués"
     }
 }
