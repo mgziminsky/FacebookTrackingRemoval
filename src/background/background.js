@@ -17,7 +17,7 @@
 */
 
 import { isChrome, log, warn } from "../common.js";
-import { options, storage, sync } from "../config.js";
+import { options, storage } from "../config.js";
 import { CHROME_PORT, MSG, NOOP, STYLE_CLASS } from "../consts.js";
 import { refreshRules } from "../rules_sync.js";
 import "./webrequest.js";
@@ -88,18 +88,15 @@ if (isChrome) {
 
     // Popups don't fire unload on close, have to handle it from here
     browser.runtime.onConnect.addListener(port => {
-        log("Options Connect: ", port);
+        log("Options Connect");
         if (port.name === CHROME_PORT) {
             let changes = {};
             port.onMessage.addListener(data => changes = data);
-            port.onDisconnect.addListener(port => {
-                log("Options Disconnect: ", port);
+            port.onDisconnect.addListener(() => {
+                log("Options Disconnect");
                 if (Object.keys(changes).length)
                     Object.assign(options, changes);
             });
         }
     });
 }
-
-// Keep config up to date
-storage.onChanged.addListener(changes => sync(Object.keys(changes)));

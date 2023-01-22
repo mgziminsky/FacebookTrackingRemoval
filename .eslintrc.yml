@@ -10,9 +10,9 @@ rules:
   no-prototype-builtins: off
   no-unused-vars:
     - error
-    - vars: local
+    - args: all
       argsIgnorePattern: ^_
-      varsIgnorePattern: ^_
+      destructuredArrayIgnorePattern: ^_
   space-before-function-paren:
     - error
     - anonymous: never

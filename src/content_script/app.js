@@ -16,8 +16,8 @@
     Copyright (C) 2016-2022 Michael Ziminsky
 */
 
-import { isChrome, log, warn } from "../common.js";
-import { hide_rules, initHideRule, options, storage, sync } from "../config.js";
+import { isChrome, log } from "../common.js";
+import { hide_rules, initHideRule, onChanged, options } from "../config.js";
 import { MSG, PROCESSED_CLASS } from "../consts.js";
 import { normalizeString, parseHideRules } from "../util.js";
 import { applyStyle, cleanRedirectLinks, cleanShimLinks, fixGifs, fixVideoLinks, stripFBCLID, stripRefs } from "./cleaning.js";
@@ -227,11 +227,9 @@ function stop() {
     browser.runtime.sendMessage({ msg: MSG.removeCss, style: activeStyle });
 }
 
-storage.onChanged.addListener(changes => {
-    sync(Object.keys(changes)).then(() => {
-        if (options.enabled) start();
-        else stop();
-    }).catch(warn);
+onChanged.addListener(() => {
+    if (options.enabled) start();
+    else stop();
 });
 
 if (options.enabled)
