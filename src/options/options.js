@@ -78,7 +78,7 @@ for (const checkbox of document.querySelectorAll("input[type=radio]")) {
 function handleText(e) {
     e.target.value = e.target.value.trim();
     if (!e.target.value) {
-        delete changes[e.target.id];
+        changes[e.target.id] = undefined;
     } else {
         changes[e.target.id] = e.target.value;
     }
@@ -196,7 +196,7 @@ document.body.addEventListener("animationend", e => e.target.classList.remove("r
 }
 
 // Keep in sync with other options pages
-browser.storage.onChanged.addListener(() => config.sync().then(init));
+config.onChanged.addListener(init);
 
 
 // Avoid duplicated event listeners
