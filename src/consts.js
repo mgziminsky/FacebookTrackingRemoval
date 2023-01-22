@@ -12,3 +12,5 @@ export const MSG = Object.freeze({
     removeCss: "REMOVE_CSS",
     rulesRefresh: "RULES",
 });
+
+export const CHROME_PORT = "CHROME_POPUP";

@@ -16,11 +16,17 @@
     Copyright (C) 2016-2022 Michael Ziminsky
 */
 
+import { isChrome } from "../common.js";
 import * as config from "../config.js";
-import { MSG, NOOP, RATE_LIMIT } from "../consts.js";
+import { CHROME_PORT, MSG, NOOP, RATE_LIMIT } from "../consts.js";
 import getMessageSafe from "../i18n.js";
 import { timeoutRemaining } from "../rules_sync.js";
 
+//
+/** @type {browser.runtime.Port} */
+let bgPort;
+if (isChrome)
+    bgPort = browser.runtime.connect({ name: CHROME_PORT });
 
 /** @type {Options} */
 const changes = new Proxy({}, {
@@ -30,9 +36,12 @@ const changes = new Proxy({}, {
         } else {
             obj[key] = val;
         }
+        if (bgPort) bgPort.postMessage(obj);
         return true;
     }
 });
+
+// Only works in FF... https://bugs.chromium.org/p/chromium/issues/detail?id=31262
 window.addEventListener("unload", () => {
     if (Object.keys(changes).length)
         Object.assign(config.options, changes);

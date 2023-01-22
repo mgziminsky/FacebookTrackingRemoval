@@ -16,9 +16,9 @@
     Copyright (C) 2016-2022 Michael Ziminsky
 */
 
-import { warn } from "../common.js";
+import { isChrome, log, warn } from "../common.js";
 import { options, storage, sync } from "../config.js";
-import { MSG, STYLE_CLASS } from "../consts.js";
+import { CHROME_PORT, MSG, NOOP, STYLE_CLASS } from "../consts.js";
 import { refreshRules } from "../rules_sync.js";
 import "./webrequest.js";
 
@@ -45,6 +45,7 @@ browser.runtime.onInstalled.addListener(details => {
         browser.runtime.reload();
     }
 });
+
 
 /**
  * @param {(tabId: number, details: browser.extensionTypes.InjectDetails) => Promise<void>} action
@@ -80,6 +81,25 @@ function onMessage({ msg, ...data }, sender) {
     }
 }
 browser.runtime.onMessage.addListener(onMessage);
+
+if (isChrome) {
+    // alarms have a min delay of 1 minute...
+    refreshRules().catch(NOOP);
+
+    // Popups don't fire unload on close, have to handle it from here
+    browser.runtime.onConnect.addListener(port => {
+        log("Options Connect: ", port);
+        if (port.name === CHROME_PORT) {
+            let changes = {};
+            port.onMessage.addListener(data => changes = data);
+            port.onDisconnect.addListener(port => {
+                log("Options Disconnect: ", port);
+                if (Object.keys(changes).length)
+                    Object.assign(options, changes);
+            });
+        }
+    });
+}
 
 // Keep config up to date
 storage.onChanged.addListener(changes => sync(Object.keys(changes)));
