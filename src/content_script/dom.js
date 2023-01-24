@@ -19,7 +19,7 @@
 
 import { log } from "../common.js";
 import { click_whitelist } from "../config.js";
-import { PROCESSED_CLASS } from "../consts.js";
+import { COLLAPSED_SELECTOR, PROCESSED_CLASS } from "../consts.js";
 
 export {
     applyEventBlockers,
@@ -100,7 +100,7 @@ function buildCollapsible(label) {
 
     const collapsible = document.createElement("details");
     collapsible.classList.add(PROCESSED_CLASS);
-    collapsible.classList.add("fbtrCollapsible");
+    collapsible.classList.add(COLLAPSED_SELECTOR.substring(1));
     collapsible.appendChild(content);
 
     return collapsible;
@@ -111,7 +111,7 @@ function buildCollapsible(label) {
  * @param {string} selector
  */
 function selectAllWithBase(node, selector) {
-    const nodeMatches = node.matches(selector);
+    const nodeMatches = !node.classList.contains(PROCESSED_CLASS) && node.matches(selector);
 
     const childResults = [];
     for (const c of node.querySelectorAll(selector)) {

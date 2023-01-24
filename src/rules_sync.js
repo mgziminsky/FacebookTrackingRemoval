@@ -25,7 +25,7 @@ export {
 };
 
 
-const SELECTOR_RULE_FILES = ["article_wrapper"];
+const SELECTOR_RULE_FILES = ["article_wrapper", "unconditional"];
 const DYN_RULE_FILES = ["pending"];
 const SPLIT_RULE_DIRS = ["sponsored", "suggested"];
 const PARAM_CLEANING_FILES = ["params", "prefix_patterns", "values"];

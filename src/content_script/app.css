@@ -26,10 +26,10 @@ section.touchable > a {
     z-index: 41;
 }
 
-details.fbtrCollapsible {
+details.fbtrHidden {
     padding: 0 10px;
 }
-details.fbtrCollapsible[open] {
+details.fbtrHidden[open] {
     padding-bottom: 10px;
 }
 

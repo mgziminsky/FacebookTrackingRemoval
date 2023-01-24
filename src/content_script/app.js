@@ -18,7 +18,7 @@
 
 import { isChrome, log } from "../common.js";
 import { hide_rules, initHideRule, onChanged, options } from "../config.js";
-import { MSG, PROCESSED_CLASS } from "../consts.js";
+import { COLLAPSED_SELECTOR, MSG, PROCESSED_CLASS } from "../consts.js";
 import { normalizeString, parseHideRules } from "../util.js";
 import { applyStyle, cleanRedirectLinks, cleanShimLinks, fixGifs, fixVideoLinks, stripFBCLID, stripRefs } from "./cleaning.js";
 import { applyEventBlockers, ariaText, buildCollapsible, selectAllWithBase, useText, visibleText } from "./dom.js";
@@ -27,10 +27,14 @@ import { applyEventBlockers, ariaText, buildCollapsible, selectAllWithBase, useT
 if (isChrome)
     browser.runtime.sendMessage({ msg: MSG.chromeShow });
 
-const userRules = initHideRule(parseHideRules(options.userRules));
 
-
+/**
+ * @param {Element} elem
+ * @param {string} label
+ * @param {"remove" | "collapse"} method
+ */
 function hide(elem, label, method) {
+    /** @type {Element} */
     let target;
     if (!elem || !(target = elem.closest(hide_rules.article_wrapper))) {
         log(`Unable to hide ${label} - ${elem}`);
@@ -41,13 +45,13 @@ function hide(elem, label, method) {
         const selector = hide_rules.article_wrapper;
         for (const s of selector.split(",")) {
             if (target.matches(s)) {
-                return `>>> Hide matched wrapper for ${target.tagName}: ${selector} = ${s}`;
+                return `>>> Wrapper matched for ${target.tagName}: ${selector} = ${s}`;
             }
         }
     });
 
     if (method === "collapse") {
-        if (target.closest(".fbtrCollapsible")) {
+        if (target.closest(COLLAPSED_SELECTOR)) {
             log(`${label} already collapsed`);
             return;
         }
@@ -83,19 +87,17 @@ function removeLinkTracking(node) {
 
 /**
  * @param {Element} node
- * @param {Object} rule
- * @param {string} rule.selector
- * @param {Map<string,string>} rule.texts
- * @param {RegExp?} rule.patterns
- * @param {string} [method=options.hideMethod]
+ * @param {HideRule} rule
+ * @param {"remove" | "collapse"} [method=options.hideMethod]
  */
 function removeArticles(node, { selector, texts, patterns }, method = options.hideMethod) {
     if (!selector)
         return;
 
+    /** @argument {string} text */
     const getMatch = text => {
-        if (texts.size === 0 && !patterns)
-            return text;
+        if (!(texts?.size || patterns))
+            return text || "Unconditional Hide";
 
         // Some sponsored have other details appended after a · (0xb7). Try matching both parts separately
         const parts = text.split("\xb7").map(s => s.trim().toLowerCase());
@@ -122,6 +124,7 @@ function removeArticles(node, { selector, texts, patterns }, method = options.hi
                 }
             });
             hide(e, match, method);
+            e.classList.add(PROCESSED_CLASS);
         }
     }
 }
@@ -131,8 +134,10 @@ function removeAll(target) {
 
     if (options.delSuggest)
         removeArticles(target, hide_rules.suggested);
-    if (options.delPixeled)
+    if (options.delPixeled) {
+        removeArticles(target, { selector: hide_rules.unconditional }, "remove");
         removeArticles(target, hide_rules.sponsored, document.location.pathname.startsWith("/marketplace") ? "remove" : options.hideMethod);
+    }
     if (options.pendingRules)
         removeArticles(target, hide_rules.pending);
 
@@ -174,10 +179,14 @@ const observer = new MutationObserver(async mutations => {
     }
 });
 
+let userRules;
 async function run() {
+    userRules = initHideRule(parseHideRules(options.userRules));
     const body = document.body;
 
     observer.disconnect();
+    removeAll(body);
+
     observer.observe(body, (() => {
         const opts = { childList: true, subtree: true, characterData: false };
         if (options.fixLinks) {
@@ -186,8 +195,6 @@ async function run() {
         }
         return opts;
     })());
-
-    removeAll(body);
 
     if (options.fixLinks && removeLinkTracking(body) && document.getElementById("newsFeedHeading")) {
         const feed = document.getElementById("newsFeedHeading").parentNode;
@@ -227,10 +234,7 @@ function stop() {
     browser.runtime.sendMessage({ msg: MSG.removeCss, style: activeStyle });
 }
 
-onChanged.addListener(() => {
-    if (options.enabled) start();
-    else stop();
-});
+onChanged.addListener(() => options.enabled ? start() : stop());
 
 if (options.enabled)
     start();
