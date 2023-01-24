@@ -103,7 +103,7 @@ function reset(keys) {
 const _data = Object.freeze({
     hide_rules: Object.freeze({
         /**@type {HideRules}*/
-        value: { article_wrapper: "", pending: {}, sponsored: {}, suggested: {} },
+        value: { article_wrapper: "", pending: {}, sponsored: {}, suggested: {}, unconditional: "" },
         update(/**@type {HideRules}*/ raw) {
             Object.assign(this.value, raw);
             Object.values(this.value).forEach(initHideRule);

@@ -6,10 +6,10 @@ div[data-pagelet='RightRail']>*>*    /* Sidebar - old */
 #ssrb_rhc_start+div>*>*              /* Sidebar - new */
 div[role="complementary"] div>span:only-child>div:only-child>div:only-child     /* Sidebar - newer */
 div[role=article]
-div[aria-posinset]       /* Feed article */
-div.tr9rh885             /* Suggestions at top of user page */
-div.m1vx35lq             /* Marketplace Sponsored Label */
-div.cqf1kptm>div+span    /* Marketplace Sidebar */
-div[style].r0bj8g6i      /* Marketplace Sponsored */
-div._6x84                /* Watch Sponsored */
-div.dzwucfd1             /* Page banner suggestions */
+div[aria-posinset]                   /* Feed article */
+div.tr9rh885                         /* Suggestions at top of user page */
+div._6x84                            /* Watch Sponsored */
+div.dzwucfd1                         /* Page banner suggestions */
+div.x1pha0wt                         /* Marketplace Sponsored Label */
+div[style].xnpuxes:first-child       /* Marketplace Sponsored */
+span>div>div.xod5an3                 /* Marketplace Sidebar */
