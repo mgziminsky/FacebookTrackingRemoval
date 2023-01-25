@@ -7,4 +7,6 @@
     "html.customData": [
         ".vscode/html.html-data.json",
     ],
+    "licenser.useSingleLineStyle": false,
+    "licenser.license": "GPLv3",
 }
