@@ -32,26 +32,34 @@ const PARAM_CLEANING_FILES = ["params", "prefix_patterns", "values"];
 const CLICK_WHITELIST_FILES = ["elements", "roles", "selectors"];
 
 
+const devMode = (await browser.management.getSelf()).installType === "development";
+async function fetchRule(path, noFallback) {
+    return fetch(`https://${devMode ? "localhost" : "mgziminsky.gitlab.io"}/FacebookTrackingRemoval/${path}`, { mode: 'cors' })
+        .then(resp => resp.ok ? resp : Promise.reject())
+        .catch(() => noFallback ? Promise.reject() : fetch(browser.runtime.getURL(`data/${path}`))) // Fallback to bundled copy
+        .then(resp => resp.ok ? resp.text() : Promise.reject());
+}
+
 async function loadHideRules() {
     const { hide_rules: currentRules = {} } = await browser.storage.local.get("hide_rules");
     const newRules = {};
 
     for (const file of SELECTOR_RULE_FILES) {
-        await fetchRule(`hide_rules/${file}`)
+        await fetchRule(`hide_rules/${file}`, currentRules[file])
             .then(joinSelectors)
             .then(sel => newRules[file] = sel)
-            .catch(e => console.warn(`Failed to selectors file "${file}"`, e));
+            .catch(e => console.warn(`Failed to load selectors file "${file}"`, e));
     }
 
     for (const file of DYN_RULE_FILES) {
-        await fetchRule(`hide_rules/${file}`)
+        await fetchRule(`hide_rules/${file}`, currentRules[file])
             .then(parseHideRules)
             .then(rule => Object.assign(newRules[file] ??= {}, rule))
             .catch(e => console.warn(`Failed to load legacy rules from "${file}"`, e));
     }
 
     for (const dir of SPLIT_RULE_DIRS) {
-        await loadSplitRule(dir)
+        await loadSplitRule(dir, currentRules[dir])
             .then(rule => Object.assign(newRules[dir] ??= {}, rule))
             .catch(e => console.warn(`Split rule "${dir}" failed to load`, e));
     }
@@ -64,7 +72,7 @@ async function loadArrayData(key, files) {
 
     const newRules = {};
     for (const file of files) {
-        await fetchRule(`${key}/${file}`)
+        await fetchRule(`${key}/${file}`, currentRules[file])
             .then(stripComments)
             .then(splitLines)
             .then(data => newRules[file] = data)
@@ -74,10 +82,11 @@ async function loadArrayData(key, files) {
     return Object.assign(currentRules, newRules);
 }
 
-async function loadSplitRule(dir) {
+/** @param {HideRule} currentRule */
+async function loadSplitRule(dir, currentRule) {
     const rule = {};
 
-    rule.selector = await fetchRule(`hide_rules/${dir}/selectors`)
+    rule.selector = await fetchRule(`hide_rules/${dir}/selectors`, currentRule?.selector)
         .then(joinSelectors)
         .catch(e => console.warn(`Failed to load selectors for "${dir}"`, e));
 
@@ -85,14 +94,14 @@ async function loadSplitRule(dir) {
     if (!rule.selector)
         return Promise.reject("Selector missing or empty");
 
-    await fetchRule(`hide_rules/${dir}/texts`)
+    await fetchRule(`hide_rules/${dir}/texts`, currentRule?.texts)
         .then(stripComments)
         .then(splitLines)
         .then(a => a.sort())
         .then(texts => rule.texts = texts)
         .catch(e => console.warn(`Failed to load texts for "${dir}"`, e));
 
-    await fetchRule(`hide_rules/${dir}/patterns`)
+    await fetchRule(`hide_rules/${dir}/patterns`, currentRule?.patterns)
         .then(stripComments)
         .then(splitLines)
         .then(a => a.sort())
@@ -100,14 +109,6 @@ async function loadSplitRule(dir) {
         .catch(e => console.warn(`Failed to load patterns for "${dir}"`, e));
 
     return rule;
-}
-
-async function fetchRule(path) {
-    const devMode = (await browser.management.getSelf()).installType === "development";
-    return fetch(`https://${devMode ? "localhost" : "mgziminsky.gitlab.io"}/FacebookTrackingRemoval/${path}`, { mode: 'cors' })
-        .then(resp => resp.ok ? resp : Promise.reject())
-        .catch(_ => fetch(browser.runtime.getURL(`data/${path}`))) // Fallback to bundled copy
-        .then(resp => resp.ok ? resp.text() : Promise.reject());
 }
 
 /** @param {Function} func */
