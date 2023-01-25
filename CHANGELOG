@@ -1,3 +1,9 @@
+v1.11.0
+- Refactored project into ES modules
+- Options changes are applied without a page reload
+- Existing rules won't be replaced by bundled copies in case of network errors
+- Fixes and supporting code for marketplace ads
+
 v1.10.4
 - Fix ad detection. Handle svg/aria trickery.
 
