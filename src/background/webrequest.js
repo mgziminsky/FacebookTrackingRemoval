@@ -60,7 +60,7 @@ browser.webRequest.onBeforeRequest.addListener(
 browser.webNavigation.onHistoryStateUpdated.addListener(details => {
     const orig = details.url;
     const clean = cleanLinkParams(details.url);
-    if (orig != clean) {
+    if (orig !== clean) {
         browser.tabs.sendMessage(details.tabId, { type: MSG.history, orig, clean });
     }
 }, {

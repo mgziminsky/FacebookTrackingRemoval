@@ -47,9 +47,9 @@ function cleanLink(a, href) {
         if (supportedProtos.includes(new URL(href, origin).protocol))
             a.href = href;
         else
-            log("Unsupported link protocol; leaving unchanged: " + href);
+            log(`Unsupported link protocol; leaving unchanged: ${href}`);
     } catch (_) {
-        log("Link cleaning encountered an invalid url: " + href);
+        log(`Link cleaning encountered an invalid url: ${href}`);
     }
     applyStyle(a);
 }
@@ -70,7 +70,7 @@ function cleanShimLinks(node) {
     const trackedLinks = selectAllWithBase(node, "a[onclick^='LinkshimAsyncLink.referrer_log']");
     for (const a of trackedLinks) {
         cleanLink(a, extractQuotedString(a.getAttribute("onmouseover")).replace(/\\(.)/g, '$1'));
-        log("Removed tracking from shim link: " + a);
+        log(`Removed tracking from shim link: ${a}`);
     }
     return trackedLinks.length;
 }
@@ -92,7 +92,7 @@ function fixVideoLinks(node) {
         };
 
         if (options.inlineVids) {
-            log("Inlined video: " + replaceVideo(vid).src);
+            log(`Inlined video: ${replaceVideo(vid).src}`);
         } else {
             cleanAttrs(vid);
             const target = vid.cloneNode(true);
@@ -104,7 +104,7 @@ function fixVideoLinks(node) {
                 replaceVideo(target).play();
             }, true);
             vid.parentNode.replaceChild(target, vid);
-            log("Cleaned deferred inline video: " + vidSrc);
+            log(`Cleaned deferred inline video: ${vidSrc}`);
         }
     }
     return videoLinks.length;
@@ -116,7 +116,7 @@ function cleanRedirectLinks(node) {
     for (const a of trackedLinks) {
         const newHref = new URL(a.href).searchParams.get('u');
         cleanLink(a, newHref);
-        log("Removed tracking from redirect link: " + a);
+        log(`Removed tracking from redirect link: ${a}`);
     }
     return trackedLinks.length;
 }
@@ -137,15 +137,17 @@ function stripFBCLID(node) {
         } else {
             a.href = link.href;
             applyStyle(a);
-            log("Removed fbclid from link: " + a);
+            log(`Removed fbclid from link: ${a}`);
         }
     }
     return trackedLinks.length;
 }
 
+/** @param {Element} node */
 function stripRefs(node) {
     let intLinks = 0;
 
+    /** @param {HTMLAnchorElement} a */
     function _strip(a) {
         if (a.nodeName !== "A" || !domains.some(d => a.hostname.endsWith(d)))
             return;
@@ -159,19 +161,19 @@ function stripRefs(node) {
             const orig = a.getAttribute("href"); // get unexpanded value
             const href = cleanLinkParams(orig, linkBase); // Don't assign here to avoid infinite mutation recursion
 
-            if (href != orig) {
+            if (href !== orig) {
                 a.href = href;
                 applyStyle(a);
-                log("Cleaned internal href:\n\t" + orig + "\n\t" + a.getAttribute("href"));
+                log(`Cleaned internal href:\n\t${orig}\n\t${a.getAttribute("href")}`);
             }
         }
 
         if (a.hasAttribute("ajaxify")) {
             const orig = a.getAttribute("ajaxify");
             a.setAttribute("ajaxify", cleanLinkParams(orig, linkBase));
-            if (orig != a.getAttribute("ajaxify")) {
+            if (orig !== a.getAttribute("ajaxify")) {
                 applyStyle(a);
-                log("Cleaned internal ajaxify link:\n\t" + orig + "\n\t" + a.getAttribute("ajaxify"));
+                log(`Cleaned internal ajaxify link:\n\t${orig}\n\t${a.getAttribute("ajaxify")}`);
             }
         }
 
@@ -179,9 +181,9 @@ function stripRefs(node) {
             delete a.dataset.hovercardReferrer;
             const orig = a.dataset.hovercard;
             a.dataset.hovercard = cleanLinkParams(orig, linkBase);
-            if (orig != a.dataset.hovercard) {
+            if (orig !== a.dataset.hovercard) {
                 applyStyle(a);
-                log("Cleaned internal hovercard link:\n\t" + orig + "\n\t" + a.dataset.hovercard);
+                log(`Cleaned internal hovercard link:\n\t${orig}\n\t${a.dataset.hovercard}`);
             }
         }
     }
@@ -225,7 +227,7 @@ function fixGifs(node) {
             wrapper.classList.add(c);
 
         target.parentNode.replaceChild(wrapper, target);
-        log("Fixed GIF: " + gif.dataset.src);
+        log(`Fixed GIF: ${gif.dataset.src}`);
     }
 }
 

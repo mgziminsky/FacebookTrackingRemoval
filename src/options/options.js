@@ -31,7 +31,7 @@ if (isChrome)
 /** @type {Options} */
 const changes = new Proxy({}, {
     set(obj, key, val) {
-        if (config.options[key] == val) {
+        if (config.options[key] === val) {
             delete obj[key];
         } else {
             obj[key] = val;
@@ -99,7 +99,7 @@ function handleToggle(e) { document.getElementById(e.target.dataset.toggle).clas
  * @param {string} name
  * @param {*} value
  */
-function findRadio(elem, name, value) { return elem.querySelector("input[name=" + name + "][value=" + value + "]"); }
+function findRadio(elem, name, value) { return elem.querySelector(`input[name=${name}][value=${value}]`); }
 
 // Per-option reset functionality
 window.customElements.define('btn-reset', class extends HTMLElement {
