@@ -36,7 +36,7 @@ if (isChrome)
 function hide(elem, label, method) {
     /** @type {Element} */
     let target;
-    if (!elem || !(target = elem.closest(hide_rules.article_wrapper))) {
+    if (!(elem && (target = elem.closest(hide_rules.article_wrapper)))) {
         log(`Unable to hide ${label} - ${elem}`);
         return;
     }
@@ -63,11 +63,11 @@ function hide(elem, label, method) {
 
         target.parentNode.appendChild(wrapper);
         wrapper.appendChild(target);
-        log("Collapsed " + label);
+        log(`Collapsed ${label}`);
     } else {
         // Removing breaks things :/ Consider using class instead of inline style?
         (target.closest(":not(:only-child)") || target).style = "display: none !important";
-        log("Removed " + label);
+        log(`Removed ${label}`);
     }
 }
 
@@ -152,7 +152,7 @@ function removeAll(target) {
  */
 function forEachAdded(mutation, cb) {
     for (const node of mutation.addedNodes) {
-        if (node.nodeType == Node.ELEMENT_NODE && !SKIP.includes(node.nodeName) && !node.classList.contains(PROCESSED_CLASS)) {
+        if (node.nodeType === Node.ELEMENT_NODE && !SKIP.includes(node.nodeName) && !node.classList.contains(PROCESSED_CLASS)) {
             cb(node);
         }
     }

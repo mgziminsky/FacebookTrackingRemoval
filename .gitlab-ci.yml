@@ -3,9 +3,7 @@ image: alpine:latest
 pages:
   stage: deploy
   script:
-  - mkdir .public
-  - cp -a data/* .public/
-  - mv .public public
+  - cp -a data public
   artifacts:
     paths:
     - public

@@ -140,7 +140,7 @@ function ariaText(elem) {
 
 /** @param {SVGUseElement} elem */
 function useText(elem) {
-    if (elem.tagName.toUpperCase() != 'USE')
+    if (elem.tagName.toUpperCase() !== 'USE')
         return;
 
     return document.querySelector(elem.href.baseVal)?.textContent;
