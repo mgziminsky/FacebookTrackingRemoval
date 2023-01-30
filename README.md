@@ -1,4 +1,4 @@
-[![GitHub manifest version](https://img.shields.io/github/manifest-json/v/mgziminsky/FacebookTrackingRemoval)](https://github.com/mgziminsky/FacebookTrackingRemoval/releases/latest)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/mgziminsky/FacebookTrackingRemoval)](https://github.com/mgziminsky/FacebookTrackingRemoval/releases/latest)
 [![GitHub release (latest by date)](https://img.shields.io/github/downloads/mgziminsky/FacebookTrackingRemoval/latest/total)](https://github.com/mgziminsky/FacebookTrackingRemoval/releases/latest)
 [![GitHub release (total)](https://img.shields.io/github/downloads/mgziminsky/FacebookTrackingRemoval/total)](https://github.com/mgziminsky/FacebookTrackingRemoval/releases)
 
@@ -21,7 +21,7 @@ For links, the event listeners on the link and its parents are removed and/or di
 
 For videos on mobile, all Facebook™ event-listeners and custom controls are removed, and the video is simplified into just the bare HTML5 video tag.
 
-## Explanation of permissions:
+## Explanation of permissions: ![GitHub manifest.json dynamic](https://img.shields.io/github/manifest-json/permissions/mgziminsky/FacebookTrackingRemoval?label=Permissions)
 - Access to facebook.com, messenger.com, and facebookwkhpilnemxj7asaniu7vnjjbiltxjqhye3mhbshg7kx5tfyd.onion is needed for main functionality, in order to work on those pages.
 - Access to mgziminsky.gitlab.io, more specifically https://mgziminsky.gitlab.io/FacebookTrackingRemoval/*, is used to download blocking rules only
 - `webNavigation`: Needed to handle cleaning FB interactions that use the browser history API instead of doing a normal page navigation

@@ -62,7 +62,6 @@
     }
   ],
 
-  // Only needed by Chrome
   "web_accessible_resources": [
     "/src/*"
   ],
