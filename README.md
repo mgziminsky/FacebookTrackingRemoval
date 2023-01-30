@@ -1,13 +1,13 @@
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/mgziminsky/FacebookTrackingRemoval)](https://github.com/mgziminsky/FacebookTrackingRemoval/releases/latest)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/mgziminsky/FacebookTrackingRemoval?logo=github)](https://github.com/mgziminsky/FacebookTrackingRemoval/releases/latest)
 [![GitHub release (latest by date)](https://img.shields.io/github/downloads/mgziminsky/FacebookTrackingRemoval/latest/total)](https://github.com/mgziminsky/FacebookTrackingRemoval/releases/latest)
 [![GitHub release (total)](https://img.shields.io/github/downloads/mgziminsky/FacebookTrackingRemoval/total)](https://github.com/mgziminsky/FacebookTrackingRemoval/releases)
 
-[![Mozilla Add-on](https://img.shields.io/amo/v/facebook-tracking-removal.svg)](https://addons.mozilla.org/addon/facebook-tracking-removal?src=external-github)
+[![Mozilla Add-on](https://img.shields.io/amo/v/facebook-tracking-removal.svg?logo=firefoxbrowser)](https://addons.mozilla.org/addon/facebook-tracking-removal?src=external-github)
 [![Mozilla Add-on](https://img.shields.io/amo/d/facebook-tracking-removal.svg)](https://addons.mozilla.org/addon/facebook-tracking-removal?src=external-github)
 [![Mozilla Add-on](https://img.shields.io/amo/users/facebook-tracking-removal.svg)](https://addons.mozilla.org/addon/facebook-tracking-removal?src=external-github)
 [![Mozilla Add-on](https://img.shields.io/amo/stars/facebook-tracking-removal.svg)](https://addons.mozilla.org/addon/facebook-tracking-removal/reviews?src=external-github)
 
-[![Chrome Web Store](https://img.shields.io/chrome-web-store/v/ldeofbdmhnnocclkaddcnamhbhanaiaj.svg)](https://chrome.google.com/webstore/detail/facebook-tracking-ad-remo/ldeofbdmhnnocclkaddcnamhbhanaiaj)
+[![Chrome Web Store](https://img.shields.io/chrome-web-store/v/ldeofbdmhnnocclkaddcnamhbhanaiaj.svg?logo=googlechrome)](https://chrome.google.com/webstore/detail/facebook-tracking-ad-remo/ldeofbdmhnnocclkaddcnamhbhanaiaj)
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/users/ldeofbdmhnnocclkaddcnamhbhanaiaj.svg)](https://chrome.google.com/webstore/detail/facebook-tracking-ad-remo/ldeofbdmhnnocclkaddcnamhbhanaiaj)
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/rating-count/ldeofbdmhnnocclkaddcnamhbhanaiaj.svg)](https://chrome.google.com/webstore/detail/facebook-tracking-ad-remo/ldeofbdmhnnocclkaddcnamhbhanaiaj)
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/stars/ldeofbdmhnnocclkaddcnamhbhanaiaj.svg)](https://chrome.google.com/webstore/detail/facebook-tracking-ad-remo/ldeofbdmhnnocclkaddcnamhbhanaiaj)

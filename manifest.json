@@ -18,12 +18,12 @@
   "permissions": [
     "alarms",
     "storage",
-    "*://*.facebook.com/*",
-    "*://*.messenger.com/*",
-    "*://*.facebookwkhpilnemxj7asaniu7vnjjbiltxjqhye3mhbshg7kx5tfyd.onion/*",
     "webNavigation",
     "webRequest",
     "webRequestBlocking",
+    "*://*.facebook.com/*",
+    "*://*.messenger.com/*",
+    "*://*.facebookwkhpilnemxj7asaniu7vnjjbiltxjqhye3mhbshg7kx5tfyd.onion/*",
     "https://mgziminsky.gitlab.io/FacebookTrackingRemoval/*"
   ],
 
