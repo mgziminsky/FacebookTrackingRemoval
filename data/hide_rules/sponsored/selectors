@@ -7,4 +7,5 @@ div[role=button]
 div>a:first-child
 div>a[onmousedown]
 h3>*
-use
+use /* replaced with svg, leave temporarily for backward compatibility */
+svg

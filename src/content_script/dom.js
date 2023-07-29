@@ -141,9 +141,9 @@ function ariaText(elem) {
 /** @param {SVGUseElement} elem */
 function useText(elem) {
     if (elem.tagName.toUpperCase() !== 'USE')
-        return;
+        return "";
 
-    return document.querySelector(elem.href.baseVal)?.textContent;
+    return document.querySelector(elem.href.baseVal)?.textContent ?? "";
 }
 
 /** @param {HTMLElement} elem */
@@ -162,6 +162,7 @@ function visibleText(elem) {
                 if (!rectsIntersect(bounds, child.getBoundingClientRect()))
                     continue;
                 text += child.dataset.content ?? "";
+                text += useText(child);
                 for (let c = child.lastChild; c !== null; c = c.previousSibling)
                     children.push(c);
                 break;

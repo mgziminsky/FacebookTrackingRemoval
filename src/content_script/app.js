@@ -21,7 +21,7 @@ import { hide_rules, initHideRule, onChanged, options } from "../config.js";
 import { COLLAPSED_SELECTOR, MSG, PROCESSED_CLASS } from "../consts.js";
 import { normalizeString, parseHideRules } from "../util.js";
 import { applyStyle, cleanRedirectLinks, cleanShimLinks, fixGifs, fixVideoLinks, stripFBCLID, stripRefs } from "./cleaning.js";
-import { applyEventBlockers, ariaText, buildCollapsible, selectAllWithBase, useText, visibleText } from "./dom.js";
+import { applyEventBlockers, ariaText, buildCollapsible, selectAllWithBase, visibleText } from "./dom.js";
 
 
 if (isChrome)
@@ -112,7 +112,7 @@ function removeArticles(node, { selector, texts, patterns }, method = options.hi
     };
 
     for (const e of selectAllWithBase(node, selector)) {
-        const elementText = ariaText(e) || useText(e) || visibleText(e);
+        const elementText = ariaText(e) || visibleText(e);
 
         const match = getMatch(elementText);
         if (match) {
