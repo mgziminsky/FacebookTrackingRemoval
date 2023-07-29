@@ -1,3 +1,6 @@
+v1.11.1
+- Fix split text in svg labels
+
 v1.11.0
 - Refactored project into ES modules
 - Options changes are applied without a page reload
