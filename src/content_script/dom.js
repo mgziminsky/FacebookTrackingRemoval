@@ -26,9 +26,9 @@ export {
     ariaText,
     buildCollapsible,
     cleanAttrs,
+    inlineUse,
     selectAllWithBase,
     stopPropagation,
-    useText,
     visibleText,
 };
 
@@ -127,6 +127,19 @@ function selectAllWithBase(node, selector) {
     return results;
 }
 
+/**
+ * Replace all `use` elements with a copy of their referenced content.
+ * @param {Element} target
+ */
+function inlineUse(target) {
+    for (const use of selectAllWithBase(target, "use")) {
+        const used = document.querySelector(use.href.baseVal)?.cloneNode(true);
+        if (used) {
+            used.removeAttribute("id");
+            use.replaceWith(used);
+        }
+    }
+}
 
 /** @param {HTMLElement} elem */
 function ariaText(elem) {
@@ -136,14 +149,6 @@ function ariaText(elem) {
 
     const text = [...new Set(labels || [])].map(e => e.textContent).join(' ');
     return text ? text : elem.getAttribute('aria-label');
-}
-
-/** @param {SVGUseElement} elem */
-function useText(elem) {
-    if (elem.tagName.toUpperCase() !== 'USE')
-        return "";
-
-    return document.querySelector(elem.href.baseVal)?.textContent ?? "";
 }
 
 /** @param {HTMLElement} elem */
@@ -162,7 +167,6 @@ function visibleText(elem) {
                 if (!rectsIntersect(bounds, child.getBoundingClientRect()))
                     continue;
                 text += child.dataset.content ?? "";
-                text += useText(child);
                 for (let c = child.lastChild; c !== null; c = c.previousSibling)
                     children.push(c);
                 break;

@@ -21,7 +21,7 @@ import { hide_rules, initHideRule, onChanged, options } from "../config.js";
 import { COLLAPSED_SELECTOR, MSG, PROCESSED_CLASS } from "../consts.js";
 import { normalizeString, parseHideRules } from "../util.js";
 import { applyStyle, cleanRedirectLinks, cleanShimLinks, fixGifs, fixVideoLinks, stripFBCLID, stripRefs } from "./cleaning.js";
-import { applyEventBlockers, ariaText, buildCollapsible, selectAllWithBase, visibleText } from "./dom.js";
+import { applyEventBlockers, ariaText, buildCollapsible, inlineUse, selectAllWithBase, visibleText } from "./dom.js";
 
 
 if (isChrome)
@@ -163,6 +163,7 @@ const observer = new MutationObserver(async mutations => {
     for (const mutation of mutations) {
         if (mutation.type === "childList" && !SKIP.includes(mutation.target.nodeName)) {
             const target = mutation.target;
+            inlineUse(target);
 
             removeAll(target);
 
