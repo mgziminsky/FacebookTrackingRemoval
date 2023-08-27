@@ -88,7 +88,8 @@ function cleanLinkParams(link, base = (location.origin + location.pathname)) {
 
         const cleanParams = new URLSearchParams(url.search);
 
-        const deleteParam = cleanParams.delete.bind(cleanParams);
+        // Can't use bind in FF115+ due to addition of optional 2nd arg for matching on value
+        const deleteParam = p => cleanParams.delete(p);
 
         const pc = param_cleaning;
         pc.params.forEach(deleteParam);
