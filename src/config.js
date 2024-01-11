@@ -158,7 +158,7 @@ function initHideRule(rule) {
     if (rule.texts)
         rule.texts = rule.texts.reduce((m, t) => m.set(normalizeString(t), t), new Map());
 
-    if (rule.patterns instanceof Array && rule.patterns.length)
+    if (Array.isArray(rule.patterns) && rule.patterns.length)
         rule.patterns = new RegExp(rule.patterns.join("|"), "iu");
     else
         delete rule.patterns;
@@ -206,7 +206,9 @@ async function sync(keys) {
 }
 storage.onChanged.addListener(changes => {
     sync(Object.keys(changes)).then(() => {
-        Object.keys(_data).forEach(k => delete changes[k]);
+        for (const k of Object.keys(_data))
+            delete changes[k];
+
         if (Object.keys(changes).length)
             for (const cb of _onChanged.values())
                 cb(changes);

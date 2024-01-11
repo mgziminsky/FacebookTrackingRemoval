@@ -1,0 +1,36 @@
+{
+    "$schema": "https://biomejs.dev/schemas/1.3.1/schema.json",
+    "formatter": {
+        "enabled": true,
+        "indentWidth": 4,
+        "indentStyle": "space",
+        "ignore": [
+            "webextension-polyfill",
+            "browser-polyfill.*"
+        ]
+    },
+    "linter": {
+        "enabled": true,
+        "ignore": [
+            "webextension-polyfill",
+            "browser-polyfill.*"
+        ],
+        "rules": {
+            "recommended": true,
+            "suspicious": {
+                "noAssignInExpressions": "off"
+            }
+        }
+    },
+    "json": {
+        "parser": {
+            "allowComments": true,
+            "allowTrailingCommas": true
+        }
+    },
+    "vcs": {
+        "enabled": true,
+        "clientKind": "git",
+        "useIgnoreFile": true
+    }
+}
