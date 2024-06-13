@@ -9,4 +9,8 @@
     ],
     "licenser.useSingleLineStyle": false,
     "licenser.license": "GPLv3",
+    // "json.schemas": [{
+    //     "url": "https://json.schemastore.org/chrome-manifest.json",
+    //     "fileMatch": ["/manifest.json"]
+    // }]
 }

@@ -32,11 +32,11 @@ const PARAM_CLEANING_FILES = ["params", "prefix_patterns", "values"];
 const CLICK_WHITELIST_FILES = ["elements", "roles", "selectors"];
 
 
-const devMode = (await browser.management.getSelf()).installType === "development";
-async function fetchRule(path, noFallback) {
-    return fetch(`https://${devMode ? "localhost" : "mgziminsky.gitlab.io"}/FacebookTrackingRemoval/${path}`, { mode: 'cors' })
+async function fetchRule(path, currentVal) {
+    const devMode = (await browser.management.getSelf()).installType === "development";
+    return fetch(`https://${devMode ? "localhost" : "mgziminsky.gitlab.io"}/FacebookTrackingRemoval/${path}`, { mode: 'cors', signal: (devMode ? AbortSignal.timeout(100) : undefined) })
         .then(resp => resp.ok ? resp : Promise.reject())
-        .catch(() => noFallback ? Promise.reject() : fetch(browser.runtime.getURL(`data/${path}`))) // Fallback to bundled copy
+        .catch(() => currentVal ? Promise.reject(`Keeping current value: ${currentVal}`) : fetch(browser.runtime.getURL(`data/${path}`))) // Fallback to bundled copy
         .then(resp => resp.ok ? resp.text() : Promise.reject());
 }
 
@@ -48,20 +48,20 @@ async function loadHideRules() {
         await fetchRule(`hide_rules/${file}`, currentRules[file])
             .then(joinSelectors)
             .then(sel => newRules[file] = sel)
-            .catch(e => console.warn(`Failed to load selectors file "${file}"`, e));
+            .catch(e => console.warn(`Failed to load selectors file "${file}"\n\t`, e));
     }
 
     for (const file of DYN_RULE_FILES) {
         await fetchRule(`hide_rules/${file}`, currentRules[file])
             .then(parseHideRules)
             .then(rule => Object.assign(newRules[file] ??= {}, rule))
-            .catch(e => console.warn(`Failed to load legacy rules from "${file}"`, e));
+            .catch(e => console.warn(`Failed to load legacy rules from "${file}"\n\t`, e));
     }
 
     for (const dir of SPLIT_RULE_DIRS) {
         await loadSplitRule(dir, currentRules[dir])
             .then(rule => Object.assign(newRules[dir] ??= {}, rule))
-            .catch(e => console.warn(`Split rule "${dir}" failed to load`, e));
+            .catch(e => console.warn(`Split rule "${dir}" failed to load\n\t`, e));
     }
 
     return Object.assign(currentRules, newRules);
@@ -76,7 +76,7 @@ async function loadArrayData(key, files) {
             .then(stripComments)
             .then(splitLines)
             .then(data => newRules[file] = data)
-            .catch(e => console.warn(`Failed to load array data from "${key}/${file}"`, e));
+            .catch(e => console.warn(`Failed to load array data from "${key}/${file}"\n\t`, e));
     }
 
     return Object.assign(currentRules, newRules);
@@ -88,7 +88,7 @@ async function loadSplitRule(dir, currentRule) {
 
     rule.selector = await fetchRule(`hide_rules/${dir}/selectors`, currentRule?.selector)
         .then(joinSelectors)
-        .catch(e => console.warn(`Failed to load selectors for "${dir}"`, e));
+        .catch(e => console.warn(`Failed to load selectors for "${dir}"\n\t`, e));
 
     // Selector required, fail if missing or empty
     if (!rule.selector)
@@ -99,14 +99,14 @@ async function loadSplitRule(dir, currentRule) {
         .then(splitLines)
         .then(a => a.sort())
         .then(texts => rule.texts = texts)
-        .catch(e => console.warn(`Failed to load texts for "${dir}"`, e));
+        .catch(e => console.warn(`Failed to load texts for "${dir}"\n\t`, e));
 
     await fetchRule(`hide_rules/${dir}/patterns`, currentRule?.patterns)
         .then(stripComments)
         .then(splitLines)
         .then(a => a.sort())
         .then(patterns => rule.patterns = patterns)
-        .catch(e => console.warn(`Failed to load patterns for "${dir}"`, e));
+        .catch(e => console.warn(`Failed to load patterns for "${dir}"\n\t`, e));
 
     return rule;
 }

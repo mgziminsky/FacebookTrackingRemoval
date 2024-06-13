@@ -42,9 +42,11 @@ function isAllowedTarget(e) {
         const role = checkTarget.attributes.role;
         if (checkTarget.tagName === "A" && checkTarget.hostname === location.hostname) {
             return true;
-        } else if (role && click_whitelist.roles.includes(role.value.toUpperCase())) {
+        }
+        if (role && click_whitelist.roles.includes(role.value.toUpperCase())) {
             return true;
-        } else if (click_whitelist.elements.includes(checkTarget.tagName) || checkTarget.classList.contains("FBTR-SAFE") || checkTarget.matches(click_whitelist.selector)) {
+        }
+        if (click_whitelist.elements.includes(checkTarget.tagName) || checkTarget.classList.contains("FBTR-SAFE") || checkTarget.matches(click_whitelist.selector)) {
             return true;
         }
         checkTarget = checkTarget.parentNode;

@@ -91,6 +91,7 @@ function cleanLinkParams(link, base = (location.origin + location.pathname)) {
         // Can't use bind in FF115+ due to addition of optional 2nd arg for matching on value
         const deleteParam = p => cleanParams.delete(p);
 
+        /**@type {ParamCleaning}*/
         const pc = param_cleaning;
         pc.params.forEach(deleteParam);
 
@@ -100,15 +101,16 @@ function cleanLinkParams(link, base = (location.origin + location.pathname)) {
             .filter(pc.pattern.test.bind(pc.pattern))
             .forEach(deleteParam);
 
-        pc.values.filter(cleanParams.has.bind(cleanParams)).forEach(k => {
-            const v = JSON.parse(cleanParams.get(k));
-            pc.params.forEach(key => delete v[key]);
-            for (const key in v) {
+        // Handle json encoded values
+        for (const name of pc.values.filter(v => cleanParams.has(v))) {
+            const val = JSON.parse(cleanParams.get(name));
+            for (const param of pc.params) delete val[param];
+            for (const key in val) {
                 if (pc.pattern.test(key))
-                    delete v[key];
+                    delete val[key];
             }
-            cleanParams.set(k, JSON.stringify(v));
-        });
+            cleanParams.set(name, JSON.stringify(val));
+        }
 
         const origLength = url.search.length;
         url.search = cleanParams;

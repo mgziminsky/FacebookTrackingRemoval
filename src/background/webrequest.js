@@ -17,47 +17,15 @@
  * along with FacebookTrackingRemoval.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { log } from "../common.js";
 import * as config from "../config.js";
 import { MSG } from "../consts.js";
 import { cleanLinkParams } from "../util.js";
 
 
-/**
- * @param {browser.webRequest._OnBeforeRequestDetails} details
- * @param {boolean} forceBlock
- * @return {browser.webRequest.BlockingResponse}
- */
-function checkRequest(details, forceBlock) {
+browser.webNavigation.onHistoryStateUpdated.addListener(details => {
     if (!config.options.enabled)
         return;
 
-    if (forceBlock || ["beacon", "ping"].includes(details.type)) {
-        log(`Blocking ${details.type} request to ${details.url}`);
-        return { cancel: true };
-    }
-}
-
-/** @param {string[]} paths */
-function* genBlockUrls(paths) {
-    for (const h of config.host_patterns)
-        for (const p of paths)
-            yield h.replace(/\*$/, p);
-}
-
-browser.webRequest.onBeforeRequest.addListener(
-    details => checkRequest(details, true),
-    { urls: [...genBlockUrls(["ajax/bz*", "ajax/bnzai*", "xti.php?*"]), ...config.host_patterns.map(h => h.replace("*.", "pixel."))] },
-    ["blocking"]
-);
-
-browser.webRequest.onBeforeRequest.addListener(
-    checkRequest,
-    { urls: config.host_patterns },
-    ["blocking"]
-);
-
-browser.webNavigation.onHistoryStateUpdated.addListener(details => {
     const orig = details.url;
     const clean = cleanLinkParams(details.url);
     if (orig !== clean) {
@@ -67,4 +35,18 @@ browser.webNavigation.onHistoryStateUpdated.addListener(details => {
     url: config.host_patterns
         .map(h => h.replaceAll(/[^.\w]/g, ""))
         .map(hostContains => ({ hostContains }))
+});
+
+function updateRuleset(enable) {
+    if (enable === true) {
+        browser.declarativeNetRequest.updateEnabledRulesets({ enableRulesetIds: ["ruleset"] });
+    }
+    else if (enable === false) {
+        browser.declarativeNetRequest.updateEnabledRulesets({ disableRulesetIds: ["ruleset"] });
+    }
+}
+config.storage.onChanged.addListener(({ enabled }) => updateRuleset(enabled?.newValue));
+browser.runtime.onInstalled.addListener(() => {
+    // Disable blocking rules on update since they get reset back to the extension default
+    config.READY.then(() => updateRuleset(config.options.enabled));
 });

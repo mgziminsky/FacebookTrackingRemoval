@@ -31,6 +31,7 @@ export {
     param_cleaning,
     reset,
     storage,
+    READY,
 };
 
 const storage = browser.storage.local;
@@ -56,10 +57,10 @@ const host_patterns = Object.freeze([...new Set(browser.runtime.getManifest().co
 const domains = Object.freeze([...new Set(host_patterns.map(m => m.replace(/\W*\*\W?/g, '')))]);
 
 /** @type {Options} */
-const _options = Object.seal(await storage.get(defaults));
+const _options = Object.seal(Object.assign({}, defaults));
 const options = new Proxy(_options, {
     set(opts, prop, val) {
-        if (!opts.hasOwnProperty(prop))
+        if (!Object.hasOwn(opts, prop))
             return false;
 
         const old = opts[prop];
@@ -92,7 +93,7 @@ const options = new Proxy(_options, {
 function reset(keys) {
     let result;
     if (keys) {
-        result = storage.remove(keys).then(() => [...keys].forEach(key => _options[key] = defaults[key]));
+        result = storage.remove(keys).then(() => { for (const key of [...keys]) _options[key] = defaults[key]; });
     } else {
         result = storage.remove(Object.keys(defaults)).then(() => Object.assign(_options, defaults));
     }
@@ -126,11 +127,7 @@ const _data = Object.freeze({
         },
     }),
 });
-{ // Load initial data
-    const data = await browser.storage.local.get(Object.keys(_data));
-    for (const k in data)
-        _data[k].update(data[k]);
-}
+
 
 /** @type {ProxyHandler} */
 const ReadOnly = {
@@ -161,6 +158,7 @@ function initHideRule(rule) {
     if (Array.isArray(rule.patterns) && rule.patterns.length)
         rule.patterns = new RegExp(rule.patterns.join("|"), "iu");
     else
+        // biome-ignore lint/performance/noDelete:
         delete rule.patterns;
 
     return rule;
@@ -213,4 +211,14 @@ storage.onChanged.addListener(changes => {
             for (const cb of _onChanged.values())
                 cb(changes);
     });
+});
+
+const READY = new Promise((res, rej) => {
+    Promise.all([
+        storage.get(defaults).then(vals => Object.assign(_options, vals)),
+        browser.storage.local.get(Object.keys(_data)).then(data => {
+            for (const k in data)
+                _data[k].update(data[k]);
+        }),
+    ]).then(() => res(), rej);
 });

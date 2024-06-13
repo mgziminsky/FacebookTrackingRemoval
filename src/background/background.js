@@ -16,12 +16,16 @@
     Copyright (C) 2016-2023 Michael Ziminsky
 */
 
+import "/browser-polyfill.min.js";
+
 import { isChrome, log, warn } from "../common.js";
 import { options, storage } from "../config.js";
 import { CHROME_PORT, MSG, NOOP, STYLE_CLASS } from "../consts.js";
 import { refreshRules } from "../rules_sync.js";
 import "./webrequest.js";
 
+
+browser.action.disable(); // Default to disabled. Content script will send message to enable
 
 // Do some cleanup after updating to 1.6.4+ for the first time
 // to get rid of old storage data that is no longer used
@@ -48,16 +52,19 @@ browser.runtime.onInstalled.addListener(details => {
 
 
 /**
- * @param {(tabId: number, details: browser.extensionTypes.InjectDetails) => Promise<void>} action
+ * @param {(injection: browser.scripting.CSSInjection) => Promise<void>} action
  * @param {string?} style
  * @param {number} tabId
  * @param {number} frameId
  */
 function updateCSS(action, style, tabId, frameId) {
-    action(tabId, {
-        frameId,
-        cssOrigin: "user",
-        code: style ? `.${STYLE_CLASS} { ${style}; }` : "",
+    action({
+        target: {
+            tabId,
+            frameIds: [frameId],
+        },
+        origin: "USER",
+        css: style ? `.${STYLE_CLASS} { ${style}; }` : "",
     }).catch(warn);
 }
 
@@ -67,14 +74,14 @@ function updateCSS(action, style, tabId, frameId) {
  */
 function onMessage({ msg, ...data }, sender) {
     switch (msg) {
-        case MSG.chromeShow:
-            browser.pageAction.show(sender.tab.id);
+        case MSG.actionEnable:
+            browser.action.enable(sender.tab.id);
             break;
         case MSG.insertCss:
-            updateCSS(browser.tabs.insertCSS, data.style, sender.tab.id, sender.frameId);
+            updateCSS(browser.scripting.insertCSS, data.style, sender.tab.id, sender.frameId);
             break;
         case MSG.removeCss:
-            updateCSS(browser.tabs.removeCSS, data.style, sender.tab.id, sender.frameId);
+            updateCSS(browser.scripting.removeCSS, data.style, sender.tab.id, sender.frameId);
             break;
         case MSG.rulesRefresh:
             return refreshRules(data.force);

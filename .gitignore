@@ -1,3 +1,4 @@
+_metadata/
 *.zip
-webextension-polyfill/package-lock.json
 browser-polyfill.min.js*
+webextension-polyfill/package-lock.json
