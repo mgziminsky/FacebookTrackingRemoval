@@ -16,16 +16,15 @@
     Copyright (C) 2016-2023 Michael Ziminsky
 */
 
-import { isChrome, log } from "../common.js";
-import { hide_rules, initHideRule, onChanged, options } from "../config.js";
+import { log } from "../common.js";
+import { READY, hide_rules, initHideRule, onChanged, options } from "../config.js";
 import { COLLAPSED_SELECTOR, MSG, PROCESSED_CLASS } from "../consts.js";
 import { normalizeString, parseHideRules } from "../util.js";
 import { applyStyle, cleanRedirectLinks, cleanShimLinks, fixGifs, fixVideoLinks, stripFBCLID, stripRefs } from "./cleaning.js";
 import { applyEventBlockers, ariaText, buildCollapsible, inlineUse, selectAllWithBase, visibleText } from "./dom.js";
 
 
-if (isChrome)
-    browser.runtime.sendMessage({ msg: MSG.chromeShow });
+browser.runtime.sendMessage({ msg: MSG.actionEnable });
 
 
 /**
@@ -237,5 +236,7 @@ function stop() {
 
 onChanged.addListener(() => options.enabled ? start() : stop());
 
-if (options.enabled)
-    start();
+READY.then(() => {
+    if (options.enabled)
+        start();
+});

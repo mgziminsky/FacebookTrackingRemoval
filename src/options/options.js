@@ -243,4 +243,4 @@ function init() {
         handleToggle.call(undefined, { target: checkbox });
     }
 }
-init();
+config.READY.then(init);

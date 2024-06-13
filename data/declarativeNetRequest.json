@@ -1,0 +1,131 @@
+[
+    {
+        "id": 1,
+        "action": {
+            "type": "block"
+        },
+        "condition": {
+            "resourceTypes": [
+                "beacon",
+                "ping"
+            ],
+            "urlFilter": "||facebook.com"
+        }
+    },
+    {
+        "id": 2,
+        "action": {
+            "type": "block"
+        },
+        "condition": {
+            "resourceTypes": [
+                "beacon",
+                "ping"
+            ],
+            "urlFilter": "||messenger.com"
+        }
+    },
+    {
+        "id": 3,
+        "action": {
+            "type": "block"
+        },
+        "condition": {
+            "resourceTypes": [
+                "beacon",
+                "ping"
+            ],
+            "urlFilter": "||facebookwkhpilnemxj7asaniu7vnjjbiltxjqhye3mhbshg7kx5tfyd.onion"
+        }
+    },
+    {
+        "id": 4,
+        "action": {
+            "type": "block"
+        },
+        "condition": {
+            "urlFilter": "||pixel.facebook.com"
+        }
+    },
+    {
+        "id": 5,
+        "action": {
+            "type": "block"
+        },
+        "condition": {
+            "urlFilter": "|*://*.facebook.com/ajax/bz*"
+        }
+    },
+    {
+        "id": 6,
+        "action": {
+            "type": "block"
+        },
+        "condition": {
+            "urlFilter": "|*://*.messenger.com/ajax/bz*"
+        }
+    },
+    {
+        "id": 7,
+        "action": {
+            "type": "block"
+        },
+        "condition": {
+            "urlFilter": "|*://*.facebookwkhpilnemxj7asaniu7vnjjbiltxjqhye3mhbshg7kx5tfyd.onion/ajax/bz*"
+        }
+    },
+    {
+        "id": 8,
+        "action": {
+            "type": "block"
+        },
+        "condition": {
+            "urlFilter": "|*://*.facebook.com/ajax/bnzai*"
+        }
+    },
+    {
+        "id": 9,
+        "action": {
+            "type": "block"
+        },
+        "condition": {
+            "urlFilter": "|*://*.messenger.com/ajax/bnzai*"
+        }
+    },
+    {
+        "id": 10,
+        "action": {
+            "type": "block"
+        },
+        "condition": {
+            "urlFilter": "|*://*.facebookwkhpilnemxj7asaniu7vnjjbiltxjqhye3mhbshg7kx5tfyd.onion/ajax/bnzai*"
+        }
+    },
+    {
+        "id": 11,
+        "action": {
+            "type": "block"
+        },
+        "condition": {
+            "urlFilter": "|*://*.facebook.com/xti.php?*"
+        }
+    },
+    {
+        "id": 12,
+        "action": {
+            "type": "block"
+        },
+        "condition": {
+            "urlFilter": "|*://*.messenger.com/xti.php?*"
+        }
+    },
+    {
+        "id": 13,
+        "action": {
+            "type": "block"
+        },
+        "condition": {
+            "urlFilter": "|*://*.facebookwkhpilnemxj7asaniu7vnjjbiltxjqhye3mhbshg7kx5tfyd.onion/xti.php?*"
+        }
+    }
+]

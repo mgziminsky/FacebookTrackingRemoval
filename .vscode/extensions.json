@@ -3,7 +3,6 @@
 	// Extension identifier format: ${publisher}.${name}. Example: vscode.csharp
 	// List of extensions which should be recommended for users of this workspace.
 	"recommendations": [
-		"dbaeumer.vscode-eslint",
 		"firefox-devtools.vscode-firefox-debug",
 		"biomejs.biome"
 	],

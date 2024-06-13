@@ -27,7 +27,7 @@ interface ClickWhitelist {
     selector: string,
 }
 
-interface Options extends Object {
+interface Options {
     enabled: boolean,
     fixLinks: boolean,
     internalRefs: boolean,

@@ -7,7 +7,7 @@ export const COLLAPSED_SELECTOR = ".fbtrHidden";
 export const NOOP = () => { };
 
 export const MSG = Object.freeze({
-    chromeShow: "CHROME_SHOW",
+    actionEnable: "ACTION_ENABLE",
     history: "HISTORY",
     insertCss: "INSERT_CSS",
     removeCss: "REMOVE_CSS",
