@@ -35,7 +35,8 @@ const changes = new Proxy(
             if (config.options[key] === val) {
                 delete obj[key];
             } else {
-                obj[key] = val;
+                // Force undefined to null. undefined values don't get sent by postMessage
+                obj[key] = val ?? null;
             }
             if (bgPort) bgPort.postMessage(obj);
             return true;

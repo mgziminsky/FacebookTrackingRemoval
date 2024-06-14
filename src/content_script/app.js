@@ -130,12 +130,12 @@ function removeAll(target) {
 
     if (options.delSuggest) removeArticles(target, hide_rules.suggested);
     if (options.delPixeled) {
-        removeArticles(target, { selector: hide_rules.unconditional }, "remove");
         removeArticles(
             target,
             hide_rules.sponsored,
             document.location.pathname.startsWith("/marketplace") ? "remove" : options.hideMethod,
         );
+        removeArticles(target, { selector: hide_rules.unconditional }, "remove");
     }
     if (options.pendingRules) removeArticles(target, hide_rules.pending);
 
