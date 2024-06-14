@@ -1,4 +1,4 @@
-// Copyright (C) 2021-2023 Michael Ziminsky (Z)
+// Copyright (C) 2021-2024 Michael Ziminsky (Z)
 //
 // This file is part of FacebookTrackingRemoval, originally from ProxyTab.
 //

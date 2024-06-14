@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2023 Michael Ziminsky (Z)
+ * Copyright (C) 2023-2024 Michael Ziminsky (Z)
  *
  * This file is part of FacebookTrackingRemoval.
  *
