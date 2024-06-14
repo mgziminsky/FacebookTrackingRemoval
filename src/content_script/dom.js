@@ -32,7 +32,6 @@ export {
     visibleText,
 };
 
-
 /** @param {Event} e */
 function isAllowedTarget(e) {
     let checkTarget = e.target;
@@ -46,7 +45,11 @@ function isAllowedTarget(e) {
         if (role && click_whitelist.roles.includes(role.value.toUpperCase())) {
             return true;
         }
-        if (click_whitelist.elements.includes(checkTarget.tagName) || checkTarget.classList.contains("FBTR-SAFE") || checkTarget.matches(click_whitelist.selector)) {
+        if (
+            click_whitelist.elements.includes(checkTarget.tagName) ||
+            checkTarget.classList.contains("FBTR-SAFE") ||
+            checkTarget.matches(click_whitelist.selector)
+        ) {
             return true;
         }
         checkTarget = checkTarget.parentNode;
@@ -58,7 +61,7 @@ function isAllowedTarget(e) {
 /**
  * Meant to be used as a capturing event handler
  * @param {Event} e
-*/
+ */
 function restrictEventPropagation(e) {
     if (isAllowedTarget(e)) {
         log(`Allowed propagation of ${e.type} from ${e.target} to ${e.currentTarget}`);
@@ -89,8 +92,7 @@ function applyEventBlockers(target) {
 function cleanAttrs(elem) {
     for (let i = elem.attributes.length - 1; i >= 0; --i) {
         const attr = elem.attributes[i];
-        if (attr.name !== 'class' && !attr.name.startsWith('aria-'))
-            elem.removeAttribute(attr.name);
+        if (attr.name !== "class" && !attr.name.startsWith("aria-")) elem.removeAttribute(attr.name);
     }
 }
 
@@ -117,8 +119,7 @@ function selectAllWithBase(node, selector) {
 
     const childResults = [];
     for (const c of node.querySelectorAll(selector)) {
-        if (!c.classList.contains(PROCESSED_CLASS))
-            childResults.push(c);
+        if (!c.classList.contains(PROCESSED_CLASS)) childResults.push(c);
     }
 
     const results = (function* () {
@@ -145,12 +146,14 @@ function inlineUse(target) {
 
 /** @param {HTMLElement} elem */
 function ariaText(elem) {
-    const labels = elem.getAttribute('aria-labelledby')?.split(' ')
+    const labels = elem
+        .getAttribute("aria-labelledby")
+        ?.split(" ")
         .map(id => document.getElementById(id))
         .filter(e => e);
 
-    const text = [...new Set(labels || [])].map(e => e.textContent).join(' ');
-    return text ? text : elem.getAttribute('aria-label');
+    const text = [...new Set(labels || [])].map(e => e.textContent).join(" ");
+    return text ? text : elem.getAttribute("aria-label");
 }
 
 /** @param {HTMLElement} elem */
@@ -166,11 +169,9 @@ function visibleText(elem) {
                 text += child.nodeValue;
                 break;
             case Node.ELEMENT_NODE: {
-                if (!rectsIntersect(bounds, child.getBoundingClientRect()))
-                    continue;
+                if (!rectsIntersect(bounds, child.getBoundingClientRect())) continue;
                 text += child.dataset.content ?? "";
-                for (let c = child.lastChild; c !== null; c = c.previousSibling)
-                    children.push(c);
+                for (let c = child.lastChild; c !== null; c = c.previousSibling) children.push(c);
                 break;
             }
         }
@@ -184,9 +185,5 @@ function visibleText(elem) {
  * @param {DOMRect} b
  */
 function rectsIntersect(a, b) {
-    return a.top < b.bottom
-        && a.right > b.left
-        && a.bottom > b.top
-        && a.left < b.right
-        ;
+    return a.top < b.bottom && a.right > b.left && a.bottom > b.top && a.left < b.right;
 }

@@ -19,11 +19,7 @@
 import { NOOP, RATE_LIMIT } from "./consts.js";
 import { joinSelectors, parseHideRules, splitLines, stripComments } from "./util.js";
 
-export {
-    refreshRules,
-    timeoutRemaining
-};
-
+export { refreshRules, timeoutRemaining };
 
 const SELECTOR_RULE_FILES = ["article_wrapper", "unconditional"];
 const DYN_RULE_FILES = ["pending"];
@@ -31,13 +27,19 @@ const SPLIT_RULE_DIRS = ["sponsored", "suggested"];
 const PARAM_CLEANING_FILES = ["params", "prefix_patterns", "values"];
 const CLICK_WHITELIST_FILES = ["elements", "roles", "selectors"];
 
-
 async function fetchRule(path, currentVal) {
     const devMode = (await browser.management.getSelf()).installType === "development";
-    return fetch(`https://${devMode ? "localhost" : "mgziminsky.gitlab.io"}/FacebookTrackingRemoval/${path}`, { mode: 'cors', signal: (devMode ? AbortSignal.timeout(100) : undefined) })
-        .then(resp => resp.ok ? resp : Promise.reject())
-        .catch(() => currentVal ? Promise.reject(`Keeping current value: ${currentVal}`) : fetch(browser.runtime.getURL(`data/${path}`))) // Fallback to bundled copy
-        .then(resp => resp.ok ? resp.text() : Promise.reject());
+    return fetch(`https://${devMode ? "localhost" : "mgziminsky.gitlab.io"}/FacebookTrackingRemoval/${path}`, {
+        mode: "cors",
+        signal: devMode ? AbortSignal.timeout(100) : undefined,
+    })
+        .then(resp => (resp.ok ? resp : Promise.reject()))
+        .catch(() =>
+            currentVal
+                ? Promise.reject(`Keeping current value: ${currentVal}`)
+                : fetch(browser.runtime.getURL(`data/${path}`)),
+        ) // Fallback to bundled copy
+        .then(resp => (resp.ok ? resp.text() : Promise.reject()));
 }
 
 async function loadHideRules() {
@@ -47,20 +49,20 @@ async function loadHideRules() {
     for (const file of SELECTOR_RULE_FILES) {
         await fetchRule(`hide_rules/${file}`, currentRules[file])
             .then(joinSelectors)
-            .then(sel => newRules[file] = sel)
+            .then(sel => (newRules[file] = sel))
             .catch(e => console.warn(`Failed to load selectors file "${file}"\n\t`, e));
     }
 
     for (const file of DYN_RULE_FILES) {
         await fetchRule(`hide_rules/${file}`, currentRules[file])
             .then(parseHideRules)
-            .then(rule => Object.assign(newRules[file] ??= {}, rule))
+            .then(rule => Object.assign((newRules[file] ??= {}), rule))
             .catch(e => console.warn(`Failed to load legacy rules from "${file}"\n\t`, e));
     }
 
     for (const dir of SPLIT_RULE_DIRS) {
         await loadSplitRule(dir, currentRules[dir])
-            .then(rule => Object.assign(newRules[dir] ??= {}, rule))
+            .then(rule => Object.assign((newRules[dir] ??= {}), rule))
             .catch(e => console.warn(`Split rule "${dir}" failed to load\n\t`, e));
     }
 
@@ -75,7 +77,7 @@ async function loadArrayData(key, files) {
         await fetchRule(`${key}/${file}`, currentRules[file])
             .then(stripComments)
             .then(splitLines)
-            .then(data => newRules[file] = data)
+            .then(data => (newRules[file] = data))
             .catch(e => console.warn(`Failed to load array data from "${key}/${file}"\n\t`, e));
     }
 
@@ -91,21 +93,20 @@ async function loadSplitRule(dir, currentRule) {
         .catch(e => console.warn(`Failed to load selectors for "${dir}"\n\t`, e));
 
     // Selector required, fail if missing or empty
-    if (!rule.selector)
-        return Promise.reject("Selector missing or empty");
+    if (!rule.selector) return Promise.reject("Selector missing or empty");
 
     await fetchRule(`hide_rules/${dir}/texts`, currentRule?.texts)
         .then(stripComments)
         .then(splitLines)
         .then(a => a.sort())
-        .then(texts => rule.texts = texts)
+        .then(texts => (rule.texts = texts))
         .catch(e => console.warn(`Failed to load texts for "${dir}"\n\t`, e));
 
     await fetchRule(`hide_rules/${dir}/patterns`, currentRule?.patterns)
         .then(stripComments)
         .then(splitLines)
         .then(a => a.sort())
-        .then(patterns => rule.patterns = patterns)
+        .then(patterns => (rule.patterns = patterns))
         .catch(e => console.warn(`Failed to load patterns for "${dir}"\n\t`, e));
 
     return rule;
@@ -129,15 +130,16 @@ async function timeoutRemaining() {
 async function refreshRules(force = false) {
     const timeout = force ? 0 : await timeoutRemaining();
 
-    if (timeout > 0)
-        return Promise.reject(timeout);
+    if (timeout > 0) return Promise.reject(timeout);
 
-    browser.storage.local.set({
-        hide_rules: await _try(loadHideRules),
-        param_cleaning: await _try(loadArrayData, "param_cleaning", PARAM_CLEANING_FILES),
-        click_whitelist: await _try(loadArrayData, "click_whitelist", CLICK_WHITELIST_FILES),
-        lastRuleRefresh: new Date().toUTCString(),
-    }).then(() => RATE_LIMIT);
+    browser.storage.local
+        .set({
+            hide_rules: await _try(loadHideRules),
+            param_cleaning: await _try(loadArrayData, "param_cleaning", PARAM_CLEANING_FILES),
+            click_whitelist: await _try(loadArrayData, "click_whitelist", CLICK_WHITELIST_FILES),
+            lastRuleRefresh: new Date().toUTCString(),
+        })
+        .then(() => RATE_LIMIT);
 }
 
 // refresh rules every 12 hours

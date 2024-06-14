@@ -5,10 +5,7 @@
             "type": "block"
         },
         "condition": {
-            "resourceTypes": [
-                "beacon",
-                "ping"
-            ],
+            "resourceTypes": ["beacon", "ping"],
             "urlFilter": "||facebook.com"
         }
     },
@@ -18,10 +15,7 @@
             "type": "block"
         },
         "condition": {
-            "resourceTypes": [
-                "beacon",
-                "ping"
-            ],
+            "resourceTypes": ["beacon", "ping"],
             "urlFilter": "||messenger.com"
         }
     },
@@ -31,10 +25,7 @@
             "type": "block"
         },
         "condition": {
-            "resourceTypes": [
-                "beacon",
-                "ping"
-            ],
+            "resourceTypes": ["beacon", "ping"],
             "urlFilter": "||facebookwkhpilnemxj7asaniu7vnjjbiltxjqhye3mhbshg7kx5tfyd.onion"
         }
     },

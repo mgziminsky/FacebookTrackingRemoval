@@ -14,31 +14,31 @@ interface HideRules {
 }
 
 interface ParamCleaning {
-    params: string[],
-    prefix_patterns: string[],
-    values: string[],
-    pattern: RegExp,
+    params: string[];
+    prefix_patterns: string[];
+    values: string[];
+    pattern: RegExp;
 }
 
 interface ClickWhitelist {
-    elements: string[],
-    roles: string[],
-    selectors: string[],
-    selector: string,
+    elements: string[];
+    roles: string[];
+    selectors: string[];
+    selector: string;
 }
 
 interface Options {
-    enabled: boolean,
-    fixLinks: boolean,
-    internalRefs: boolean,
-    inlineVids: boolean,
-    fixVideos: boolean,
-    delPixeled: boolean,
-    delSuggest: boolean,
-    hideMethod: string,
-    useStyle: boolean,
-    logging: boolean,
-    modStyle: string,
-    userRules: string,
-    pendingRules: boolean,
+    enabled: boolean;
+    fixLinks: boolean;
+    internalRefs: boolean;
+    inlineVids: boolean;
+    fixVideos: boolean;
+    delPixeled: boolean;
+    delSuggest: boolean;
+    hideMethod: string;
+    useStyle: boolean;
+    logging: boolean;
+    modStyle: string;
+    userRules: string;
+    pendingRules: boolean;
 }

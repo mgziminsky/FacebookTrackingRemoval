@@ -9,6 +9,16 @@
     ],
     "licenser.useSingleLineStyle": false,
     "licenser.license": "GPLv3",
+
+    "[javascript]": {
+        "editor.codeActionsOnSave": {
+            "source.organizeImports.biome": "explicit"
+        },
+    },
+    "[javascript][json][jsonc][typescript]": {
+        "editor.defaultFormatter": "biomejs.biome"
+    },
+
     // "json.schemas": [{
     //     "url": "https://json.schemastore.org/chrome-manifest.json",
     //     "fileMatch": ["/manifest.json"]

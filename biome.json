@@ -4,22 +4,22 @@
         "enabled": true,
         "indentWidth": 4,
         "indentStyle": "space",
-        "ignore": [
-            "webextension-polyfill",
-            "browser-polyfill.*"
-        ]
+        "lineWidth": 120,
+        "ignore": ["webextension-polyfill", "browser-polyfill.*", ".vscode"]
     },
     "linter": {
         "enabled": true,
-        "ignore": [
-            "webextension-polyfill",
-            "browser-polyfill.*"
-        ],
+        "ignore": ["webextension-polyfill", "browser-polyfill.*"],
         "rules": {
             "recommended": true,
             "suspicious": {
                 "noAssignInExpressions": "off"
             }
+        }
+    },
+    "javascript": {
+        "formatter": {
+            "arrowParentheses": "asNeeded"
         }
     },
     "json": {

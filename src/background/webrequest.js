@@ -21,27 +21,25 @@ import * as config from "../config.js";
 import { MSG } from "../consts.js";
 import { cleanLinkParams } from "../util.js";
 
+browser.webNavigation.onHistoryStateUpdated.addListener(
+    details => {
+        if (!config.options.enabled) return;
 
-browser.webNavigation.onHistoryStateUpdated.addListener(details => {
-    if (!config.options.enabled)
-        return;
-
-    const orig = details.url;
-    const clean = cleanLinkParams(details.url);
-    if (orig !== clean) {
-        browser.tabs.sendMessage(details.tabId, { type: MSG.history, orig, clean });
-    }
-}, {
-    url: config.host_patterns
-        .map(h => h.replaceAll(/[^.\w]/g, ""))
-        .map(hostContains => ({ hostContains }))
-});
+        const orig = details.url;
+        const clean = cleanLinkParams(details.url);
+        if (orig !== clean) {
+            browser.tabs.sendMessage(details.tabId, { type: MSG.history, orig, clean });
+        }
+    },
+    {
+        url: config.host_patterns.map(h => h.replaceAll(/[^.\w]/g, "")).map(hostContains => ({ hostContains })),
+    },
+);
 
 function updateRuleset(enable) {
     if (enable === true) {
         browser.declarativeNetRequest.updateEnabledRulesets({ enableRulesetIds: ["ruleset"] });
-    }
-    else if (enable === false) {
+    } else if (enable === false) {
         browser.declarativeNetRequest.updateEnabledRulesets({ disableRulesetIds: ["ruleset"] });
     }
 }
