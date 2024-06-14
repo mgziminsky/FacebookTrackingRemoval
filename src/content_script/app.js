@@ -157,9 +157,42 @@ function forEachAdded(mutation, cb) {
         }
     }
 }
-const SKIP = ["SCRIPT", "STYLE", "LINK"];
 
-const observer = new MutationObserver(async mutations => {
+/** @type {Map<string, [Node]>} */
+const pendingRefs = new Map();
+/**
+ * Find any new elements that reference nodes that don't yet exist
+ * @param {Element} target
+ */
+function findPending(target) {
+    for (const elem of selectAllWithBase(target, "[aria-labelledby]")) {
+        if (elem.closest(COLLAPSED_SELECTOR)) continue;
+
+        for (const attr of elem.getAttribute("aria-labelledby")?.split(" ") ?? []) {
+            if (!document.getElementById(attr)) {
+                log(() => `New pending element referencing [${attr}]`);
+                if (!pendingRefs.has(attr)) pendingRefs.set(attr, []);
+                pendingRefs.get(attr).push(elem);
+            }
+        }
+    }
+}
+/** Check if any of the ids we are waiting for were added, and if so process their nodes */
+function processPending() {
+    for (const [id, elems] of pendingRefs.entries()) {
+        if (document.getElementById(id)) {
+            log(() => `Waited on element now present for [${id}]`);
+            pendingRefs.delete(id);
+            for (const elem of elems) {
+                removeAll(elem);
+            }
+        }
+    }
+}
+
+const SKIP = ["SCRIPT", "STYLE", "LINK"];
+const observer = new MutationObserver(mutations => {
+    processPending();
     for (const mutation of mutations) {
         if (mutation.type === "childList" && !SKIP.includes(mutation.target.nodeName)) {
             const target = mutation.target;
@@ -169,6 +202,7 @@ const observer = new MutationObserver(async mutations => {
 
             if (options.fixLinks) forEachAdded(mutation, removeLinkTracking);
 
+            forEachAdded(mutation, findPending);
             forEachAdded(mutation, node => node.classList.add(PROCESSED_CLASS));
         } else if (mutation.target) {
             if (options.fixLinks) removeLinkTracking(mutation.target);
