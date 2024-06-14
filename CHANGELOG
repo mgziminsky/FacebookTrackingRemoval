@@ -1,3 +1,6 @@
+v1.12.0
+- Migrate to manifest v3
+
 v1.11.3
 - Link cleaning fix for FF115+
 
