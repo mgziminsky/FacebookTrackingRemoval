@@ -18,29 +18,21 @@
 
 import { options } from "./config.js";
 
-export {
-    isChrome,
-    log,
-    warn,
-};
-
+export { isChrome, log, warn };
 
 const isChrome = Object.getPrototypeOf(browser) !== Object.prototype;
 
 function log(arg) {
-    if (options.logging)
-        log_to(console.log, arg);
+    if (options.logging) log_to(console.log, arg);
 }
 function warn(arg) {
-    if (options.logging)
-        log_to(console.warn, arg);
+    if (options.logging) log_to(console.warn, arg);
 }
 
 function log_to(logger, arg) {
-    if (typeof (arg) === "function") {
+    if (typeof arg === "function") {
         const res = arg();
-        if (res)
-            logger(res);
+        if (res) logger(res);
     } else {
         logger(arg);
     }

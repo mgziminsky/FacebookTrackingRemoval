@@ -20,12 +20,18 @@ import { log } from "../common.js";
 import { READY, hide_rules, initHideRule, onChanged, options } from "../config.js";
 import { COLLAPSED_SELECTOR, MSG, PROCESSED_CLASS } from "../consts.js";
 import { normalizeString, parseHideRules } from "../util.js";
-import { applyStyle, cleanRedirectLinks, cleanShimLinks, fixGifs, fixVideoLinks, stripFBCLID, stripRefs } from "./cleaning.js";
+import {
+    applyStyle,
+    cleanRedirectLinks,
+    cleanShimLinks,
+    fixGifs,
+    fixVideoLinks,
+    stripFBCLID,
+    stripRefs,
+} from "./cleaning.js";
 import { applyEventBlockers, ariaText, buildCollapsible, inlineUse, selectAllWithBase, visibleText } from "./dom.js";
 
-
 browser.runtime.sendMessage({ msg: MSG.actionEnable });
-
 
 /**
  * @param {Element} elem
@@ -57,8 +63,7 @@ function hide(elem, label, method) {
 
         const wrapper = buildCollapsible(label);
         applyStyle(wrapper);
-        for (const c of target.classList)
-            wrapper.classList.add(c);
+        for (const c of target.classList) wrapper.classList.add(c);
 
         target.parentNode.appendChild(wrapper);
         wrapper.appendChild(target);
@@ -71,15 +76,10 @@ function hide(elem, label, method) {
 }
 
 function removeLinkTracking(node) {
-    const cleaned = cleanShimLinks(node)
-        + fixVideoLinks(node)
-        + cleanRedirectLinks(node)
-        + stripFBCLID(node)
-        ;
+    const cleaned = cleanShimLinks(node) + fixVideoLinks(node) + cleanRedirectLinks(node) + stripFBCLID(node);
     fixGifs(node);
 
-    if (cleaned)
-        applyEventBlockers(node);
+    if (cleaned) applyEventBlockers(node);
 
     return cleaned;
 }
@@ -90,19 +90,16 @@ function removeLinkTracking(node) {
  * @param {"remove" | "collapse"} [method=options.hideMethod]
  */
 function removeArticles(node, { selector, texts, patterns }, method = options.hideMethod) {
-    if (!selector)
-        return;
+    if (!selector) return;
 
     /** @argument {string} text */
     const getMatch = text => {
-        if (!(texts?.size || patterns))
-            return text || "Unconditional Hide";
+        if (!(texts?.size || patterns)) return text || "Unconditional Hide";
 
         // Some sponsored have other details appended after a · (0xb7). Try matching both parts separately
         const parts = text.split("\xb7").map(s => s.trim().toLowerCase());
 
-        if (patterns && parts.some(p => patterns.test(p)))
-            return text;
+        if (patterns && parts.some(p => patterns.test(p))) return text;
 
         for (const p of parts) {
             const x = texts.get(normalizeString(p));
@@ -131,19 +128,19 @@ function removeArticles(node, { selector, texts, patterns }, method = options.hi
 function removeAll(target) {
     removeArticles(target, userRules);
 
-    if (options.delSuggest)
-        removeArticles(target, hide_rules.suggested);
+    if (options.delSuggest) removeArticles(target, hide_rules.suggested);
     if (options.delPixeled) {
         removeArticles(target, { selector: hide_rules.unconditional }, "remove");
-        removeArticles(target, hide_rules.sponsored, document.location.pathname.startsWith("/marketplace") ? "remove" : options.hideMethod);
+        removeArticles(
+            target,
+            hide_rules.sponsored,
+            document.location.pathname.startsWith("/marketplace") ? "remove" : options.hideMethod,
+        );
     }
-    if (options.pendingRules)
-        removeArticles(target, hide_rules.pending);
+    if (options.pendingRules) removeArticles(target, hide_rules.pending);
 
-    if (options.internalRefs)
-        stripRefs(target);
+    if (options.internalRefs) stripRefs(target);
 }
-
 
 /**
  * @param {MutationRecord} mutation
@@ -151,7 +148,11 @@ function removeAll(target) {
  */
 function forEachAdded(mutation, cb) {
     for (const node of mutation.addedNodes) {
-        if (node.nodeType === Node.ELEMENT_NODE && !SKIP.includes(node.nodeName) && !node.classList.contains(PROCESSED_CLASS)) {
+        if (
+            node.nodeType === Node.ELEMENT_NODE &&
+            !SKIP.includes(node.nodeName) &&
+            !node.classList.contains(PROCESSED_CLASS)
+        ) {
             cb(node);
         }
     }
@@ -166,15 +167,12 @@ const observer = new MutationObserver(async mutations => {
 
             removeAll(target);
 
-            if (options.fixLinks)
-                forEachAdded(mutation, removeLinkTracking);
+            if (options.fixLinks) forEachAdded(mutation, removeLinkTracking);
 
             forEachAdded(mutation, node => node.classList.add(PROCESSED_CLASS));
         } else if (mutation.target) {
-            if (options.fixLinks)
-                removeLinkTracking(mutation.target);
-            if (options.internalRefs)
-                stripRefs(mutation.target);
+            if (options.fixLinks) removeLinkTracking(mutation.target);
+            if (options.internalRefs) stripRefs(mutation.target);
         }
     }
 });
@@ -187,14 +185,17 @@ async function run() {
     observer.disconnect();
     removeAll(body);
 
-    observer.observe(body, (() => {
-        const opts = { childList: true, subtree: true, characterData: false };
-        if (options.fixLinks) {
-            opts.attributes = true;
-            opts.attributeFilter = ["href"];
-        }
-        return opts;
-    })());
+    observer.observe(
+        body,
+        (() => {
+            const opts = { childList: true, subtree: true, characterData: false };
+            if (options.fixLinks) {
+                opts.attributes = true;
+                opts.attributeFilter = ["href"];
+            }
+            return opts;
+        })(),
+    );
 
     if (options.fixLinks && removeLinkTracking(body) && document.getElementById("newsFeedHeading")) {
         const feed = document.getElementById("newsFeedHeading").parentNode;
@@ -221,11 +222,9 @@ function start() {
     run();
     browser.runtime.onMessage.addListener(handleMessage);
 
-    if (activeStyle)
-        browser.runtime.sendMessage({ msg: MSG.removeCss, style: activeStyle });
+    if (activeStyle) browser.runtime.sendMessage({ msg: MSG.removeCss, style: activeStyle });
 
-    if (options.useStyle)
-        browser.runtime.sendMessage({ msg: MSG.insertCss, style: activeStyle = options.modStyle });
+    if (options.useStyle) browser.runtime.sendMessage({ msg: MSG.insertCss, style: (activeStyle = options.modStyle) });
 }
 
 function stop() {
@@ -234,9 +233,8 @@ function stop() {
     browser.runtime.sendMessage({ msg: MSG.removeCss, style: activeStyle });
 }
 
-onChanged.addListener(() => options.enabled ? start() : stop());
+onChanged.addListener(() => (options.enabled ? start() : stop()));
 
 READY.then(() => {
-    if (options.enabled)
-        start();
+    if (options.enabled) start();
 });

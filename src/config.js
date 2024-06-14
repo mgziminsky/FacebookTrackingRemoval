@@ -53,15 +53,16 @@ const defaults = Object.freeze({
     pendingRules: false,
 });
 
-const host_patterns = Object.freeze([...new Set(browser.runtime.getManifest().content_scripts.flatMap(cs => cs.matches))]);
-const domains = Object.freeze([...new Set(host_patterns.map(m => m.replace(/\W*\*\W?/g, '')))]);
+const host_patterns = Object.freeze([
+    ...new Set(browser.runtime.getManifest().content_scripts.flatMap(cs => cs.matches)),
+]);
+const domains = Object.freeze([...new Set(host_patterns.map(m => m.replace(/\W*\*\W?/g, "")))]);
 
 /** @type {Options} */
 const _options = Object.seal(Object.assign({}, defaults));
 const options = new Proxy(_options, {
     set(opts, prop, val) {
-        if (!Object.hasOwn(opts, prop))
-            return false;
+        if (!Object.hasOwn(opts, prop)) return false;
 
         const old = opts[prop];
         opts[prop] = val ?? defaults[prop];
@@ -72,14 +73,14 @@ const options = new Proxy(_options, {
         } else {
             apply = storage.remove.bind(storage, prop);
         }
-        apply().catch(() => opts[prop] = old);
+        apply().catch(() => (opts[prop] = old));
 
         return true;
     },
     deleteProperty(opts, prop) {
         const old = opts[prop];
         opts[prop] = defaults[prop];
-        storage.remove(prop).catch(() => opts[prop] = old);
+        storage.remove(prop).catch(() => (opts[prop] = old));
         return false;
     },
 });
@@ -93,13 +94,14 @@ const options = new Proxy(_options, {
 function reset(keys) {
     let result;
     if (keys) {
-        result = storage.remove(keys).then(() => { for (const key of [...keys]) _options[key] = defaults[key]; });
+        result = storage.remove(keys).then(() => {
+            for (const key of [...keys]) _options[key] = defaults[key];
+        });
     } else {
         result = storage.remove(Object.keys(defaults)).then(() => Object.assign(_options, defaults));
     }
     return result;
 }
-
 
 const _data = Object.freeze({
     hide_rules: Object.freeze({
@@ -112,10 +114,10 @@ const _data = Object.freeze({
     }),
     param_cleaning: Object.freeze({
         /**@type {ParamCleaning}*/
-        value: { params: [], prefix_patterns: ['$'], values: [] },
+        value: { params: [], prefix_patterns: ["$"], values: [] },
         update(/**@type {ParamCleaning}*/ raw) {
             Object.assign(this.value, raw);
-            this.value.pattern = new RegExp(`^(${this.value.prefix_patterns.join('|')})`);
+            this.value.pattern = new RegExp(`^(${this.value.prefix_patterns.join("|")})`);
         },
     }),
     click_whitelist: Object.freeze({
@@ -128,20 +130,22 @@ const _data = Object.freeze({
     }),
 });
 
-
 /** @type {ProxyHandler} */
 const ReadOnly = {
     set: () => false,
     isExtensible: () => false,
-    defineProperty: () => { throw new Error("Not Allowed"); },
-    deleteProperty: () => { throw new Error("Not Allowed"); },
+    defineProperty: () => {
+        throw new Error("Not Allowed");
+    },
+    deleteProperty: () => {
+        throw new Error("Not Allowed");
+    },
 };
 const [hide_rules, param_cleaning, click_whitelist] = [
     new Proxy(_data.hide_rules.value, ReadOnly),
     new Proxy(_data.param_cleaning.value, ReadOnly),
     new Proxy(_data.click_whitelist.value, ReadOnly),
 ];
-
 
 /**
  * Converts the texts and patterns of a rule to final format
@@ -152,25 +156,20 @@ const [hide_rules, param_cleaning, click_whitelist] = [
  * @returns {HideRule}
  */
 function initHideRule(rule) {
-    if (rule.texts)
-        rule.texts = rule.texts.reduce((m, t) => m.set(normalizeString(t), t), new Map());
+    if (rule.texts) rule.texts = rule.texts.reduce((m, t) => m.set(normalizeString(t), t), new Map());
 
-    if (Array.isArray(rule.patterns) && rule.patterns.length)
-        rule.patterns = new RegExp(rule.patterns.join("|"), "iu");
-    else
-        // biome-ignore lint/performance/noDelete:
-        delete rule.patterns;
+    if (Array.isArray(rule.patterns) && rule.patterns.length) rule.patterns = new RegExp(rule.patterns.join("|"), "iu");
+    // biome-ignore lint/performance/noDelete:
+    else delete rule.patterns;
 
     return rule;
 }
-
 
 const _onChanged = new Set();
 /** @type {WebExtEvent<(changes: { [key: string]: browser.storage.StorageChange }) => void>} */
 const onChanged = Object.freeze({
     addListener(cb) {
-        if (typeof cb === "function")
-            _onChanged.add(cb);
+        if (typeof cb === "function") _onChanged.add(cb);
     },
     removeListener: _onChanged.delete.bind(_onChanged),
     hasListener: _onChanged.has.bind(_onChanged),
@@ -182,34 +181,32 @@ const onChanged = Object.freeze({
  * @param {string | string[]} keys
  */
 async function sync(keys) {
-    const { opts, rules } = [...keys].reduce((acc, key) => {
-        if (key in defaults)
-            acc.opts[key] = defaults[key];
-        else if (key in _data)
-            acc.rules[key] = _data[key].value;
-        return acc;
-    }, { opts: {}, rules: {} });
+    const { opts, rules } = [...keys].reduce(
+        (acc, key) => {
+            if (key in defaults) acc.opts[key] = defaults[key];
+            else if (key in _data) acc.rules[key] = _data[key].value;
+            return acc;
+        },
+        { opts: {}, rules: {} },
+    );
 
     const result = [];
-    if (Object.keys(opts).length)
-        result.push(storage.get(opts).then(opts => Object.assign(_options, opts)));
+    if (Object.keys(opts).length) result.push(storage.get(opts).then(opts => Object.assign(_options, opts)));
 
     if (Object.keys(rules).length)
-        result.push(storage.get(rules).then(rules => {
-            for (const k in rules)
-                _data[k].update(rules[k]);
-        }));
+        result.push(
+            storage.get(rules).then(rules => {
+                for (const k in rules) _data[k].update(rules[k]);
+            }),
+        );
 
     return Promise.allSettled(result);
 }
 storage.onChanged.addListener(changes => {
     sync(Object.keys(changes)).then(() => {
-        for (const k of Object.keys(_data))
-            delete changes[k];
+        for (const k of Object.keys(_data)) delete changes[k];
 
-        if (Object.keys(changes).length)
-            for (const cb of _onChanged.values())
-                cb(changes);
+        if (Object.keys(changes).length) for (const cb of _onChanged.values()) cb(changes);
     });
 });
 
@@ -217,8 +214,7 @@ const READY = new Promise((res, rej) => {
     Promise.all([
         storage.get(defaults).then(vals => Object.assign(_options, vals)),
         browser.storage.local.get(Object.keys(_data)).then(data => {
-            for (const k in data)
-                _data[k].update(data[k]);
+            for (const k in data) _data[k].update(data[k]);
         }),
     ]).then(() => res(), rej);
 });

@@ -24,20 +24,17 @@ import { CHROME_PORT, MSG, NOOP, STYLE_CLASS } from "../consts.js";
 import { refreshRules } from "../rules_sync.js";
 import "./webrequest.js";
 
-
 browser.action.disable(); // Default to disabled. Content script will send message to enable
 
 // Do some cleanup after updating to 1.6.4+ for the first time
 // to get rid of old storage data that is no longer used
 browser.runtime.onInstalled.addListener(details => {
     // Not an update
-    if (!details.previousVersion || details.previousVersion === browser.runtime.getManifest().version)
-        return;
+    if (!details.previousVersion || details.previousVersion === browser.runtime.getManifest().version) return;
 
     // Always force refresh rules after an update for simplicity
     // 1.8.0 changed the dynamic rules format
-    browser.storage.local.remove(["lastRuleRefresh", "hide_rules"])
-        .finally(refreshRules.bind(undefined, true));
+    browser.storage.local.remove(["lastRuleRefresh", "hide_rules"]).finally(refreshRules.bind(undefined, true));
 
     const old = [1, 6, 3];
     const prev = details.previousVersion.split(".").map(Number);
@@ -49,7 +46,6 @@ browser.runtime.onInstalled.addListener(details => {
         browser.runtime.reload();
     }
 });
-
 
 /**
  * @param {(injection: browser.scripting.CSSInjection) => Promise<void>} action
@@ -98,11 +94,10 @@ if (isChrome) {
         log("Options Connect");
         if (port.name === CHROME_PORT) {
             let changes = {};
-            port.onMessage.addListener(data => changes = data);
+            port.onMessage.addListener(data => (changes = data));
             port.onDisconnect.addListener(() => {
                 log("Options Disconnect");
-                if (Object.keys(changes).length)
-                    Object.assign(options, changes);
+                if (Object.keys(changes).length) Object.assign(options, changes);
             });
         }
     });

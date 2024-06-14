@@ -21,8 +21,7 @@
  */
 function getMessage(key, ...vars) {
     const msg = browser.i18n.getMessage(key, vars);
-    if (!msg)
-        throw `!! Missing Translation - ${key} !!`;
+    if (!msg) throw `!! Missing Translation - ${key} !!`;
 
     return msg;
 }
@@ -41,67 +40,78 @@ function getMessageSafe(key, ...vars) {
  */
 function translate(elem) {
     try {
-        const { i18n: key, i18nAttr: attr = 'title', i18nVars: vars = "" } = elem.dataset;
+        const { i18n: key, i18nAttr: attr = "title", i18nVars: vars = "" } = elem.dataset;
         elem.setAttribute(attr, getMessage(key, ...vars.split("||")));
     } catch (e) {
-        console.warn('Failed to apply translation to %o:', elem, e);
+        console.warn("Failed to apply translation to %o:", elem, e);
     }
 }
 
-window.customElements.define('fbtr-i18n', class extends HTMLElement {
-    static get observedAttributes() { return ['key']; }
-
-    constructor() {
-        super();
-        for (const child of this.childNodes) {
-            if (child.nodeName !== 'PARAM')
-                child.remove();
+window.customElements.define(
+    "fbtr-i18n",
+    class extends HTMLElement {
+        static get observedAttributes() {
+            return ["key"];
         }
 
-        // NOTE: Shadow DOM plays poorly with accessibility
-        this.text = this.attachShadow({ mode: 'open' });
+        constructor() {
+            super();
+            for (const child of this.childNodes) {
+                if (child.nodeName !== "PARAM") child.remove();
+            }
 
-        this.observer = new MutationObserver(this.update.bind(this));
-    }
+            // NOTE: Shadow DOM plays poorly with accessibility
+            this.text = this.attachShadow({ mode: "open" });
 
-    get textContent() { return this.text.textContent; }
-
-    attributeChangedCallback() { this.update(); }
-
-    connectedCallback() { this.observer.observe(this, { childList: true, subtree: true, attributeFilter: ['value'] }); }
-
-    disconnectedCallback() { this.observer.disconnect(); }
-
-    update() {
-        const key = this.getAttribute('key');
-        const vars = [...this.getElementsByTagName('param')].map(v => v.value);
-        try {
-            this.text.innerHTML = getMessage(key, ...vars);
-            this.classList.remove('error');
-        } catch (e) {
-            this.text.textContent = e;
-            this.classList.add('error');
+            this.observer = new MutationObserver(this.update.bind(this));
         }
-    }
-});
 
-const I18N_SELECTOR = '[data-i18n]';
+        get textContent() {
+            return this.text.textContent;
+        }
+
+        attributeChangedCallback() {
+            this.update();
+        }
+
+        connectedCallback() {
+            this.observer.observe(this, { childList: true, subtree: true, attributeFilter: ["value"] });
+        }
+
+        disconnectedCallback() {
+            this.observer.disconnect();
+        }
+
+        update() {
+            const key = this.getAttribute("key");
+            const vars = [...this.getElementsByTagName("param")].map(v => v.value);
+            try {
+                this.text.innerHTML = getMessage(key, ...vars);
+                this.classList.remove("error");
+            } catch (e) {
+                this.text.textContent = e;
+                this.classList.add("error");
+            }
+        }
+    },
+);
+
+const I18N_SELECTOR = "[data-i18n]";
 document.querySelectorAll(I18N_SELECTOR).forEach(translate);
 new MutationObserver(muts => {
     for (const m of muts) {
-        if (m.type === 'attributes') {
+        if (m.type === "attributes") {
             translate(m.target);
-        } else for (const e of m.addedNodes) {
-            if (e.nodeType !== 1)
-                continue;
+        } else
+            for (const e of m.addedNodes) {
+                if (e.nodeType !== 1) continue;
 
-            if (e.matches(I18N_SELECTOR))
-                translate(e);
-            e.querySelectorAll(I18N_SELECTOR).forEach(translate);
-        }
+                if (e.matches(I18N_SELECTOR)) translate(e);
+                e.querySelectorAll(I18N_SELECTOR).forEach(translate);
+            }
     }
 }).observe(document, {
-    attributeFilter: ['data-i18n', 'data-i18n-attr', 'data-i18n-vars'],
+    attributeFilter: ["data-i18n", "data-i18n-attr", "data-i18n-vars"],
     subtree: true,
 });
 

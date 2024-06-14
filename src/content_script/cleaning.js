@@ -23,16 +23,7 @@ import { STYLE_CLASS } from "../consts.js";
 import { cleanLinkParams } from "../util.js";
 import { applyEventBlockers, cleanAttrs, selectAllWithBase, stopPropagation } from "./dom.js";
 
-export {
-    applyStyle,
-    cleanShimLinks,
-    cleanRedirectLinks,
-    fixGifs,
-    fixVideoLinks,
-    stripFBCLID,
-    stripRefs,
-};
-
+export { applyStyle, cleanShimLinks, cleanRedirectLinks, fixGifs, fixVideoLinks, stripFBCLID, stripRefs };
 
 function applyStyle(elem) {
     elem.classList.add(STYLE_CLASS);
@@ -44,10 +35,8 @@ function cleanLink(a, href) {
     a.target = "_blank";
     a.rel = "noreferrer noopener";
     try {
-        if (supportedProtos.includes(new URL(href, origin).protocol))
-            a.href = href;
-        else
-            log(`Unsupported link protocol; leaving unchanged: ${href}`);
+        if (supportedProtos.includes(new URL(href, origin).protocol)) a.href = href;
+        else log(`Unsupported link protocol; leaving unchanged: ${href}`);
     } catch (_) {
         log(`Link cleaning encountered an invalid url: ${href}`);
     }
@@ -69,7 +58,7 @@ function buildVideo(src, poster) {
 function cleanShimLinks(node) {
     const trackedLinks = selectAllWithBase(node, "a[onclick^='LinkshimAsyncLink.referrer_log']");
     for (const a of trackedLinks) {
-        cleanLink(a, extractQuotedString(a.getAttribute("onmouseover")).replace(/\\(.)/g, '$1'));
+        cleanLink(a, extractQuotedString(a.getAttribute("onmouseover")).replace(/\\(.)/g, "$1"));
         log(`Removed tracking from shim link: ${a}`);
     }
     return trackedLinks.length;
@@ -79,9 +68,10 @@ function cleanShimLinks(node) {
 function fixVideoLinks(node) {
     const videoLinks = selectAllWithBase(node, "div[data-sigil=inlineVideo],a[href^='/video_redirect/']");
     for (const vid of videoLinks) {
-        const vidSrc = vid.tagName === 'DIV'
-            ? JSON.parse(vid.getAttribute("data-store")).src // Phone
-            : new URL(vid.href).searchParams.get('src'); // m.facebook
+        const vidSrc =
+            vid.tagName === "DIV"
+                ? JSON.parse(vid.getAttribute("data-store")).src // Phone
+                : new URL(vid.href).searchParams.get("src"); // m.facebook
 
         const replaceVideo = target => {
             const img = target.querySelector(".img,img"); // phone,m.facebook
@@ -98,11 +88,15 @@ function fixVideoLinks(node) {
             const target = vid.cloneNode(true);
             applyStyle(target);
             target.classList.add("FBTR-SAFE");
-            target.addEventListener("click", e => {
-                e.stopImmediatePropagation();
-                e.stopPropagation();
-                replaceVideo(target).play();
-            }, true);
+            target.addEventListener(
+                "click",
+                e => {
+                    e.stopImmediatePropagation();
+                    e.stopPropagation();
+                    replaceVideo(target).play();
+                },
+                true,
+            );
             vid.parentNode.replaceChild(target, vid);
             log(`Cleaned deferred inline video: ${vidSrc}`);
         }
@@ -112,16 +106,19 @@ function fixVideoLinks(node) {
 
 // Desktop and Mobile
 function cleanRedirectLinks(node) {
-    const trackedLinks = selectAllWithBase(node, `a[href*='${document.domain.split(".").slice(-2).join(".")}/l.php?']`);
+    const trackedLinks = selectAllWithBase(
+        node,
+        `a[href*='${location.hostname.split(".").slice(-2).join(".")}/l.php?']`,
+    );
     for (const a of trackedLinks) {
-        const newHref = new URL(a.href).searchParams.get('u');
+        const newHref = new URL(a.href).searchParams.get("u");
         cleanLink(a, newHref);
         log(`Removed tracking from redirect link: ${a}`);
     }
     return trackedLinks.length;
 }
 
-const fbclidFallback = /((?:[?&]|%3F|%26)fbclid=.*?)($|[?&]|%3F|%26)/ig;
+const fbclidFallback = /((?:[?&]|%3F|%26)fbclid=.*?)($|[?&]|%3F|%26)/gi;
 function stripFBCLID(node) {
     const trackedLinks = selectAllWithBase(node, `a[href*='fbclid='i]`);
     for (const a of trackedLinks) {
@@ -133,7 +130,7 @@ function stripFBCLID(node) {
         }
 
         if (a.href === link.href) {
-            log("Failed to remove fbclid from link:\n -> " + a);
+            log(`Failed to remove fbclid from link:\n -> ${a}`);
         } else {
             a.href = link.href;
             applyStyle(a);
@@ -149,8 +146,7 @@ function stripRefs(node) {
 
     /** @param {HTMLAnchorElement} a */
     function _strip(a) {
-        if (a.nodeName !== "A" || !domains.some(d => a.hostname.endsWith(d)))
-            return;
+        if (a.nodeName !== "A" || !domains.some(d => a.hostname.endsWith(d))) return;
 
         ++intLinks;
         applyEventBlockers(a.parentNode);
@@ -189,7 +185,7 @@ function stripRefs(node) {
     }
 
     _strip(node);
-    for (const a of node.getElementsByTagName('a')) {
+    for (const a of node.getElementsByTagName("a")) {
         _strip(a);
     }
     return intLinks;
@@ -199,8 +195,7 @@ function fixGifs(node) {
     const gifs = selectAllWithBase(node, "div._5b-_");
     for (const g of gifs) {
         const target = g.closest("div._2lhm");
-        if (!target)
-            continue;
+        if (!target) continue;
 
         const gif = target.querySelector("img.img").cloneNode(false);
         gif.classList.add("FBTR-SAFE");
@@ -210,10 +205,8 @@ function fixGifs(node) {
         const controls = target.querySelector("div._393-").parentNode.cloneNode(true);
         controls.classList.add("FBTR-SAFE");
 
-        const toggle = (e) => {
-            gif.src = controls.classList.toggle("fbtrHide")
-                ? gif.dataset.src
-                : gif.dataset.placeholder;
+        const toggle = e => {
+            gif.src = controls.classList.toggle("fbtrHide") ? gif.dataset.src : gif.dataset.placeholder;
             stopPropagation(e);
         };
         gif.addEventListener("click", toggle, true);
@@ -223,8 +216,7 @@ function fixGifs(node) {
         wrapper.appendChild(gif);
         wrapper.appendChild(controls);
 
-        for (const c of target.classList)
-            wrapper.classList.add(c);
+        for (const c of target.classList) wrapper.classList.add(c);
 
         target.parentNode.replaceChild(wrapper, target);
         log(`Fixed GIF: ${gif.dataset.src}`);

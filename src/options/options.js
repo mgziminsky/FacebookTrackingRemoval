@@ -25,28 +25,28 @@ import { timeoutRemaining } from "../rules_sync.js";
 //
 /** @type {browser.runtime.Port} */
 let bgPort;
-if (isChrome)
-    bgPort = browser.runtime.connect({ name: CHROME_PORT });
+if (isChrome) bgPort = browser.runtime.connect({ name: CHROME_PORT });
 
 /** @type {Options} */
-const changes = new Proxy({}, {
-    set(obj, key, val) {
-        if (config.options[key] === val) {
-            delete obj[key];
-        } else {
-            obj[key] = val;
-        }
-        if (bgPort) bgPort.postMessage(obj);
-        return true;
-    }
-});
+const changes = new Proxy(
+    {},
+    {
+        set(obj, key, val) {
+            if (config.options[key] === val) {
+                delete obj[key];
+            } else {
+                obj[key] = val;
+            }
+            if (bgPort) bgPort.postMessage(obj);
+            return true;
+        },
+    },
+);
 
 // Only works in FF... https://bugs.chromium.org/p/chromium/issues/detail?id=31262
 window.addEventListener("unload", () => {
-    if (Object.keys(changes).length)
-        Object.assign(config.options, changes);
+    if (Object.keys(changes).length) Object.assign(config.options, changes);
 });
-
 
 // Expert Options
 const modStyle = document.getElementById("modStyle");
@@ -63,13 +63,17 @@ document.getElementById("legend").append(` - v${browser.runtime.getManifest().ve
 }
 
 /** @param {Event} e */
-function handleCheckbox(e) { changes[e.target.id] = e.target.checked; }
+function handleCheckbox(e) {
+    changes[e.target.id] = e.target.checked;
+}
 for (const checkbox of document.querySelectorAll("input[type=checkbox]")) {
     checkbox.addEventListener("change", handleCheckbox);
 }
 
 /** @param {Event} e */
-function handleRadio(e) { changes[e.target.name] = e.target.value; }
+function handleRadio(e) {
+    changes[e.target.name] = e.target.value;
+}
 for (const checkbox of document.querySelectorAll("input[type=radio]")) {
     checkbox.addEventListener("change", handleRadio);
 }
@@ -87,53 +91,61 @@ for (const text of document.querySelectorAll("input[type=text],textarea")) {
     text.addEventListener("change", handleText);
 }
 
-document.getElementById("reset").addEventListener("click", _ => config.reset().then(() => document.body.classList.add("resetDone")));
+document
+    .getElementById("reset")
+    .addEventListener("click", _ => config.reset().then(() => document.body.classList.add("resetDone")));
 
-modStyle.addEventListener("input", e => preview.style.cssText = e.target.value);
+modStyle.addEventListener("input", e => (preview.style.cssText = e.target.value));
 
 /** @param {Event} e */
-function handleToggle(e) { document.getElementById(e.target.dataset.toggle).classList.toggle("hidden", !e.target.checked); }
+function handleToggle(e) {
+    document.getElementById(e.target.dataset.toggle).classList.toggle("hidden", !e.target.checked);
+}
 
 /**
  * @param {Element} elem
  * @param {string} name
  * @param {*} value
  */
-function findRadio(elem, name, value) { return elem.querySelector(`input[name=${name}][value=${value}]`); }
+function findRadio(elem, name, value) {
+    return elem.querySelector(`input[name=${name}][value=${value}]`);
+}
 
 // Per-option reset functionality
-window.customElements.define('btn-reset', class extends HTMLElement {
-    constructor() {
-        super();
-        const img = this.attachShadow({ mode: "open" }).appendChild(document.createElement("img"));
-        img.src = "reset.svg";
-        img.alt = getMessageSafe("optsResetAlt");
-        img.title = getMessageSafe("optsResetTitle");
-        this.addEventListener("click", this.reset.bind(this));
-    }
-
-    /** @param {MouseEvent} e */
-    reset(e) {
-        e?.preventDefault();
-        const option = this.parentNode.querySelector("input[id],textarea[id],input[name]");
-        const key = option.id || option.name;
-        changes[key] = null;
-        switch (option.type) {
-            case "radio":
-                findRadio(this.parentNode, key, config.defaults[key]).checked = true;
-                break;
-            case "checkbox":
-                option.checked = config.defaults[key];
-                break;
-            default:
-                option.value = config.defaults[key];
-                break;
+window.customElements.define(
+    "btn-reset",
+    class extends HTMLElement {
+        constructor() {
+            super();
+            const img = this.attachShadow({ mode: "open" }).appendChild(document.createElement("img"));
+            img.src = "reset.svg";
+            img.alt = getMessageSafe("optsResetAlt");
+            img.title = getMessageSafe("optsResetTitle");
+            this.addEventListener("click", this.reset.bind(this));
         }
-        this.parentNode.classList.add("resetDone");
-    }
-});
-document.body.addEventListener("animationend", e => e.target.classList.remove("resetDone"));
 
+        /** @param {MouseEvent} e */
+        reset(e) {
+            e?.preventDefault();
+            const option = this.parentNode.querySelector("input[id],textarea[id],input[name]");
+            const key = option.id || option.name;
+            changes[key] = null;
+            switch (option.type) {
+                case "radio":
+                    findRadio(this.parentNode, key, config.defaults[key]).checked = true;
+                    break;
+                case "checkbox":
+                    option.checked = config.defaults[key];
+                    break;
+                default:
+                    option.value = config.defaults[key];
+                    break;
+            }
+            this.parentNode.classList.add("resetDone");
+        }
+    },
+);
+document.body.addEventListener("animationend", e => e.target.classList.remove("resetDone"));
 
 // Refresh button
 {
@@ -154,8 +166,7 @@ document.body.addEventListener("animationend", e => e.target.classList.remove("r
     const btnRefreshTimer = () => {
         resetBtn();
         timeoutRemaining().then((timeout = 0) => {
-            if (timeout <= 0)
-                return;
+            if (timeout <= 0) return;
 
             let remaining = Math.ceil(timeout / 1000);
 
@@ -176,9 +187,7 @@ document.body.addEventListener("animationend", e => e.target.classList.remove("r
     btnRefresh.addEventListener("click", e => {
         btnRefresh.disabled = disabled = true;
         btnRefresh.classList.remove("ctrl");
-        browser.runtime.sendMessage({ msg: MSG.rulesRefresh, force: e.ctrlKey })
-            .then(btnRefreshTimer)
-            .catch(NOOP);
+        browser.runtime.sendMessage({ msg: MSG.rulesRefresh, force: e.ctrlKey }).then(btnRefreshTimer).catch(NOOP);
     });
 
     window.addEventListener("keydown", e => {
@@ -198,12 +207,13 @@ document.body.addEventListener("animationend", e => e.target.classList.remove("r
 // Keep in sync with other options pages
 config.onChanged.addListener(init);
 
-
 // Avoid duplicated event listeners
 const dependFuncs = new Map();
 
 function init() {
-    for (const key in changes) { delete changes[key]; }
+    for (const key in changes) {
+        delete changes[key];
+    }
 
     const opts = config.options;
     for (const key in opts) {
@@ -213,16 +223,14 @@ function init() {
             if (item.type === "checkbox") {
                 item.checked = value;
             } else if (item.type === "text" || item.tagName === "TEXTAREA") {
-                if (!item.placeholder)
-                    item.placeholder = config.defaults[key];
+                if (!item.placeholder) item.placeholder = config.defaults[key];
                 item.value = value;
             } else {
                 item.value = value;
             }
         } else {
             const radio = findRadio(document, key, value);
-            if (radio)
-                radio.checked = true;
+            if (radio) radio.checked = true;
         }
     }
 
@@ -231,8 +239,7 @@ function init() {
     for (const elem of document.querySelectorAll("[data-depends]")) {
         const source = document.getElementById(elem.dataset.depends);
 
-        if (!dependFuncs.has(elem))
-            dependFuncs.set(elem, () => elem.disabled = !source.checked);
+        if (!dependFuncs.has(elem)) dependFuncs.set(elem, () => (elem.disabled = !source.checked));
 
         source.addEventListener("change", dependFuncs.get(elem));
         elem.disabled = !source.checked;
