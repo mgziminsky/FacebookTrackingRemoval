@@ -20,6 +20,7 @@ import { log } from "../common.js";
 import { READY, hide_rules, initHideRule, onChanged, options } from "../config.js";
 import { COLLAPSED_SELECTOR, MSG, PROCESSED_CLASS } from "../consts.js";
 import { normalizeString, parseHideRules } from "../util.js";
+import { computeCanvasPrints, testCanvas } from "./canvas_fingerprint.js";
 import {
     applyStyle,
     cleanRedirectLinks,
@@ -32,6 +33,11 @@ import {
 import { applyEventBlockers, ariaText, buildCollapsible, inlineUse, selectAllWithBase, visibleText } from "./dom.js";
 
 browser.runtime.sendMessage({ msg: MSG.actionEnable });
+
+/** @param {Element} target */
+function isCollapsed(target) {
+    return !!target.closest(COLLAPSED_SELECTOR);
+}
 
 /**
  * @param {Element} elem
@@ -56,7 +62,7 @@ function hide(elem, label, method) {
     });
 
     if (method === "collapse") {
-        if (target.closest(COLLAPSED_SELECTOR)) {
+        if (isCollapsed(target)) {
             log(`${label} already collapsed`);
             return;
         }
@@ -64,6 +70,7 @@ function hide(elem, label, method) {
         const wrapper = buildCollapsible(label);
         applyStyle(wrapper);
         for (const c of target.classList) wrapper.classList.add(c);
+        target.classList.add(PROCESSED_CLASS);
 
         target.parentNode.appendChild(wrapper);
         wrapper.appendChild(target);
@@ -90,7 +97,7 @@ function removeLinkTracking(node) {
  * @param {"remove" | "collapse"} [method=options.hideMethod]
  */
 function removeArticles(node, { selector, texts, patterns }, method = options.hideMethod) {
-    if (!selector) return;
+    if (!selector || node.classList.contains(PROCESSED_CLASS)) return;
 
     /** @argument {string} text */
     const getMatch = text => {
@@ -120,8 +127,41 @@ function removeArticles(node, { selector, texts, patterns }, method = options.hi
                 }
             });
             hide(e, match, method);
-            e.classList.add(PROCESSED_CLASS);
         }
+    }
+}
+
+let fprintsComputed = false;
+/** @param {HTMLCanvasElement} canvas */
+function removeCanvasArticle(canvas) {
+    if (isCollapsed(canvas) || canvas.classList.contains(PROCESSED_CLASS)) return;
+    if (!fprintsComputed) {
+        const texts = new Set(userRules.texts.values());
+        if (options.delPixeled) {
+            for (const text of hide_rules.sponsored.texts.values()) texts.add(text);
+        }
+        if (options.delSuggest) {
+            for (const text of hide_rules.suggested.texts.values()) texts.add(text);
+        }
+        if (options.pendingRules) {
+            for (const text of hide_rules.pending.texts.values()) texts.add(text);
+        }
+        computeCanvasPrints(texts, canvas);
+        fprintsComputed = true;
+    }
+
+    try {
+        const ctx = canvas.getContext("2d");
+        const tform = ctx.getTransform();
+        ctx.resetTransform();
+        const match = testCanvas(ctx);
+        ctx.setTransform(tform);
+        if (match) {
+            log(() => `>>> Canvas matched for "${match}"`);
+            hide(canvas, match, options.hideMethod);
+        }
+    } catch (error) {
+        watchCanvas(canvas);
     }
 }
 
@@ -138,6 +178,10 @@ function removeAll(target) {
         removeArticles(target, { selector: hide_rules.unconditional }, "remove");
     }
     if (options.pendingRules) removeArticles(target, hide_rules.pending);
+    if (options.testCanvas)
+        for (const canvas of selectAllWithBase(target, "canvas")) {
+            removeCanvasArticle(canvas);
+        }
 
     if (options.internalRefs) stripRefs(target);
 }
@@ -199,10 +243,10 @@ const observer = new MutationObserver(mutations => {
             inlineUse(target);
 
             removeAll(target);
+            if (!options.testCanvas) forEachAdded(mutation, findPending);
 
             if (options.fixLinks) forEachAdded(mutation, removeLinkTracking);
 
-            forEachAdded(mutation, findPending);
             forEachAdded(mutation, node => node.classList.add(PROCESSED_CLASS));
         } else if (mutation.target) {
             if (options.fixLinks) removeLinkTracking(mutation.target);
@@ -210,10 +254,21 @@ const observer = new MutationObserver(mutations => {
         }
     }
 });
+function watchCanvas(canvas) {
+    new MutationObserver(([record, ...rest], obs) => {
+        obs.takeRecords();
+        obs.disconnect();
+        setTimeout(() => removeCanvasArticle(record.target), 100);
+    }).observe(canvas, {
+        attributeFilter: ["width", "height"],
+    });
+}
 
+/** @type {HideRule} */
 let userRules;
 async function run() {
     userRules = initHideRule(parseHideRules(options.userRules));
+
     const body = document.body;
 
     observer.disconnect();
@@ -268,7 +323,6 @@ function stop() {
 }
 
 onChanged.addListener(() => (options.enabled ? start() : stop()));
-
 READY.then(() => {
     if (options.enabled) start();
 });

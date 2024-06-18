@@ -90,5 +90,14 @@
     },
     "optsResetAlt": {
         "message": "Reset"
+    },
+    "optsCanvas": {
+        "message": "Attempt detection of ads that use images for their label"
+    },
+    "optsSensitivity": {
+        "message": "Image detection sensitivity"
+    },
+    "optsSenseHover": {
+        "message": "Higher for stricter matching, lower for looser matching"
     }
 }

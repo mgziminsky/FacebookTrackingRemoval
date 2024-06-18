@@ -61,6 +61,22 @@
                     <fbtr-i18n key="optsSuggest"></fbtr-i18n>
                 </label>
             </li>
+            <li>
+                <btn-reset></btn-reset>
+                <div class="flex-col">
+                    <label>
+                        <input type="checkbox" id="testCanvas">
+                        <fbtr-i18n key="optsCanvas"></fbtr-i18n>
+                    </label>
+                </div>
+            </li>
+            <li>
+                <btn-reset></btn-reset>
+                <label class="flex-col">
+                    <fbtr-i18n key="optsSensitivity"></fbtr-i18n>
+                    <input type="range" id="canvasSensitivity" data-depends="testCanvas" min="0" step="0.2">
+                </label>
+            </li>
             <li id="_hideMethod">
                 <btn-reset></btn-reset>
                 <fbtr-i18n key="optsHideMethod"></fbtr-i18n>

@@ -63,33 +63,38 @@ document.getElementById("legend").append(` - v${browser.runtime.getManifest().ve
     userRules.placeholder = getMessageSafe("optsUserRulesPlaceholder");
 }
 
-/** @param {Event} e */
-function handleCheckbox(e) {
-    changes[e.target.id] = e.target.checked;
-}
-for (const checkbox of document.querySelectorAll("input[type=checkbox]")) {
-    checkbox.addEventListener("change", handleCheckbox);
-}
-
-/** @param {Event} e */
-function handleRadio(e) {
-    changes[e.target.name] = e.target.value;
-}
-for (const checkbox of document.querySelectorAll("input[type=radio]")) {
-    checkbox.addEventListener("change", handleRadio);
+// Set max value for sensitivity slider
+{
+    const slider = document.getElementById("canvasSensitivity");
+    slider.max = config.MAX_CANVAS_SENSITIVITY;
+    slider.title = getMessageSafe("optsSenseHover");
 }
 
 /** @param {Event} e */
-function handleText(e) {
-    e.target.value = e.target.value.trim();
-    if (!e.target.value) {
-        changes[e.target.id] = undefined;
-    } else {
-        changes[e.target.id] = e.target.value;
+function handleChange(e) {
+    switch (e.target.type) {
+        case "checkbox":
+            changes[e.target.id] = e.target.checked;
+            break;
+        case "radio":
+            changes[e.target.name] = e.target.value;
+            break;
+        case "text":
+        case "textarea":
+            e.target.value = e.target.value.trim();
+            if (!e.target.value) {
+                changes[e.target.id] = undefined;
+            } else {
+                changes[e.target.id] = e.target.value;
+            }
+            break;
+        default:
+            changes[e.target.id] = e.target.value;
+            break;
     }
 }
-for (const text of document.querySelectorAll("input[type=text],textarea")) {
-    text.addEventListener("change", handleText);
+for (const text of document.querySelectorAll("input,textarea")) {
+    text.addEventListener("change", handleChange);
 }
 
 document

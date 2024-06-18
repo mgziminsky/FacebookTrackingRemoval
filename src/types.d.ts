@@ -41,4 +41,6 @@ interface Options {
     modStyle: string;
     userRules: string;
     pendingRules: boolean;
+    testCanvas: boolean;
+    canvasSensitivity: number;
 }

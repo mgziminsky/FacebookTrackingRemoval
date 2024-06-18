@@ -26,15 +26,17 @@ export {
     hide_rules,
     host_patterns,
     initHideRule,
+    MAX_CANVAS_SENSITIVITY,
     onChanged,
     options,
     param_cleaning,
+    READY,
     reset,
     storage,
-    READY,
 };
 
 const storage = browser.storage.local;
+const MAX_CANVAS_SENSITIVITY = 2;
 
 /** @type {Options} */
 const defaults = Object.freeze({
@@ -51,6 +53,8 @@ const defaults = Object.freeze({
     modStyle: "outline: 1px dashed rgba(0, 128, 0, 0.5) !important;",
     userRules: "",
     pendingRules: false,
+    testCanvas: true,
+    canvasSensitivity: 0.8,
 });
 
 const host_patterns = Object.freeze([
@@ -141,6 +145,8 @@ const ReadOnly = {
         throw new Error("Not Allowed");
     },
 };
+
+/** @type {[HideRules, ParamCleaning, ClickWhitelist]} */
 const [hide_rules, param_cleaning, click_whitelist] = [
     new Proxy(_data.hide_rules.value, ReadOnly),
     new Proxy(_data.param_cleaning.value, ReadOnly),
