@@ -1,10 +1,12 @@
 A Video You May Like
+Events You May Like
 Follow
 Games You May Like
 Page Stories You May Like
 People You May Know
 Popular Across Facebook
 Public Figures to Follow
+Reels
 Reels and short videos
 Related Pages
 Suggested for You
@@ -16,3 +18,110 @@ This shop has added new items.
 TV Watchlist
 /* Swedish */
 Reels och korta videor
+/* From https://greasyfork.org/en/scripts/431970-fb-clean-my-feeds/code */
+/* People you may know */
+/* ar      */ أشخاص قد تعرفهم
+/* bg      */ които може би познавате
+/* bg      */ Хора
+/* cs      */ Koho možná znáte
+/* de      */ die du kennen könntest
+/* de      */ Personen
+/* el      */ Άτομα που ίσως γνωρίζετε
+/* es      */ Personas que quizá conozcas
+/* fi      */ Ihmiset
+/* fi      */ jotka saatat tuntea
+/* fr      */ Connaissez-vous...
+/* he      */ אנשים שאולי אתה מכיר
+/* id      */ Orang yang Mungkin Anda Kenal
+/* it      */ Persone che potresti conoscere
+/* ja      */ あなたが知っているかもしれない人々
+/* lv      */ Cilvēki
+/* lv      */ kurus tu varētu pazīt
+/* nl      */ Mensen die je misschien kent
+/* pl      */ które możesz znać
+/* pl      */ Osoby
+/* pt      */ Pessoas que talvez conheças
+/* ru      */ которых вы можете знать
+/* ru      */ Люди
+/* tr      */ Tanıyor olabileceğin kişiler
+/* uk      */ Люди
+/* uk      */ яких Ви можете знати
+/* vi      */ Những người bạn có thể biết
+/* zh-Hans */ 你可能认识的人
+/* zh-Hant */ 你可能認識的人
+/* Reels and short videos */
+/* ar      */ ريلز ومقاطع الفيديو القصيرة
+/* bg      */ Ленти и кратки видеоклипове
+/* cs      */ Sekvence a krátká videa
+/* de      */ Reels und Kurzvideos
+/* el      */ Reel και σύντομα βίντεο
+/* es      */ Reels y vídeos cortos
+/* fi      */ Keloja ja lyhyitä videoita
+/* fr      */ Reels et vidéos courtes
+/* he      */ סרטוני Reels וקטעי וידאו קצרים
+/* id      */ Reels dan Video Pendek
+/* it      */ Reel e video brevi
+/* ja      */ リールとショート動画
+/* lv      */ Reels un īsi videoklipi
+/* nl      */ Reels en korte video\s
+/* pl      */ Rolki i krótkie filmy
+/* pt      */ Vídeos do Reels e vídeos de curta duração
+/* ru      */ Reels и короткие видео
+/* tr      */ Makaralar ve kısa videolar
+/* uk      */ Відео Reels і короткі відео
+/* vi      */ Reels và video ngắn
+/* zh-Hans */ 卷轴和短视频
+/* zh-Hant */ Reels 和短影片
+/* Events you may like */
+/* ar      */ أحداث قد تعجبك
+/* bg      */ които може да ви харесат
+/* bg      */ Събития
+/* cs      */ které se vám mohou líbit
+/* cs      */ Události
+/* de      */ die Ihnen gefallen könnten
+/* de      */ Veranstaltungen
+/* el      */ Εκδηλώσεις που μπορεί να σας αρέσουν
+/* es      */ Eventos que te pueden gustar
+/* fi      */ Kela/lyhyt video
+/* fr      */ Évènements qui pourraient vous intéresser
+/* he      */ אירועים שאולי תאהבו
+/* id      */ Acara yang mungkin Anda sukai
+/* it      */ Eventi che potrebbero piacerti
+/* ja      */ リール/ショートビデオ
+/* lv      */ kas jums varētu patikt
+/* lv      */ Notikumi
+/* nl      */ Evenementen die je misschien leuk vindt
+/* pl      */ które mogą Ci się spodobać
+/* pl      */ Wydarzenia
+/* pt      */ Eventos que você pode gostar
+/* ru      */ которые вам могут понравиться
+/* ru      */ Мероприятия
+/* tr      */ makara/kısa video
+/* uk      */ Події
+/* uk      */ які можуть вам сподобатися
+/* vi      */ Sự kiện bạn có thể thích
+/* zh-Hans */ 您可能喜欢的活动
+/* zh-Hant */ 你可能感興趣的活動
+/* Follow */
+/* ar      */ تابع
+/* bg      */ Следвай
+/* cs      */ Sledovat
+/* de      */ Folgen
+/* el      */ Ακολούθησε
+/* es      */ Seguir
+/* fi      */ Seuraa
+/* fr      */ Suivre
+/* he      */ עקוב
+/* id      */ Ikuti
+/* it      */ Segui
+/* ja      */ フォロー
+/* lv      */ Sekot
+/* nl      */ Volgen
+/* pl      */ Obserwuj
+/* pt      */ Seguir
+/* ru      */ Подписаться
+/* tr      */ Takip Et
+/* uk      */ Слідуйте
+/* vi      */ Theo dõi
+/* zh-Hans */ 关注
+/* zh-Hant */ 追蹤

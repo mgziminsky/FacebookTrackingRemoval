@@ -1,5 +1,6 @@
 [aria-label]
 [aria-labelledby]
+div.native-text>span        /* Mobile */
 div[role="button"]
 h3
 span[dir]

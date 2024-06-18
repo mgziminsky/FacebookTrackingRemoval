@@ -14,3 +14,4 @@ div.dzwucfd1                         /* Page banner suggestions */
 div.x1pha0wt                         /* Marketplace Sponsored Label */
 div[style].xnpuxes:first-child       /* Marketplace Sponsored */
 span>div>div.xod5an3                 /* Marketplace Sidebar */
+div[data-type="vscroller"]>div[data-type="container"]    /* Mobile Feed */
