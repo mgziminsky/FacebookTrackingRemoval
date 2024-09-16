@@ -1,14 +1,3 @@
-# For most projects, this workflow file will not need changing; you simply need
-# to commit it to your repository.
-#
-# You may wish to alter this file to override the set of languages analyzed,
-# or to provide custom queries or build logic.
-#
-# ******** NOTE ********
-# We have attempted to detect the languages in your repository. Please check
-# the `language` matrix defined below to confirm you have the correct set of
-# supported CodeQL languages.
-#
 name: Mirror to Gitlab
 
 on:
@@ -41,4 +30,4 @@ jobs:
       - name: Push to Gitlab
         env:
           GIT_SSH_COMMAND: ssh -v -i ~/.ssh/push_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=no
-        run: git push --force --all --prune git@gitlab.com:mgziminsky/FacebookTrackingRemoval.git
+        run: git push --mirror git@gitlab.com:mgziminsky/FacebookTrackingRemoval.git
