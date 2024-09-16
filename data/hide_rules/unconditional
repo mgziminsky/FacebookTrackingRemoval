@@ -1,2 +1,3 @@
 /* Selectors that will always be removed unconditionally and never collapsed */
 .x12fkvr4           /* Marketplace sponsored hamburger menu */
+a[href*="hoisted"] > span:not(:empty):only-child /* feed group suggestions */

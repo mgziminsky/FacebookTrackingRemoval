@@ -1,2 +1,1 @@
 /* Syntax: css-selector[||innerText|/regex/,...] */
-a[href*="hoisted"] > span:not(:empty):only-child /* group suggestions */
