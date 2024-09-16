@@ -30,4 +30,4 @@ jobs:
       - name: Push to Gitlab
         env:
           GIT_SSH_COMMAND: ssh -v -i ~/.ssh/push_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=no
-        run: git push --mirror git@gitlab.com:mgziminsky/FacebookTrackingRemoval.git
+        run: git push --force --prune git@gitlab.com:mgziminsky/FacebookTrackingRemoval.git master refs/tags/*
