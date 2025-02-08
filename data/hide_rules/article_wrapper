@@ -4,8 +4,9 @@ div.mbm
 div.pagelet
 div[data-pagelet='RightRail']>*>*    /* Sidebar - old */
 #ssrb_rhc_start+div>*>*              /* Sidebar - new */
-div[role="complementary"] div>span:only-child>div:only-child>div:only-child     /* Sidebar - newer */
-div[role="complementary"] div>span:only-of-type>div:only-child                  /* Sidebar - newerer */
+div[role='complementary'] div>span:only-child>div:only-child>div:only-child     /* Sidebar - newer */
+div[role='complementary'] div>span:only-of-type>div:only-child                  /* Sidebar - newerer */
+div[role='complementary'] div:has(>:is(div,span):empty)                         /* Sidebar - newererer */
 div[role=article]
 div[aria-posinset]                   /* Feed article */
 div.tr9rh885                         /* Suggestions at top of user page */
@@ -14,4 +15,4 @@ div.dzwucfd1                         /* Page banner suggestions */
 div.x1pha0wt                         /* Marketplace Sponsored Label */
 div[style].xnpuxes:first-child       /* Marketplace Sponsored */
 span>div>div.xod5an3                 /* Marketplace Sidebar */
-div[data-type="vscroller"]>div[data-type="container"]    /* Mobile Feed */
+div[data-type='vscroller']>div[data-type='container']    /* Mobile Feed */
