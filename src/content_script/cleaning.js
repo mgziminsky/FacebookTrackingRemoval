@@ -23,7 +23,7 @@ import { STYLE_CLASS } from "../consts.js";
 import { cleanLinkParams } from "../util.js";
 import { applyEventBlockers, cleanAttrs, selectAllWithBase, stopPropagation } from "./dom.js";
 
-export { applyStyle, cleanShimLinks, cleanRedirectLinks, fixGifs, fixVideoLinks, stripFBCLID, stripRefs };
+export { applyStyle, cleanShimLinks, cleanRedirectLinks, fixGifs, fixVideoLinks, stripFBCLID, stripBRID, stripRefs };
 
 function applyStyle(elem) {
     elem.classList.add(STYLE_CLASS);
@@ -135,6 +135,28 @@ function stripFBCLID(node) {
             a.href = link.href;
             applyStyle(a);
             log(`Removed fbclid from link: ${a}`);
+        }
+    }
+    return trackedLinks.length;
+}
+
+const bridFallback = /((?:[?&]|%3F|%26)brid=.*?)($|[?&]|%3F|%26)/gi;
+function stripBRID(node) {
+    const trackedLinks = selectAllWithBase(node, `a[href*='brid='i]`);
+    for (const a of trackedLinks) {
+        const link = new URL(a.href);
+
+        link.searchParams.delete("brid");
+        if (a.href === link.href) {
+            link.href = link.href.replace(bridFallback, "$2");
+        }
+
+        if (a.href === link.href) {
+            log(`Failed to remove brid from link:\n -> ${a}`);
+        } else {
+            a.href = link.href;
+            applyStyle(a);
+            log(`Removed brid from link: ${a}`);
         }
     }
     return trackedLinks.length;

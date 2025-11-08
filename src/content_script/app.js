@@ -28,6 +28,7 @@ import {
     fixGifs,
     fixVideoLinks,
     stripFBCLID,
+    stripBRID,
     stripRefs,
 } from "./cleaning.js";
 import { applyEventBlockers, ariaText, buildCollapsible, inlineUse, selectAllWithBase, visibleText } from "./dom.js";
@@ -83,7 +84,7 @@ function hide(elem, label, method) {
 }
 
 function removeLinkTracking(node) {
-    const cleaned = cleanShimLinks(node) + fixVideoLinks(node) + cleanRedirectLinks(node) + stripFBCLID(node);
+    const cleaned = cleanShimLinks(node) + fixVideoLinks(node) + cleanRedirectLinks(node) + stripFBCLID(node) + stripBRID(node);
     fixGifs(node);
 
     if (cleaned) applyEventBlockers(node);
